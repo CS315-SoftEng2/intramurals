@@ -13,7 +13,7 @@ export const resolvers = {
         ...categoryResolver.Query,
         ...eventResolver.Query,
         ...scheduleResolver.Query,
-        ...scoreboardResolver.Query
+        ...scoreboardResolver.Query,
     },
 
     Mutation: {
@@ -23,7 +23,7 @@ export const resolvers = {
         ...categoryResolver.Mutation,
         ...eventResolver.Mutation,
         ...scheduleResolver.Mutation,
-        ...scoreboardResolver.Mutation
+        ...scoreboardResolver.Mutation,
     },
 };
 

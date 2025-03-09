@@ -1,49 +1,50 @@
 export const rootSchema = `#graphql
-    type Query {
-        users: [User] 
-        user(id: Int!): User
+type Query {
+    users: [User] 
+    user(id: Int!): User
 
-        teams: [Team] 
-        team(id: Int!): Team
+    teams: [Team] 
+    team(id: Int!): Team
 
-        categories: [Category] 
-        category(id: Int!): Category
+    categories: [Category] 
+    category(id: Int!): Category
 
-        events: [Event] 
-        event(id: Int!): Event
+    events: [Event] 
+    event(id: Int!): Event
 
-        schedules: [Schedule] 
-        schedule(id: Int!): Schedule
+    schedules: [Schedule] 
+    schedule(id: Int!): Schedule
 
-        scoreboards: [Scoreboard] 
-        scoreboard(id: Int!): Scoreboard
-    }
+    scoreboards: [Scoreboard] 
+    scoreboard(id: Int!): Scoreboard
 
-    type Mutation {
-        userLogin(user_name: String!, password: String!): LogInUser
+}
 
-        addUserAccount(useraccount: AddUserInput!): User
-        updateUserAccount(id: Int!, useraccount: UpdateUserInput!): User
-        deleteUserAccount(id: Int!): User
-        
-        addTeam(team: AddTeamInput): Team
-        updateTeam(id: Int!, team: UpdateTeamInput!): Team
-        deleteTeam(id: Int!): Team
+type Mutation {
+    userLogin(user_name: String!, password: String!): loginResponse
 
-        addCategory(category: AddCategoryInput!): Category
-        updateCategory(id: Int!, category: UpdateCategoryInput!): Category
-        deleteCategory(id: Int!): Category
+    addUserAccount(useraccount: AddUserInput!, admin_id: Int!): addUserResponse
+    updateUserAccount(useraccount: UpdateUserInput!, admin_id: Int!, user_id: Int!): updateUserResponse
+    deleteUserAccount(admin_id: Int!, user_id: Int!): deleteUserResponse
+    
+    addTeam(team: AddTeamInput, admin_id: Int!): addTeamResponse
+    updateTeam(team: UpdateTeamInput!, admin_id: Int!, team_id: Int!): updateTeamResponse
+    deleteTeam(admin_id: Int!, team_id: Int!): deleteTeamResponse
 
-        addEvent(event: AddEventInput!): Event
-        updateEvent(id: Int!, event: UpdateEventInput!): Event
-        deleteEvent(id: Int!): Event
+    addCategory(category: AddCategoryInput!, admin_id: Int!): addCategoryResponse
+    updateCategory(category: UpdateCategoryInput!, admin_id: Int!, category_id: Int!): updateCategoryResponse
+    deleteCategory(admin_id: Int!, category_id: Int!): deleteCategoryResponse
 
-        addSchedule(schedule: AddScheduleInput!): Schedule
-        updateSchedule(id: Int!, schedule: UpdateScheduleInput!): Schedule
-        deleteSchedule(id: Int!): Schedule
+    addEvent(event: AddEventInput!, admin_id: Int!): addEventResponse
+    updateEvent(event: UpdateEventInput!, admin_id: Int!, event_id: Int!): updateEventResponse
+    deleteEvent(admin_id: Int!, event_id: Int!): deleteEventResponse
 
-        addScoreboard(scoreboard: AddScoreboardInput!): Scoreboard
-        updateScoreboard(id: Int!, scoreboard: UpdateScoreboardInput!): Scoreboard
-        deleteScoreboard(id: Int!): Scoreboard
-    }
+    addSchedule(schedule: AddScheduleInput!, admin_id: Int!): addScheduleResponse
+    updateSchedule(schedule: UpdateScheduleInput!, admin_id: Int!, schedule_id: Int!): updateScheduleResponse
+    deleteSchedule(admin_id: Int!, schedule_id: Int!): deleteScheduleResponse
+
+    addScoreboard(scoreboard: AddScoreboardInput!, admin_id: Int!): addScoreboardResponse
+    updateScoreboard(user_id: Int!, scoreboard_id: Int!, score: Int!): updateScoreboardResponse
+    deleteScoreboard(admin_id: Int!, scoreboard_id: Int!): deleteScoreboardResponse
+}
 `;

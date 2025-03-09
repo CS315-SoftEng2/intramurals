@@ -1,87 +1,177 @@
-import bcrypt from "bcrypt";
-import client from "../helpers/dbHelper.js";
+    import bcrypt from "bcrypt";
+    import { pool } from "../helpers/dbHelper.js";
 
-export const userAccountResolver = {
-    Query: {
-        users: async () => {
-            try {
-                const query = {
-                    text: "SELECT * FROM useraccount",
-                };
-                const result = await client.query(query);
-                return result.rows;
-            } catch (err) {
-                console.error("Error:", err);
-                throw new Error("Failed to fetch users.");
-            }
-        },
+    export const userAccountResolver = {
 
-        user: async (_, { id }) => {
-            try {
-                const query = {
-                    text: "SELECT * FROM useraccount WHERE user_id = $1",
-                    values: [id],
-                };
-                const result = await client.query(query);
-                return result.rows[0];
-            } catch (err) {
-                console.error("Error:", err);
-                throw new Error("Failed to fetch user.");
-            }
-        },
-    },
+        Query: {
+            users: async () => {
 
-    Mutation: {
-        addUserAccount: async (_, { useraccount, admin_id }) => {
-            try {
-                const hashedPassword = await bcrypt.hash(useraccount.password, 10);
+                const client = await pool.connect();
 
-                const query = {
-                    text: "SELECT fn_admin_add_user_account($1, $2, $3, $4) AS result",
-                    values: [admin_id, useraccount.user_name, hashedPassword, useraccount.user_type],
-                };
+                try {
+                    const query = {
+                        text: "SELECT * FROM useraccount",
+                    };
 
-                const result = await client.query(query);
-                return { message: result.rows[0].result };
-            } catch (err) {
-                console.error("Error:", err);
-                throw new Error("Failed to add user account.");
-            }
-        },
+                    const result = await client.query(query);
 
-        updateUserAccount: async (_, { admin_id, useraccount }) => {
-            try {
-                let hashedPassword = useraccount.password;
-                if (useraccount.password) {
-                    hashedPassword = await bcrypt.hash(useraccount.password, 10);
+                    console.log("Result:", result.rows);
+
+                    return result.rows;
+                } catch (err) {
+                    console.error("Error:", err);
+                    throw new Error("Failed to fetch users.");
+                } finally {
+                    client.release();
                 }
+            },
 
-                const query = {
-                    text: "SELECT fn_admin_update_user_account($1, $2, $3, $4, $5) AS result",
-                    values: [admin_id, useraccount.user_id, useraccount.user_name, hashedPassword, useraccount.user_type],
-                };
+            user: async (_, { id }) => {
 
-                const result = await client.query(query);
-                return { message: result.rows[0].result };
-            } catch (err) {
-                console.error("Error:", err);
-                throw new Error("Failed to update user account.");
-            }
+                const client = await pool.connect();
+                
+                try {
+                    const query = {
+                        text: "SELECT * FROM useraccount WHERE user_id = $1",
+                        values: [id],
+                    };
+                    
+                    const result = await client.query(query);
+                    console.log("Result:", result.rows);
+                    return result.rows[0];
+                } catch (err) {
+                    console.error("Error:", err);
+                    throw new Error("Failed to fetch user.");
+                } finally {
+                    client.release();
+                }
+            },
         },
 
-        deleteUserAccount: async (_, { admin_id, user_id }) => {
-            try {
-                const query = {
-                    text: "SELECT fn_admin_delete_user_account($1, $2) AS result",
-                    values: [admin_id, user_id],
-                };
+        Mutation: {
+            addUserAccount: async (_, { useraccount, admin_id }) => {
 
-                const result = await client.query(query);
-                return { message: result.rows[0].result };
-            } catch (err) {
-                console.error("Error:", err);
-                throw new Error("Failed to delete user account.");
-            }
+                const client = await pool.connect();
+
+                try {
+                
+                    const { user_name, password, user_type } = useraccount
+
+                    const hashedPassword = await bcrypt.hash(password, 10);
+
+                    let response = {
+                        content: null,
+                        type: "",
+                        message: "",
+                    };    
+
+                    const query = {
+                        text: "SELECT * FROM fn_admin_add_user_account($1, $2, $3, $4) AS result",
+                        values: [admin_id, user_name, hashedPassword, user_type],
+                    };
+
+                    const result = await client.query(query);
+                
+                    if (result && result.rows.length > 0) {
+                        const res = result.rows[0].result;
+                        console.log("Added user result: ", res);
+                        if (res) {
+                        response = {
+                            content: res.content,
+                            type: res.type,
+                            message: res.message,
+                        };
+                        }
+                    }
+
+                    return response;
+                } catch (err) {
+                    console.error("Error:", err);
+                    throw new Error("Failed to add user account.");
+                } finally {
+                    await client.end();
+                }
+            },
+
+            updateUserAccount: async (_, { admin_id, user_id, useraccount }) => {
+
+                const client = await pool.connect();
+
+                try {
+
+                    let hashedPassword = useraccount.password;
+
+                    if (useraccount.assword) {
+                        hashedPassword = await bcrypt.hash(useraccount.password, 10);
+                    }
+
+                    let response = {
+                        type: "",
+                        message: "",
+                    };  
+
+                    const query = {
+                        text: "SELECT fn_admin_update_user_account($1, $2, $3, $4, $5) AS result",
+                        values: [admin_id, user_id, useraccount.user_name, hashedPassword, useraccount.user_type],
+                    };
+
+                    const result = await client.query(query);
+
+                    if (result && result.rows.length > 0) {
+                        const res = result.rows[0].result;
+                        console.log("Updated user result: ", res);
+                        if (res) {
+                        response = {
+                            type: res.type,
+                            message: res.message,
+                        };
+                        }
+                    }
+
+                    return response;
+                } catch (err) {
+                    console.error("Error:", err);
+                    throw new Error("Failed to update user account.");
+                } finally {
+                    await client.end();
+                }
+            },
+
+            deleteUserAccount: async (_, { admin_id, user_id }) => {
+
+                const client = await pool.connect();
+
+                try {
+
+                    let response = {
+                        type: "",
+                        message: "",
+                    };  
+
+                    const query = {
+                        text: "SELECT fn_admin_delete_user_account($1, $2) AS result",
+                        values: [admin_id, user_id],
+                    };
+
+                    const result = await client.query(query);
+
+                    if (result && result.rows.length > 0) {
+                        const res = result.rows[0].result;
+                        console.log("Deleted user result: ", res);
+                        if (res) {
+                        response = {
+                            type: res.type,
+                            message: res.message, 
+                        };
+                        }
+                    }
+                    return response;
+                } catch (err) {
+                    console.error("Error:", err);
+                    throw new Error("Failed to delete user account.");
+                } finally {
+                    await client.end();
+                }
+            },
         },
-    },
-};
+    };

@@ -1,24 +1,44 @@
 export const scheduleSchema = `#graphql
+    scalar Date
+    scalar Time
+    scalar DateTime
+    scalar CustomDateTime
+
     type Schedule {
-    schedule_id: ID!
-    date: String!
-    start_time: String!
-    end_time: String!
-    event_id: ID!
+        schedule_id: Int
+        date: Date!              
+        start_time: Time!         
+        end_time: Time!           
+        event_id: Int!
+    }
+
+    type addScheduleResponse {
+        content: Schedule
+        type: String!
+        message: String!
+    }
+
+    type updateScheduleResponse {
+        type: String!
+        message: String!
+    }
+
+    type deleteScheduleResponse {
+        type: String!
+        message: String!
     }
 
     input AddScheduleInput {
-    date: String!
-    start_time: String!
-    end_time: String!
-    event_id: ID!
+        date: Date!             
+        start_time: Time!        
+        end_time: Time!        
+        event_id: Int!
     }
 
     input UpdateScheduleInput {
-    date: String
-    start_time: String
-    end_time: String
-    event_id: ID
+        date: Date
+        start_time: Time
+        end_time: Time
+        event_id: Int
     }
 `;
-

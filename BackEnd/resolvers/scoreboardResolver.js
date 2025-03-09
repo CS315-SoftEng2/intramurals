@@ -1,71 +1,165 @@
-import client from '../helpers/dbHelper.js';
+import { pool } from '../helpers/dbHelper.js';
 
 export const scoreboardResolver = {
     Query: {
         scoreboards: async () => {
+            const client = await pool.connect();
             try {
                 const query = {
-                    text: "SELRCT * FROM scoreboard",
+                    text: "SELECT * FROM scoreboard",
                 };
+
                 const result = await client.query(query);
+                console.log("Result:", result.rows);
                 return result.rows;
             } catch (err) {
-                console.error("Error:", err);
-                throw new Error("Failed to fetch scoreboard.");
+                console.error("Error fetching scoreboards:", err);
+                throw new Error("Failed to fetch scoreboards.");
+            } finally {
+                client.release();
             }
         },
         scoreboard: async (_, { id }) => {
+            const client = await pool.connect();
             try {
                 const query = {
                     text: "SELECT * FROM scoreboard WHERE scoreboard_id = $1",
                     values: [id],
                 };
+
                 const result = await client.query(query);
-                return result.rows[0];
+                console.log("Result:", result.rows);
+                return result.rows[0] || null;
             } catch (err) {
-                console.error("Error:", err);
-                throw new Error("Failed to fetch the scoreboard.");
+                console.error("Error fetching scoreboard:", err);
+                throw new Error("Failed to fetch scoreboard.");
+            } finally {
+                client.release();
             }
         },
     },
+    
     Mutation: {
-        addScoreboard: async (_, { scoreboard }) => {
+        addScoreboard: async (_, { admin_id, scoreboard }) => {
+            console.log("addScoreboard called with:", { admin_id, scoreboard });
+        
+            const client = await pool.connect();
             try {
                 const query = {
-                    text: "SELECT * FROM fn_admin_add_scoreboard($1, $2, $3, $4, $5, $6)",
-                    values: [scoreboard.score, scoreboard.ranking, scoreboard.team_id, scoreboard.user_id, scoreboard.event_id, scoreboard.schedule_id],
+                    text: "SELECT fn_admin_add_scoreboard($1, $2, $3, $4, $5) AS result",
+                    values: [
+                        admin_id,
+                        scoreboard.user_id,
+                        scoreboard.team_id,
+                        scoreboard.event_id,
+                        scoreboard.schedule_id,
+                    ],
                 };
+        
+                console.log("Executing query:", query);
+        
                 const result = await client.query(query);
-                return result.rows[0];
+                console.log("Raw DB response:", result.rows);
+        
+                if (result.rows.length > 0 && result.rows[0].result) {
+                    let res = result.rows[0].result;
+        
+                    if (typeof res === "string") {
+                        try {
+                            res = JSON.parse(res);
+                        } catch (error) {
+                            console.error("Error parsing JSON from DB:", error);
+                            throw new Error("Invalid JSON response from database");
+                        }
+                    }
+        
+                    console.log("Parsed response:", res);
+                    return res; 
+                }
+        
+                console.error("Unexpected empty response from database.");
+                return { type: "error", message: "Unexpected empty response", content: null };
             } catch (err) {
-                console.error("Error:", err);
-                throw new Error("Failed to add new scoreboard.");
+                console.error("Error adding scoreboard:", err);
+                throw new Error("Failed to add scoreboard.");
+            } finally {
+                client.release();
+            }
+        },        
+
+        updateScoreboard: async (_, { user_id, scoreboard_id, score }) => {
+            console.log("updateScoreboard called with:", { user_id, scoreboard_id, score });
+
+            const client = await pool.connect();
+            try {
+                const query = {
+                    text: "SELECT fn_user_update_scoreboard($1, $2, $3) AS result",
+                    values: [user_id, scoreboard_id, score],
+                };
+
+                console.log("Executing query:", query);
+
+                const result = await client.query(query);
+                console.log("Raw DB response:", result.rows);
+
+                if (result?.rows?.length > 0 && result.rows[0].result) {
+                    let res = result.rows[0].result;
+
+                    if (typeof res === "string") {
+                        try {
+                            res = JSON.parse(res);
+                        } catch (error) {
+                            console.error("Error parsing JSON from DB:", error);
+                            throw new Error("Invalid JSON response from database");
+                        }
+                    }
+
+                    console.log("Parsed response:", res);
+                    return res;
+                }
+
+                return { type: "error", message: "Unexpected empty response", content: null };
+            } catch (err) {
+                console.error("Error in updateScoreboard:", err);
+                throw new Error("Failed to update scoreboard.");
+            } finally {
+                client.release();
             }
         },
-        updateScoreboard: async (_, { id, scoreboard }) => {
+
+        deleteScoreboard: async (_, { admin_id, scoreboard_id }) => {
+            const client = await pool.connect();
             try {
                 const query = {
-                    text: "SELECT * FROM scoreboard($1, $2, $3, $4, $5, $6, $7)",
-                    values: [id, scoreboard.score, scoreboard.ranking, scoreboard.team_id, scoreboard.user_id, scoreboard.event_id, scoreboard.schedule_id],
+                    text: "SELECT fn_admin_delete_scoreboard($1, $2) AS result",
+                    values: [admin_id, scoreboard_id],
                 };
+
                 const result = await client.query(query);
-                return result.rows[0];
+                console.log("Raw DB response:", result.rows);
+
+                if (result?.rows?.length > 0 && result.rows[0].result) {
+                    let res = result.rows[0].result;
+
+                    if (typeof res === "string") {
+                        try {
+                            res = JSON.parse(res);
+                        } catch (error) {
+                            console.error("Error parsing JSON from DB:", error);
+                            throw new Error("Invalid JSON response from database");
+                        }
+                    }
+
+                    console.log("Parsed response:", res);
+                    return res;
+                }
+
+                return { type: "error", message: "Unexpected empty response", content: null };
             } catch (err) {
-                console.error("Error:", err);
-                throw new Error("Failed to update the scoreboard.");
-            }
-        },
-        deleteScoreboard: async (_, { id }) => {
-            try {
-                const query = {
-                    text: "SELECT * FROM fn_admin_delete_scoreboard($1)",
-                    values: [id],
-                };
-                const result = await client.query(query);
-                return result.rows[0];
-            } catch (err) {
-                console.error("Error:", err);
-                throw new Error("Failed to delete the scoreboard.");
+                console.error("Error deleting scoreboard:", err);
+                throw new Error("Failed to delete scoreboard.");
+            } finally {
+                client.release();
             }
         },
     },
