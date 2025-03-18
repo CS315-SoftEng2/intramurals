@@ -4,12 +4,17 @@ export const scoreboardResolver = {
     Query: {
         scoreboards: async () => {
             const client = await pool.connect();
+
+            // SQL query to fetch all categories.
             try {
                 const query = {
                     text: "SELECT * FROM scoreboard",
                 };
 
+                // Executing the query and storing the result.
                 const result = await client.query(query);
+
+                // Logging the fetched data.
                 console.log("Result:", result.rows);
                 return result.rows;
             } catch (err) {
@@ -24,12 +29,13 @@ export const scoreboardResolver = {
             try {
                 const query = {
                     text: "SELECT * FROM scoreboard WHERE scoreboard_id = $1",
-                    values: [id],
+                    values: [id], // Parameterized query to fetch a category by ID.
                 };
 
+                // Executing the query.
                 const result = await client.query(query);
                 console.log("Result:", result.rows);
-                return result.rows[0] || null;
+                return result.rows[0] || null; // Returning the fetched category.
             } catch (err) {
                 console.error("Error fetching scoreboard:", err);
                 throw new Error("Failed to fetch scoreboard.");
@@ -44,6 +50,7 @@ export const scoreboardResolver = {
             console.log("addScoreboard called with:", { admin_id, scoreboard });
         
             const client = await pool.connect();
+
             try {
                 const query = {
                     text: "SELECT fn_admin_add_scoreboard($1, $2, $3, $4, $5) AS result",

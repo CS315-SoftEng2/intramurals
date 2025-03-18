@@ -101,7 +101,7 @@
 
                     let hashedPassword = useraccount.password;
 
-                    if (useraccount.assword) {
+                    if (useraccount.password) {
                         hashedPassword = await bcrypt.hash(useraccount.password, 10);
                     }
 
