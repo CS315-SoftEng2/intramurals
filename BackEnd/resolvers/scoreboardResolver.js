@@ -53,13 +53,14 @@ export const scoreboardResolver = {
 
             try {
                 const query = {
-                    text: "SELECT fn_admin_add_scoreboard($1, $2, $3, $4, $5) AS result",
+                    text: "SELECT fn_admin_add_scoreboard($1, $2, $3, $4, $5, $6) AS result",
                     values: [
                         admin_id,
                         scoreboard.user_id,
                         scoreboard.team_id,
                         scoreboard.event_id,
                         scoreboard.schedule_id,
+                        scoreboard.category_id,
                     ],
                 };
         

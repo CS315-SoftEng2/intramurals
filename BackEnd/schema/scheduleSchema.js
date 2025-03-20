@@ -10,6 +10,7 @@ export const scheduleSchema = `#graphql
         start_time: Time!         
         end_time: Time!           
         event_id: Int!
+        category_id: Int!
     }
 
     type addScheduleResponse {
@@ -33,6 +34,7 @@ export const scheduleSchema = `#graphql
         start_time: Time!        
         end_time: Time!        
         event_id: Int!
+        category_id: Int!
     }
 
     input UpdateScheduleInput {
@@ -40,5 +42,6 @@ export const scheduleSchema = `#graphql
         start_time: Time
         end_time: Time
         event_id: Int
+        category_id: Int
     }
 `;

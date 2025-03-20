@@ -5,6 +5,7 @@ import generateToken from "../helpers/tokenHelper.js";
 export const loginResolver = {
     Mutation: {
         userLogin: async (_, { user_name, password }) => {
+
             const client = await pool.connect();
 
             let response = {

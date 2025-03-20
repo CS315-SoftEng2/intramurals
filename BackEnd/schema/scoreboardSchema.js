@@ -5,6 +5,7 @@ export const scoreboardSchema = `#graphql
         team_id: Int!
         event_id: Int!
         schedule_id: Int!
+        category_id: Int!
     }
 
     type addScoreboardResponse {
@@ -28,6 +29,7 @@ export const scoreboardSchema = `#graphql
         team_id: Int!
         event_id: Int!
         schedule_id: Int!
+        category_id: Int!
 }
 `;
 

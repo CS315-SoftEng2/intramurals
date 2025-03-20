@@ -3,6 +3,7 @@ import { startStandaloneServer } from "@apollo/server/standalone";
 
 import { typeDefs } from "./schema/schema.js";
 import { resolvers } from "./resolvers/resolvers.js";
+import appContext from "../BackEnd/helpers/contextHandler.js";
 
 const server = new ApolloServer({
     typeDefs,
@@ -11,6 +12,7 @@ const server = new ApolloServer({
 
 const startServer = async () => {
     const { url } = await startStandaloneServer(server, {
+        context: appContext,
         listen: { port: 4002 },
     });
     console.log(` Server ready at: ${url}`);

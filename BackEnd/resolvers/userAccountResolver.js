@@ -49,21 +49,30 @@
         },
 
         Mutation: {
-            addUserAccount: async (_, { useraccount, admin_id }) => {
+            addUserAccount: async (_, { useraccount, admin_id }, context) => {
+
+                console.log("context", context);
+
+                if (context.type == "error") {
+                    return {
+                      type: "error",
+                      message: "Token expired.",
+                    };
+                }
 
                 const client = await pool.connect();
 
                 try {
-                
-                    const { user_name, password, user_type } = useraccount
-
-                    const hashedPassword = await bcrypt.hash(password, 10);
 
                     let response = {
                         content: null,
                         type: "",
                         message: "",
-                    };    
+                    }; 
+                
+                    const { user_name, password, user_type } = useraccount
+
+                    const hashedPassword = await bcrypt.hash(password, 10);   
 
                     const query = {
                         text: "SELECT * FROM fn_admin_add_user_account($1, $2, $3, $4) AS result",

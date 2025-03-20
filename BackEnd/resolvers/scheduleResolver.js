@@ -73,8 +73,8 @@ export const scheduleResolver = {
                 };
         
                 const query = {
-                    text: "SELECT fn_admin_add_schedule($1, $2, $3, $4, $5) AS result",
-                    values: [admin_id, schedule.date, schedule.start_time, schedule.end_time, schedule.event_id],
+                    text: "SELECT fn_admin_add_schedule($1, $2, $3, $4, $5, $6) AS result",
+                    values: [admin_id, schedule.date, schedule.start_time, schedule.end_time, schedule.event_id, schedule.category_id],
                 };
         
                 console.log("Executing query:", query);
@@ -119,8 +119,8 @@ export const scheduleResolver = {
 
                 // Parameterized query calling a stored function to add a category.
                 const query = {
-                    text: "SELECT * FROM fn_admin_update_schedule($1, $2, $3, $4, $5, $6) AS result",
-                    values: [admin_id, schedule_id, schedule.date, schedule.start_time, schedule.end_time, schedule.event_id],
+                    text: "SELECT * FROM fn_admin_update_schedule($1, $2, $3, $4, $5, $6, $7) AS result",
+                    values: [admin_id, schedule_id, schedule.date, schedule.start_time, schedule.end_time, schedule.event_id, schedule.category_id],
                 };
 
                 // Executing the query.
