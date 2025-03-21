@@ -60,7 +60,15 @@ export const scheduleResolver = {
         },
     },
     Mutation: {
-        addSchedule: async (_, { admin_id, schedule }) => {
+        addSchedule: async (_, { admin_id, schedule }, context) => {
+
+            if (context.type == "error") {
+                return {
+                  type: "error",
+                  message: "Token expired.",
+                };
+            }
+
             console.log("Add schedule inputs: ", { admin_id, schedule });
         
             const client = await pool.connect();
@@ -105,7 +113,14 @@ export const scheduleResolver = {
             }
         },
 
-        updateSchedule: async (_, { admin_id, schedule_id, schedule }) => {
+        updateSchedule: async (_, { admin_id, schedule_id, schedule }, context) => {
+
+            if (context.type == "error") {
+                return {
+                  type: "error",
+                  message: "Token expired.",
+                };
+            }
 
             const client = await pool.connect();
 
@@ -148,7 +163,15 @@ export const scheduleResolver = {
                 await client.end();
             }
         },
-        deleteSchedule: async (_, { admin_id, schedule_id }) => {
+        deleteSchedule: async (_, { admin_id, schedule_id }, context) => {
+
+            if (context.type == "error") {
+                return {
+                  type: "error",
+                  message: "Token expired.",
+                };
+            }
+
             // Delete a schedule
             const client = await pool.connect();
 

@@ -38,7 +38,15 @@ export const eventResolver = {
         },
     },
     Mutation: {
-        addEvent: async (_, { admin_id, event }) => { 
+        addEvent: async (_, { admin_id, event }, context) => { 
+
+            if (context.type == "error") {
+                return {
+                  type: "error",
+                  message: "Token expired.",
+                };
+            }
+
             const client = await pool.connect();
 
             try {
@@ -75,7 +83,15 @@ export const eventResolver = {
                 client.release(); 
             }
         },
-        updateEvent: async (_, { admin_id, event_id, event }) => { 
+        updateEvent: async (_, { admin_id, event_id, event }, context) => { 
+
+            if (context.type == "error") {
+                return {
+                  type: "error",
+                  message: "Token expired.",
+                };
+            }
+
             const client = await pool.connect(); 
 
             try {
@@ -110,7 +126,15 @@ export const eventResolver = {
                 client.release(); 
             }
         },
-        deleteEvent: async (_, { admin_id, event_id }) => { 
+        deleteEvent: async (_, { admin_id, event_id }, context) => { 
+
+            if (context.type == "error") {
+                return {
+                  type: "error",
+                  message: "Token expired.",
+                };
+            }
+
             const client = await pool.connect(); 
 
             try {

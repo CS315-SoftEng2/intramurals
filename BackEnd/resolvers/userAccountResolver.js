@@ -51,8 +51,6 @@
         Mutation: {
             addUserAccount: async (_, { useraccount, admin_id }, context) => {
 
-                console.log("context", context);
-
                 if (context.type == "error") {
                     return {
                       type: "error",
@@ -102,7 +100,14 @@
                 }
             },
 
-            updateUserAccount: async (_, { admin_id, user_id, useraccount }) => {
+            updateUserAccount: async (_, { admin_id, user_id, useraccount }, context) => {
+
+                if (context.type == "error") {
+                    return {
+                      type: "error",
+                      message: "Token expired.",
+                    };
+                }
 
                 const client = await pool.connect();
 
@@ -146,7 +151,14 @@
                 }
             },
 
-            deleteUserAccount: async (_, { admin_id, user_id }) => {
+            deleteUserAccount: async (_, { admin_id, user_id }, context) => {
+
+                if (context.type == "error") {
+                    return {
+                      type: "error",
+                      message: "Token expired.",
+                    };
+                }
 
                 const client = await pool.connect();
 

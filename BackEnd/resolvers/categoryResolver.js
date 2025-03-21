@@ -52,7 +52,14 @@ export const categoryResolver = {
         },
     },
     Mutation: {
-        addCategory: async (_, { admin_id, category }) => {
+        addCategory: async (_, { admin_id, category }, context) => {
+
+            if (context.type == "error") {
+                return {
+                  type: "error",
+                  message: "Token expired.",
+                };
+            }
 
             const client = await pool.connect();
 
@@ -98,7 +105,14 @@ export const categoryResolver = {
             }
         },
 
-        updateCategory: async (_, { admin_id, category_id, category }) => {
+        updateCategory: async (_, { admin_id, category_id, category }, context) => {
+
+            if (context.type == "error") {
+                return {
+                  type: "error",
+                  message: "Token expired.",
+                };
+            }
 
             const client = await pool.connect();
 
@@ -142,7 +156,14 @@ export const categoryResolver = {
             }
         },
 
-        deleteCategory: async (_, { admin_id, category_id }) => {
+        deleteCategory: async (_, { admin_id, category_id }, context) => {
+
+            if (context.type == "error") {
+                return {
+                  type: "error",
+                  message: "Token expired.",
+                };
+            }
 
             const client = await pool.connect();
 

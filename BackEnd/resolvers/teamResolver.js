@@ -50,7 +50,14 @@ export const teamResolver = {
         },
     },
     Mutation: {
-        addTeam: async (_, { team, admin_id }) => {
+        addTeam: async (_, { team, admin_id },context) => {
+
+            if (context.type == "error") {
+                return {
+                  type: "error",
+                  message: "Token expired.",
+                };
+            }
 
             const client = await pool.connect();
 
@@ -96,7 +103,14 @@ export const teamResolver = {
             }
         },
 
-        updateTeam: async (_, { admin_id, team_id, team }) => {
+        updateTeam: async (_, { admin_id, team_id, team }, context) => {
+
+            if (context.type == "error") {
+                return {
+                  type: "error",
+                  message: "Token expired.",
+                };
+            }
 
             const client = await pool.connect();
 
@@ -134,7 +148,14 @@ export const teamResolver = {
             }
         },
 
-        deleteTeam: async (_, { admin_id, team_id }) => {
+        deleteTeam: async (_, { admin_id, team_id }, context) => {
+
+            if (context.type == "error") {
+                return {
+                  type: "error",
+                  message: "Token expired.",
+                };
+            }
 
             const client = await pool.connect();
 

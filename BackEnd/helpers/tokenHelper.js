@@ -10,7 +10,7 @@ const generateToken = async (useraccount) => {
         user_type: user_type,
     },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "5m" }
+    { expiresIn: "3m" }
 );
 
 return accessToken;

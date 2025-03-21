@@ -46,7 +46,15 @@ export const scoreboardResolver = {
     },
     
     Mutation: {
-        addScoreboard: async (_, { admin_id, scoreboard }) => {
+        addScoreboard: async (_, { admin_id, scoreboard }, context) => {
+
+            if (context.type == "error") {
+                return {
+                  type: "error",
+                  message: "Token expired.",
+                };
+            }
+
             console.log("addScoreboard called with:", { admin_id, scoreboard });
         
             const client = await pool.connect();
@@ -95,7 +103,15 @@ export const scoreboardResolver = {
             }
         },        
 
-        updateScoreboard: async (_, { user_id, scoreboard_id, score }) => {
+        updateScoreboard: async (_, { user_id, scoreboard_id, score }, context) => {
+
+            if (context.type == "error") {
+                return {
+                  type: "error",
+                  message: "Token expired.",
+                };
+            }
+
             console.log("updateScoreboard called with:", { user_id, scoreboard_id, score });
 
             const client = await pool.connect();
@@ -135,7 +151,15 @@ export const scoreboardResolver = {
             }
         },
 
-        deleteScoreboard: async (_, { admin_id, scoreboard_id }) => {
+        deleteScoreboard: async (_, { admin_id, scoreboard_id }, context) => {
+
+            if (context.type == "error") {
+                return {
+                  type: "error",
+                  message: "Token expired.",
+                };
+            }
+
             const client = await pool.connect();
             try {
                 const query = {
