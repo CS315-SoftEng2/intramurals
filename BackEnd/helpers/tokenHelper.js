@@ -3,18 +3,22 @@ import jwt from "jsonwebtoken";
 const generateToken = async (useraccount) => {
     const { user_name, user_type } = useraccount;
 
-    console.log("Payload result: ",useraccount);
+    if (!user_name || !user_type) {
+        throw new Error('Invalid user data: user_name and user_type are required');
+    }
 
-    const accessToken = jwt.sign({
-        user_name: user_name,
-        user_type: user_type,
-    },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "3m" }
-);
+    console.log("Payload result: ", useraccount);  
 
-return accessToken;
+    const accessToken = jwt.sign(
+        {
+            user_name,  
+            user_type, 
+        },
+        process.env.ACCESS_TOKEN_SECRET,  
+        { expiresIn: "1h" }  
+    );
+
+    return accessToken; 
 };
 
 export default generateToken;
-

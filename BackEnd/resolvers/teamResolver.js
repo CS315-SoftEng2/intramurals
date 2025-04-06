@@ -72,8 +72,8 @@ export const teamResolver = {
 
                 // Parameterized query calling a stored function to add a category.
                 const query = {
-                    text: "SELECT * FROM fn_admin_add_team($1, $2) AS result", 
-                    values: [admin_id, team.team_name], 
+                    text: "SELECT * FROM fn_admin_add_team($1, $2, $3) AS result", 
+                    values: [admin_id, team.team_name, team.team_color], 
                 };                
 
                 // Executing the query.
@@ -122,8 +122,8 @@ export const teamResolver = {
                 };
 
                 const query = {
-                    text: "SELECT * FROM fn_admin_update_team($1, $2, $3) AS result",
-                    values: [admin_id, team_id, team.team_name],
+                    text: "SELECT * FROM fn_admin_update_team($1, $2, $3, $4) AS result",
+                    values: [admin_id, team_id, team.team_name, team.team_color],
                 };
                 
                 const result = await client.query(query);
