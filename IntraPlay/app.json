@@ -11,6 +11,9 @@
     "ios": {
       "supportsTablet": true
     },
+    "router": {
+      "ignore": ["**/mutations/*.js", "**/queries/*.js"]
+    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
@@ -33,7 +36,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true

@@ -3,7 +3,6 @@ export const eventSchema = `#graphql
         event_id: Int
         event_name: String!
         venue: String!
-        team_id: Int!
         category_id: Int!
     }
 
@@ -26,14 +25,12 @@ export const eventSchema = `#graphql
     input AddEventInput {
         event_name: String!
         venue: String!
-        team_id: Int!
         category_id: Int!
     }
 
     input UpdateEventInput {
         event_name: String
         venue: String
-        team_id: Int
         category_id: Int
     }
 `;

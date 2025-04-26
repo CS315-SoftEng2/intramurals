@@ -6,18 +6,23 @@ import { resolvers } from "./resolvers/resolvers.js";
 import appContext from "../BackEnd/helpers/contextHandler.js";
 
 const server = new ApolloServer({
-    typeDefs,
-    resolvers,
+  typeDefs,
+  resolvers,
 });
 
 const startServer = async () => {
-    const { url } = await startStandaloneServer(server, {
-        context: appContext,
-        listen: { port: 4002 },
-    });
-    console.log(` Server ready at: ${url}`);
+  const { url } = await startStandaloneServer(server, {
+    context: appContext,
+    listen: { port: 4002 },
+    cors: {
+      origin: "*",
+      credentials: true,
+    },
+  });
+
+  console.log(`🚀 Server ready at: ${url}`);
 };
 
 startServer().catch((err) => {
-    console.error("Error starting server:", err);
+  console.error("Error starting server:", err);
 });

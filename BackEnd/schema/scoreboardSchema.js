@@ -1,11 +1,15 @@
 export const scoreboardSchema = `#graphql
     type Scoreboard {
         scoreboard_id: Int!
-        user_id: Int!
-        team_id: Int!
-        event_id: Int!
-        schedule_id: Int!
-        category_id: Int!
+        match_id: Int!
+        scoring_team_id: Int!
+        score: Int!
+        score_a: Int
+        score_b: Int
+        team_a: String
+        team_b: String
+        team_a_id: Int
+        team_b_id: Int
     }
 
     type addScoreboardResponse {
@@ -27,9 +31,16 @@ export const scoreboardSchema = `#graphql
     input AddScoreboardInput {
         user_id: Int!
         team_id: Int!
-        event_id: Int!
+        match_id: Int!
         schedule_id: Int!
         category_id: Int!
-}
-`;
+    }
 
+    input UpdateScoreboardInput {
+        user_id: Int
+        team_id: Int
+        match_id: Int
+        schedule_id: Int
+        category_id: Int
+    }
+`;

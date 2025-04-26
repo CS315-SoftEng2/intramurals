@@ -1,198 +1,196 @@
-    import bcrypt from "bcrypt";
-    import { pool } from "../helpers/dbHelper.js";
+import bcrypt from "bcrypt";
+import { pool } from "../helpers/dbHelper.js";
 
-    export const userAccountResolver = {
+export const userAccountResolver = {
+  Query: {
+    users: async () => {
+      const client = await pool.connect();
 
-        Query: {
-            users: async () => {
+      try {
+        const query = {
+          text: "SELECT * FROM useraccount",
+        };
 
-                const client = await pool.connect();
+        const result = await client.query(query);
 
-                try {
-                    const query = {
-                        text: "SELECT * FROM useraccount",
-                    };
+        return result.rows.filter((row) => row !== null);
+      } catch (err) {
+        console.error("Error:", err);
+        throw new Error("Failed to fetch users.");
+      } finally {
+        client.release();
+      }
+    },
 
-                    const result = await client.query(query);
+    user: async (_, { id }) => {
+      const client = await pool.connect();
 
-                    console.log("Result:", result.rows);
+      try {
+        const query = {
+          text: "SELECT * FROM useraccount WHERE user_id = $1",
+          values: [id],
+        };
 
-                    return result.rows;
-                } catch (err) {
-                    console.error("Error:", err);
-                    throw new Error("Failed to fetch users.");
-                } finally {
-                    client.release();
-                }
-            },
+        const result = await client.query(query);
+        return result.rows[0];
+      } catch (err) {
+        console.error("Error:", err);
+        throw new Error("Failed to fetch user.");
+      } finally {
+        client.release();
+      }
+    },
+  },
 
-            user: async (_, { id }) => {
+  Mutation: {
+    addUserAccount: async (_, { useraccount, admin_id }, context) => {
+      // if (context.type == "error") {
+      //     return {
+      //       type: "error",
+      //       message: "Token expired.",
+      //     };
+      // }
 
-                const client = await pool.connect();
-                
-                try {
-                    const query = {
-                        text: "SELECT * FROM useraccount WHERE user_id = $1",
-                        values: [id],
-                    };
-                    
-                    const result = await client.query(query);
-                    console.log("Result:", result.rows);
-                    return result.rows[0];
-                } catch (err) {
-                    console.error("Error:", err);
-                    throw new Error("Failed to fetch user.");
-                } finally {
-                    client.release();
-                }
-            },
-        },
+      const client = await pool.connect();
 
-        Mutation: {
-            addUserAccount: async (_, { useraccount, admin_id }, context) => {
+      try {
+        let response = {
+          content: null,
+          type: "",
+          message: "",
+        };
 
-                if (context.type == "error") {
-                    return {
-                      type: "error",
-                      message: "Token expired.",
-                    };
-                }
+        const { user_name, password, user_type } = useraccount;
 
-                const client = await pool.connect();
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-                try {
+        const query = {
+          text: "SELECT * FROM fn_admin_add_user_account($1, $2, $3, $4) AS result",
+          values: [admin_id, user_name, hashedPassword, user_type],
+        };
 
-                    let response = {
-                        content: null,
-                        type: "",
-                        message: "",
-                    }; 
-                
-                    const { user_name, password, user_type } = useraccount
+        const result = await client.query(query);
 
-                    const hashedPassword = await bcrypt.hash(password, 10);   
+        if (result && result.rows.length > 0) {
+          const res = result.rows[0].result;
+          console.log("Added user result: ", res);
+          if (res) {
+            response = {
+              content: res.content,
+              type: res.type,
+              message: res.message,
+            };
+          }
+        }
 
-                    const query = {
-                        text: "SELECT * FROM fn_admin_add_user_account($1, $2, $3, $4) AS result",
-                        values: [admin_id, user_name, hashedPassword, user_type],
-                    };
+        return response;
+      } catch (err) {
+        console.error("Error:", err);
+        throw new Error("Failed to add user account.");
+      } finally {
+        await client.end();
+      }
+    },
 
-                    const result = await client.query(query);
-                
-                    if (result && result.rows.length > 0) {
-                        const res = result.rows[0].result;
-                        console.log("Added user result: ", res);
-                        if (res) {
-                        response = {
-                            content: res.content,
-                            type: res.type,
-                            message: res.message,
-                        };
-                        }
-                    }
+    updateUserAccount: async (
+      _,
+      { admin_id, user_id, useraccount },
+      context
+    ) => {
+      // if (context.type == "error") {
+      //     return {
+      //       type: "error",
+      //       message: "Token expired.",
+      //     };
+      // }
 
-                    return response;
-                } catch (err) {
-                    console.error("Error:", err);
-                    throw new Error("Failed to add user account.");
-                } finally {
-                    await client.end();
-                }
-            },
+      const client = await pool.connect();
 
-            updateUserAccount: async (_, { admin_id, user_id, useraccount }, context) => {
+      try {
+        let hashedPassword = useraccount.password;
 
-                if (context.type == "error") {
-                    return {
-                      type: "error",
-                      message: "Token expired.",
-                    };
-                }
+        if (useraccount.password) {
+          hashedPassword = await bcrypt.hash(useraccount.password, 10);
+        }
 
-                const client = await pool.connect();
+        let response = {
+          type: "",
+          message: "",
+        };
 
-                try {
+        const query = {
+          text: "SELECT fn_admin_update_user_account($1, $2, $3, $4, $5) AS result",
+          values: [
+            admin_id,
+            user_id,
+            useraccount.user_name,
+            hashedPassword,
+            useraccount.user_type,
+          ],
+        };
 
-                    let hashedPassword = useraccount.password;
+        const result = await client.query(query);
 
-                    if (useraccount.password) {
-                        hashedPassword = await bcrypt.hash(useraccount.password, 10);
-                    }
+        if (result && result.rows.length > 0) {
+          const res = result.rows[0].result;
+          console.log("Updated user result: ", res);
+          if (res) {
+            response = {
+              type: res.type,
+              message: res.message,
+            };
+          }
+        }
 
-                    let response = {
-                        type: "",
-                        message: "",
-                    };  
+        return response;
+      } catch (err) {
+        console.error("Error:", err);
+        throw new Error("Failed to update user account.");
+      } finally {
+        await client.end();
+      }
+    },
 
-                    const query = {
-                        text: "SELECT fn_admin_update_user_account($1, $2, $3, $4, $5) AS result",
-                        values: [admin_id, user_id, useraccount.user_name, hashedPassword, useraccount.user_type],
-                    };
+    deleteUserAccount: async (_, { admin_id, user_id }, context) => {
+      // if (context.type == "error") {
+      //     return {
+      //       type: "error",
+      //       message: "Token expired.",
+      //     };
+      // }
 
-                    const result = await client.query(query);
+      const client = await pool.connect();
 
-                    if (result && result.rows.length > 0) {
-                        const res = result.rows[0].result;
-                        console.log("Updated user result: ", res);
-                        if (res) {
-                        response = {
-                            type: res.type,
-                            message: res.message,
-                        };
-                        }
-                    }
+      try {
+        let response = {
+          type: "",
+          message: "",
+        };
 
-                    return response;
-                } catch (err) {
-                    console.error("Error:", err);
-                    throw new Error("Failed to update user account.");
-                } finally {
-                    await client.end();
-                }
-            },
+        const query = {
+          text: "SELECT fn_admin_delete_user_account($1, $2) AS result",
+          values: [admin_id, user_id],
+        };
 
-            deleteUserAccount: async (_, { admin_id, user_id }, context) => {
+        const result = await client.query(query);
 
-                if (context.type == "error") {
-                    return {
-                      type: "error",
-                      message: "Token expired.",
-                    };
-                }
-
-                const client = await pool.connect();
-
-                try {
-
-                    let response = {
-                        type: "",
-                        message: "",
-                    };  
-
-                    const query = {
-                        text: "SELECT fn_admin_delete_user_account($1, $2) AS result",
-                        values: [admin_id, user_id],
-                    };
-
-                    const result = await client.query(query);
-
-                    if (result && result.rows.length > 0) {
-                        const res = result.rows[0].result;
-                        console.log("Deleted user result: ", res);
-                        if (res) {
-                        response = {
-                            type: res.type,
-                            message: res.message, 
-                        };
-                        }
-                    }
-                    return response;
-                } catch (err) {
-                    console.error("Error:", err);
-                    throw new Error("Failed to delete user account.");
-                } finally {
-                    await client.end();
-                }
-            },
-        },
-    };
+        if (result && result.rows.length > 0) {
+          const res = result.rows[0].result;
+          console.log("Deleted user result: ", res);
+          if (res) {
+            response = {
+              type: res.type,
+              message: res.message,
+            };
+          }
+        }
+        return response;
+      } catch (err) {
+        console.error("Error:", err);
+        throw new Error("Failed to delete user account.");
+      } finally {
+        await client.end();
+      }
+    },
+  },
+};

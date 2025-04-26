@@ -4,18 +4,18 @@ import CustomTeamIcon from "../../assets/icons/teams";
 import ScheduleIcon from "../../assets/icons/schedules";
 import ScoreboardIcon from "../../assets/icons/scoreboards";
 
-export default function RootLayout() {
+export default function GuestTabs() {
   return (
     <Tabs
-    screenOptions={{
-      tabBarStyle: {
-        backgroundColor: "#151521", 
-        height: 60,  
-        paddingBottom: 5,
-        paddingTop: 5,              
-      },
-      tabBarActiveTintColor: "#A4F168",  
-      tabBarInactiveTintColor: "gray",      
+      screenOptions={{
+        tabBarStyle: {
+          backgroundColor: "#151521",
+          height: 60,
+          paddingBottom: 5,
+          paddingTop: 5,
+        },
+        tabBarActiveTintColor: "#A4F168",
+        tabBarInactiveTintColor: "gray",
       }}
     >
       <Tabs.Screen
@@ -23,7 +23,7 @@ export default function RootLayout() {
         options={{
           title: "Dashboard",
           headerShown: false,
-          tabBarIcon: ({ focused, color }) => (
+          tabBarIcon: ({ color }) => (
             <MaterialIcons name="dashboard" size={24} color={color} />
           ),
         }}
@@ -33,8 +33,7 @@ export default function RootLayout() {
         options={{
           title: "Schedule",
           headerShown: false,
-          tabBarIcon: ({ focused, color }) => 
-            <ScheduleIcon color={color} />,
+          tabBarIcon: ({ color }) => <ScheduleIcon color={color} />,
         }}
       />
       <Tabs.Screen
@@ -42,8 +41,7 @@ export default function RootLayout() {
         options={{
           title: "Teams",
           headerShown: false,
-          tabBarIcon: ({ focused, color }) => 
-            <CustomTeamIcon color={color} />,
+          tabBarIcon: ({ color }) => <CustomTeamIcon color={color} />,
         }}
       />
       <Tabs.Screen
@@ -51,8 +49,7 @@ export default function RootLayout() {
         options={{
           title: "Scoreboard",
           headerShown: false,
-          tabBarIcon: ({ focused, color }) => 
-            <ScoreboardIcon color={color} />,
+          tabBarIcon: ({ color }) => <ScoreboardIcon color={color} />,
         }}
       />
     </Tabs>

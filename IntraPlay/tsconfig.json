@@ -3,9 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     }
   },
   "include": [
@@ -13,9 +11,9 @@
     "**/*.tsx",
     "app/(tabs)/_layout.jsx",
     "app/(tabs)/index.jsx",
-    "app/+not-found.app/(tabs)/_layout.jsxout.jsx",
-    "app/(tabs)/_layout.jsx",
-    "app/(tabs)/explore.jsx",
-    "app/(tabs)/index.jsx"
+    "app/(admin)/dashboard.jsx",
+    "app/(user)/dashboard.jsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
   ]
 }

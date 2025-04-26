@@ -9,6 +9,7 @@ type loginResponse {
     type: String!
     message: String!
     token: String
+    user: User
 }
 
 input InputLogIn {
@@ -16,4 +17,3 @@ input InputLogIn {
     password: String!
 }
 `;
-    

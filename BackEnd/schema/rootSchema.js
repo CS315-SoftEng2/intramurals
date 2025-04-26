@@ -18,10 +18,17 @@ type Query {
     scoreboards: [Scoreboard] 
     scoreboard(id: Int!): Scoreboard
 
+    eventDetails: [EventDetail!]!
+    teamScores: [TeamTotalScore!]!
+
+    getMatches: [Match]
+    getMatchById(match_id: Int!): Match
 }
 
 type Mutation {
     userLogin(user_name: String!, password: String!): loginResponse
+
+    userUpdateScore(match: MatchScoreInput!, user_id: Int!, match_id: Int!): userUpdateScoreResponse
 
     addUserAccount(useraccount: AddUserInput!, admin_id: Int!): addUserResponse
     updateUserAccount(useraccount: UpdateUserInput!, admin_id: Int!, user_id: Int!): updateUserResponse
@@ -44,7 +51,11 @@ type Mutation {
     deleteSchedule(admin_id: Int!, schedule_id: Int!): deleteScheduleResponse
 
     addScoreboard(scoreboard: AddScoreboardInput!, admin_id: Int!): addScoreboardResponse
-    updateScoreboard(user_id: Int!, scoreboard_id: Int!, score: Int!): updateScoreboardResponse
+    updateScoreboard(scoreboard: UpdateScoreboardInput!, admin_id: Int!, scoreboard_id: Int!): updateScoreboardResponse
     deleteScoreboard(admin_id: Int!, scoreboard_id: Int!): deleteScoreboardResponse
+
+    addMatch(match: AddMatchInput!, admin_id: Int!): addMatchResponse
+    updateMatch(match: UpdateMatchInput!, admin_id: Int!, match_id: Int!): updateMatchResponse
+    deleteMatch(admin_id: Int!, match_id: Int!): deleteMatchResponse
 }
 `;
