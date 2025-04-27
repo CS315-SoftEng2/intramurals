@@ -1,20 +1,19 @@
 import { gql } from "@apollo/client";
 
-const VIEW_DETAILS = gql`
-  query EventDetails {
-    eventDetails {
-      schedule_id
+const GET_SCOREBOARD = gql`
+  query Scoreboard {
+    scoreboard {
       event_id
       event_name
-      event_date
+      venue
+      category_name
+      division
+      schedule_id
+      date
       start_time
       end_time
-      venue
-      team_a_name
-      team_b_name
-      division
     }
   }
 `;
 
-export default VIEW_DETAILS;
+export default GET_SCOREBOARD;

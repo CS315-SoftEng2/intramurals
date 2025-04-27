@@ -14,7 +14,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import GET_MATCHES from "../../queries/matchesQuery";
 import GET_SCHEDULE from "../../queries/scheduleQuery";
-import VIEW_DETAILS from "../../queries/viewDetailsQuery";
+import GET_EVENTS from "../../queries/eventsQuery";
 import GET_TEAMS from "../../queries/teamsQuery";
 import LoadingIndicator from "../components/LoadingIndicator";
 import useAuthGuard from "@/utils/authGuard";
@@ -39,7 +39,7 @@ const Dashboard = () => {
     loading: venueLoading,
     error: venueError,
     data: venueData,
-  } = useQuery(VIEW_DETAILS);
+  } = useQuery(GET_EVENTS);
   const {
     loading: teamLoading,
     error: teamError,
@@ -102,12 +102,22 @@ const Dashboard = () => {
   }
 
   const schedules = scheduleData?.schedules || [];
-  const venueEvent = venueData?.eventDetails || [];
+  const venueEvent = venueData?.events || []; // Fixed from venueData?.Events
   const teamName = teamData?.teams || [];
 
-  const getEventVenue = (schedule_id) =>
-    venueEvent.find((e) => String(e.schedule_id) === String(schedule_id))
-      ?.venue || "Venue TBD";
+  const getEventVenue = (schedule_id) => {
+    // Find the schedule by schedule_id to get its event_id
+    const schedule = schedules.find(
+      (s) => String(s.schedule_id) === String(schedule_id)
+    );
+    if (!schedule) return "Venue TBD";
+
+    // Find the event by event_id
+    const event = venueEvent.find(
+      (e) => String(e.event_id) === String(schedule.event_id)
+    );
+    return event?.venue || "Venue TBD";
+  };
 
   const getScheduleDetails = (scheduleId) =>
     schedules.find((s) => s.schedule_id === scheduleId);
@@ -375,24 +385,38 @@ const Dashboard = () => {
                     </Text>
                   </View>
 
-                  <View
+                  <TouchableOpacity
                     style={[
-                      styles.scoredContainer,
+                      styles.manageScoreButton,
                       {
                         marginHorizontal: isTablet ? 80 : 55,
                         paddingVertical: isTablet ? 10 : 8,
                       },
                     ]}
+                    onPress={() =>
+                      router.push({
+                        pathname: `/score-update/${match.match_id}`,
+                        params: {
+                          event_name: match.event_name,
+                          division: match.division,
+                          team_a_id: match.team_a_id,
+                          team_b_id: match.team_b_id,
+                          score_a: match.score_a || 0,
+                          score_b: match.score_b || 0,
+                          user_assigned_id: match.user_assigned_id,
+                        },
+                      })
+                    }
                   >
                     <Text
                       style={[
-                        styles.scoredText,
+                        styles.manageScoreText,
                         { fontSize: isTablet ? 18 : 16 },
                       ]}
                     >
-                      Scored: {match.score_a} - {match.score_b}
+                      Update Scores
                     </Text>
-                  </View>
+                  </TouchableOpacity>
                 </View>
               );
             })}

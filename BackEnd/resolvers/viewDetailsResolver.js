@@ -1,23 +1,29 @@
 import { pool } from "../helpers/dbHelper.js";
+import { formatDate, formatTime } from "../helpers/scalarHandler.js";
 
 export const viewDetailsResolver = {
   Query: {
-    eventDetails: async () => {
+    scoreboard: async () => {
       const client = await pool.connect();
 
-      // SQL query to fetch all event details.
+      // SQL query to fetch all scoreboard details.
       try {
         const query = {
-          text: "SELECT * FROM vw_eventdetails",
+          text: "SELECT * FROM vw_scoreboard",
         };
 
         // Executing the query and storing the result.
         const result = await client.query(query);
 
-        return result.rows;
+        return result.rows.map((row) => ({
+          ...row,
+          date: formatDate(row.date),
+          start_time: formatTime(row.start_time),
+          end_time: formatTime(row.end_time),
+        }));
       } catch (err) {
         console.error("Error:", err);
-        throw new Error("Failed to fetch event details.");
+        throw new Error("Failed to fetch scoreboard details.");
       } finally {
         // Releasing the database connection.
         client.release();

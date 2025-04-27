@@ -107,7 +107,6 @@ const Team = () => {
         </View>
 
         <View style={styles.teamsContainer}>
-          {/* Team A */}
           <View style={styles.teamContainer}>
             <Image
               style={styles.teamCircle}
@@ -119,7 +118,6 @@ const Team = () => {
             </Text>
           </View>
 
-          {/* VS and Score */}
           <View style={styles.scoreContainer}>
             <Text style={styles.vsText}>VS</Text>
             {item.score_a !== null && item.score_b !== null ? (
@@ -135,7 +133,6 @@ const Team = () => {
             )}
           </View>
 
-          {/* Team B */}
           <View style={styles.teamContainer}>
             <Image
               style={styles.teamCircle}

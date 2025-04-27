@@ -18,6 +18,7 @@ const GET_MATCHES = gql`
       winner_team_id
       winner_team_color
       user_assigned_id
+      score_updated_at
     }
   }
 `;

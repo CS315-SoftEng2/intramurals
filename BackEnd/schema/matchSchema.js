@@ -15,6 +15,7 @@ type Match {
     winner_team_id: Int
     winner_team_color: String
     user_assigned_id: Int 
+    score_updated_at: String
 }
 
 type addMatchResponse {

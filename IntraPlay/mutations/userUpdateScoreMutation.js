@@ -13,6 +13,7 @@ const USER_UPDATE_SCORE = gql`
         match_id
         score_a
         score_b
+        score_updated_at
       }
     }
   }

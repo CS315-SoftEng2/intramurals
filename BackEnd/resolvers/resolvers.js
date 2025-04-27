@@ -4,7 +4,6 @@ import { teamResolver } from "./teamResolver.js";
 import { categoryResolver } from "./categoryResolver.js";
 import { eventResolver } from "./eventResolver.js";
 import { scheduleResolver } from "./scheduleResolver.js";
-import { scoreboardResolver } from "./scoreboardResolver.js";
 import { userUpdateScoreResolver } from "./userScoreboardResolver.js";
 import { viewDetailsResolver } from "./viewDetailsResolver.js";
 import { matchesResolver } from "./matchesResolver.js";
@@ -16,7 +15,6 @@ export const resolvers = {
     ...categoryResolver.Query,
     ...eventResolver.Query,
     ...scheduleResolver.Query,
-    ...scoreboardResolver.Query,
     ...viewDetailsResolver.Query,
     ...matchesResolver.Query,
   },
@@ -28,7 +26,6 @@ export const resolvers = {
     ...categoryResolver.Mutation,
     ...eventResolver.Mutation,
     ...scheduleResolver.Mutation,
-    ...scoreboardResolver.Mutation,
     ...userUpdateScoreResolver.Mutation,
     ...matchesResolver.Mutation,
   },

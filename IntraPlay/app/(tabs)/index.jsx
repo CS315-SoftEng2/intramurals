@@ -217,12 +217,65 @@ const Index = () => {
       parse(b, "EEEE, MMMM d, yyyy", new Date())
   );
 
-  // Filter Completed Matches for Just Now Section
+  // Filter and sort completed matches for Just Now Section
   const completedMatches =
-    matchData?.getMatches?.filter(
-      (match) =>
-        match.score_a !== null && match.score_b !== null && match.winner_team_id
-    ) || [];
+    matchData?.getMatches
+      ?.filter(
+        (match) =>
+          match.score_a !== null &&
+          match.score_b !== null &&
+          match.winner_team_id
+      )
+      ?.map((match) => {
+        const schedule = scheduleData?.schedules?.find(
+          (s) => s.schedule_id === match.schedule_id
+        );
+        const event = eventData?.events?.find(
+          (e) => e.event_id === schedule?.event_id
+        );
+        const category = categoryData?.categories?.find(
+          (c) => c.category_id === event?.category_id
+        );
+        const winnerTeam = teamData?.teams?.find(
+          (t) => t.team_id === match.winner_team_id
+        );
+        // Handle invalid or null score_updated_at
+        let parsedUpdatedAt;
+        if (match.score_updated_at) {
+          // Check if score_updated_at is a Unix timestamp (numeric string)
+          if (/^\d+$/.test(match.score_updated_at)) {
+            parsedUpdatedAt = new Date(parseInt(match.score_updated_at, 10));
+          } else {
+            parsedUpdatedAt = new Date(match.score_updated_at);
+          }
+        } else {
+          // Fallback to distant past for null score_updated_at
+          parsedUpdatedAt = new Date("1970-01-01T00:00:00Z");
+        }
+        return {
+          ...match,
+          event_name: event?.event_name || "Unknown Event",
+          division: category?.division || "Unknown Division",
+          venue: event?.venue || "Unknown Venue",
+          winner_team_color:
+            match.winner_team_color || winnerTeam?.team_color || "#22C55E",
+          parsed_updated_at: parsedUpdatedAt,
+        };
+      })
+      ?.sort((a, b) => b.parsed_updated_at - a.parsed_updated_at) || [];
+
+  // Debug logging
+  console.log(
+    "Completed Matches:",
+    completedMatches.map((m) => ({
+      match_id: m.match_id,
+      score_a: m.score_a,
+      score_b: m.score_b,
+      score_updated_at: m.score_updated_at,
+      parsed_updated_at: m.parsed_updated_at.toISOString(),
+      event_name: m.event_name,
+    }))
+  );
 
   // Leading Team
   const leadingTeam = leadingData?.teamScores?.find(
@@ -258,23 +311,19 @@ const Index = () => {
     green: "#00FF00",
     yellow: "#FFFF00",
     blue: "#0000FF",
-    // Add more colors as needed
   };
 
   // Convert color to hex if it's a named color, or validate hex
   const normalizeColor = (color) => {
-    if (!color) return "#22C55E"; // Default color
-    // Check if it's a named color
+    if (!color) return "#22C55E";
     const namedColor = color.toLowerCase();
     if (colorMap[namedColor]) {
       return colorMap[namedColor];
     }
-    // Check if it's a valid hex color
     const hexPattern = /^#([0-9A-F]{3}|[0-9A-F]{6})$/i;
     if (hexPattern.test(color)) {
       return color;
     }
-    // Fallback to default if invalid
     return "#22C55E";
   };
 
@@ -289,7 +338,7 @@ const Index = () => {
     const r = parseInt(color.slice(0, 2), 16);
     const g = parseInt(color.slice(2, 4), 16);
     const b = parseInt(color.slice(4, 6), 16);
-    const factor = 0.6; // Darken by 40%
+    const factor = 0.6;
     return `rgb(${Math.round(r * factor)}, ${Math.round(
       g * factor
     )}, ${Math.round(b * factor)})`;
@@ -508,6 +557,7 @@ const Index = () => {
 
 export default Index;
 
+// ... (Styles remain unchanged)
 const styles = StyleSheet.create({
   headerTitleUpcomingEvents: {
     fontSize: 22,

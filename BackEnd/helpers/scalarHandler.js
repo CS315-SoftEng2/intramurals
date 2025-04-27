@@ -87,3 +87,24 @@ export const CustomDateTimeScalar = new GraphQLScalarType({
     return null;
   },
 });
+
+export const formatDate = (dateStr) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
+export const formatTime = (timeStr) => {
+  const [hours, minutes] = timeStr.split(":");
+  const date = new Date();
+  date.setHours(parseInt(hours), parseInt(minutes));
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+};

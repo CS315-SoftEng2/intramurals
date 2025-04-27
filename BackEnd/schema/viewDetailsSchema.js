@@ -1,15 +1,17 @@
 export const viewDetails = `#graphql
-    type EventDetail {
+scalar Date
+scalar Time
+
+    type Scoreboard {
         event_id: ID!
         event_name: String!
-        event_date: String!
-        start_time: String!
-        end_time: String!
         venue: String!
-        team_a_name: String!
-        team_b_name: String!
+        category_name: String!
         division: String!
         schedule_id: Int!
+        date: Date!
+        start_time: Time!
+        end_time: Time!
     }
 
   type TeamTotalScore {

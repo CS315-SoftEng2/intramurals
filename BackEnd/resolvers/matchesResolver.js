@@ -32,7 +32,8 @@ export const matchesResolver = {
               e.event_name,
               c.division,
               ta.team_name AS team_a_name,
-              tb.team_name AS team_b_name
+              tb.team_name AS team_b_name,
+              m.score_updated_at
             FROM match m
             LEFT JOIN team ta ON m.team_a_id = ta.team_id
             LEFT JOIN team tb ON m.team_b_id = tb.team_id

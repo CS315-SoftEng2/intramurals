@@ -15,10 +15,7 @@ type Query {
     schedules: [Schedule] 
     schedule(id: Int!): Schedule
 
-    scoreboards: [Scoreboard] 
-    scoreboard(id: Int!): Scoreboard
-
-    eventDetails: [EventDetail!]!
+    scoreboard: [Scoreboard!]!
     teamScores: [TeamTotalScore!]!
 
     getMatches: [Match]
@@ -49,10 +46,6 @@ type Mutation {
     addSchedule(schedule: AddScheduleInput!, admin_id: Int!): addScheduleResponse
     updateSchedule(schedule: UpdateScheduleInput!, admin_id: Int!, schedule_id: Int!): updateScheduleResponse
     deleteSchedule(admin_id: Int!, schedule_id: Int!): deleteScheduleResponse
-
-    addScoreboard(scoreboard: AddScoreboardInput!, admin_id: Int!): addScoreboardResponse
-    updateScoreboard(scoreboard: UpdateScoreboardInput!, admin_id: Int!, scoreboard_id: Int!): updateScoreboardResponse
-    deleteScoreboard(admin_id: Int!, scoreboard_id: Int!): deleteScoreboardResponse
 
     addMatch(match: AddMatchInput!, admin_id: Int!): addMatchResponse
     updateMatch(match: UpdateMatchInput!, admin_id: Int!, match_id: Int!): updateMatchResponse
