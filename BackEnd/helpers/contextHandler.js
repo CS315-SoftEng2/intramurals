@@ -32,7 +32,7 @@ const appContext = ({ req }) => {
           usertype: username,
         },
         type: "success",
-        message: "Authorized!"
+        message: "Authorized!",
       };
     } catch (err) {
       console.error("Token verification failed:", err);
@@ -44,10 +44,10 @@ const appContext = ({ req }) => {
   return {
     content: {
       username: null,
-    usertype: null,
+      usertype: null,
     },
     type: "error",
-    message: "Not Authenticated"
+    message: "Not Authenticated",
   };
 };
 

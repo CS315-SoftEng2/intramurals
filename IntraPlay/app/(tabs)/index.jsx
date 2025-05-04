@@ -1,16 +1,10 @@
 import { Link } from "expo-router";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  ScrollView,
-  ActivityIndicator,
-} from "react-native";
+import { Text, View, Image, ScrollView, ActivityIndicator } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Font from "expo-font";
 import { useState, useEffect } from "react";
+import styles from "../../assets/styles/indexStyles";
 import globalstyles from "../../assets/styles/globalstyles";
 import GET_MATCHES from "../../queries/matchesQuery";
 import GET_SCHEDULES from "../../queries/scheduleQuery";
@@ -27,7 +21,6 @@ import Toast from "react-native-toast-message";
 const Index = () => {
   const [fontsLoaded, setFontsLoaded] = useState(false);
 
-  // GraphQL Queries
   const {
     data: matchData,
     loading: matchLoading,
@@ -67,7 +60,6 @@ const Index = () => {
     });
   }
 
-  // Error Notifications
   useEffect(() => {
     if (matchError)
       Toast.show({ type: "error", text1: "Error!", text2: matchError.message });
@@ -89,7 +81,6 @@ const Index = () => {
       Toast.show({ type: "error", text1: "Error!", text2: teamError.message });
   }, [matchError, scheduleError, eventError, categoryError, teamError]);
 
-  // Load Fonts
   useEffect(() => {
     async function loadFonts() {
       await Font.loadAsync({
@@ -101,7 +92,6 @@ const Index = () => {
     loadFonts();
   }, []);
 
-  // Loading State
   if (
     !fontsLoaded ||
     matchLoading ||
@@ -113,7 +103,6 @@ const Index = () => {
     return <LoadingIndicator visible={true} />;
   }
 
-  // Build eventDetails for Upcoming and Ongoing Matches
   const eventDetails = [];
   if (matchData && scheduleData && eventData && categoryData && teamData) {
     const matches = matchData.getMatches;
@@ -162,7 +151,6 @@ const Index = () => {
     });
   }
 
-  // Date and Time Utilities
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const now = new Date();
@@ -187,21 +175,18 @@ const Index = () => {
     }
   };
 
-  // Filter Upcoming Events
   const upcomingEvents = eventDetails.filter((event) => {
     const eventDate = parse(event.event_date, "EEEE, MMMM d, yyyy", new Date());
     if (isNaN(eventDate.getTime())) return false;
     return eventDate >= today;
   });
 
-  // Filter Ongoing Matches
   const ongoingMatches = eventDetails.filter((event) => {
     const startTime = convertToDateTime(event.event_date, event.start_time);
     const endTime = convertToDateTime(event.event_date, event.end_time);
     return startTime && endTime && now >= startTime && now <= endTime;
   });
 
-  // Group Upcoming Events by Date
   const groupedEvents = {};
   upcomingEvents.forEach((event) => {
     const dateKey = event.event_date;
@@ -217,7 +202,6 @@ const Index = () => {
       parse(b, "EEEE, MMMM d, yyyy", new Date())
   );
 
-  // Filter and sort completed matches for Just Now Section
   const completedMatches =
     matchData?.getMatches
       ?.filter(
@@ -239,17 +223,14 @@ const Index = () => {
         const winnerTeam = teamData?.teams?.find(
           (t) => t.team_id === match.winner_team_id
         );
-        // Handle invalid or null score_updated_at
         let parsedUpdatedAt;
         if (match.score_updated_at) {
-          // Check if score_updated_at is a Unix timestamp (numeric string)
           if (/^\d+$/.test(match.score_updated_at)) {
             parsedUpdatedAt = new Date(parseInt(match.score_updated_at, 10));
           } else {
             parsedUpdatedAt = new Date(match.score_updated_at);
           }
         } else {
-          // Fallback to distant past for null score_updated_at
           parsedUpdatedAt = new Date("1970-01-01T00:00:00Z");
         }
         return {
@@ -264,20 +245,6 @@ const Index = () => {
       })
       ?.sort((a, b) => b.parsed_updated_at - a.parsed_updated_at) || [];
 
-  // Debug logging
-  console.log(
-    "Completed Matches:",
-    completedMatches.map((m) => ({
-      match_id: m.match_id,
-      score_a: m.score_a,
-      score_b: m.score_b,
-      score_updated_at: m.score_updated_at,
-      parsed_updated_at: m.parsed_updated_at.toISOString(),
-      event_name: m.event_name,
-    }))
-  );
-
-  // Leading Team
   const leadingTeam = leadingData?.teamScores?.find(
     (team) => team.overall_ranking === 1
   ) || {
@@ -285,7 +252,6 @@ const Index = () => {
     total_score: 0,
   };
 
-  // Team Logos
   const teamLogos = {
     "team1.png": require("../../assets/images/team1.png"),
     "team2.png": require("../../assets/images/team2.png"),
@@ -305,7 +271,6 @@ const Index = () => {
     return team?.team_color || "#22C55E";
   };
 
-  // Map named colors to hex values
   const colorMap = {
     red: "#FF0000",
     green: "#00FF00",
@@ -313,7 +278,6 @@ const Index = () => {
     blue: "#0000FF",
   };
 
-  // Convert color to hex if it's a named color, or validate hex
   const normalizeColor = (color) => {
     if (!color) return "#22C55E";
     const namedColor = color.toLowerCase();
@@ -327,7 +291,6 @@ const Index = () => {
     return "#22C55E";
   };
 
-  // Darken the color for the gradient
   const darkenColor = (hex) => {
     let color = hex.startsWith("#") ? hex.slice(1) : hex;
     if (color.length === 3)
@@ -556,240 +519,3 @@ const Index = () => {
 };
 
 export default Index;
-
-// ... (Styles remain unchanged)
-const styles = StyleSheet.create({
-  headerTitleUpcomingEvents: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#fff",
-    marginTop: 40,
-    alignSelf: "flex-start",
-    marginLeft: 25,
-  },
-  headerTitleLeadingTeam: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#fff",
-    marginTop: 20,
-    alignSelf: "flex-start",
-    marginLeft: 25,
-  },
-  headerTitleJustNow: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#fff",
-    marginLeft: 25,
-    alignSelf: "flex-start",
-    marginBottom: 5,
-  },
-  headerTitleOngoingMatches: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#fff",
-    marginTop: 10,
-    marginBottom: 5,
-    marginLeft: 25,
-    alignSelf: "flex-start",
-  },
-  upcomingEventsContainer: {
-    backgroundColor: "#2A2A3C",
-    width: "90%",
-    marginTop: 15,
-    marginBottom: 20,
-    borderRadius: 15,
-    padding: 15,
-    paddingBottom: 20,
-  },
-  dateHeader: {
-    color: "#22C55E",
-    fontSize: 15,
-    fontWeight: "600",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  eventList: {
-    width: "100%",
-  },
-  eventCard: {
-    backgroundColor: "#1E1E2E",
-    borderRadius: 10,
-    marginBottom: 8,
-    padding: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  eventCardContent: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  eventNameContainer: {
-    flex: 1,
-    paddingRight: 8,
-  },
-  eventName: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "600",
-    marginBottom: 4,
-  },
-  eventTimeRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  eventTime: {
-    color: "#aaa",
-    fontSize: 12,
-  },
-  venueText: {
-    color: "#aaa",
-    fontSize: 12,
-  },
-  locationContainer: {
-    alignItems: "flex-end",
-  },
-  locationText: {
-    color: "#ddd",
-    fontSize: 12,
-    marginBottom: 2,
-  },
-  teamText: {
-    color: "#aaa",
-    fontSize: 11,
-  },
-  leadingTeamContainer: {
-    height: 120,
-    width: "98%",
-    marginTop: 5,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 15,
-    borderRadius: 15,
-  },
-  matchVenueContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 10,
-  },
-  team1Logo: {
-    width: 75,
-    height: 75,
-    borderRadius: 50,
-  },
-  scoreContainer: {
-    marginLeft: 20,
-    alignItems: "center",
-  },
-  totalScoreLabel: {
-    fontFamily: "Oswald-Semi-Bold",
-    fontSize: 18,
-    color: "#fff",
-    marginBottom: 5,
-  },
-  totalScoreValue: {
-    fontFamily: "Racing Sans One-Regular",
-    fontSize: 50,
-    color: "#fff",
-  },
-  justNowContainer: {
-    width: "95%",
-    borderRadius: 15,
-    padding: 15,
-    paddingBottom: 20,
-  },
-  justNowCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 10,
-    marginBottom: 10,
-    padding: 10,
-    minHeight: 60,
-  },
-  justNowTeamLogo: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  justNowTextContainer: {
-    flex: 1,
-  },
-  justNowTitle: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "bold",
-    textTransform: "uppercase",
-    marginBottom: 2,
-  },
-  justNowSubtitle: {
-    color: "#fff",
-    fontSize: 12,
-    textTransform: "uppercase",
-  },
-  justNowEmptyText: {
-    color: "#fff",
-    textAlign: "center",
-    padding: 10,
-  },
-  eventNameMatch: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-    fontFamily: "Racing Sans One-Regular",
-    textAlign: "center",
-    margin: -5,
-    marginBottom: 5,
-  },
-  matchingTeamNames: {
-    color: "#fff",
-    fontSize: 18,
-    fontFamily: "Oswald-Semi-Bold",
-    textAlign: "center",
-  },
-  ongoingMatchesTeamLogos: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-  },
-  ongoingMatchesContainer: {
-    width: "98%",
-    borderRadius: 15,
-    padding: 15,
-  },
-  errorText: {
-    color: "red",
-    textAlign: "center",
-    padding: 10,
-  },
-  emptyStateText: {
-    color: "#fff",
-    textAlign: "center",
-    padding: 10,
-  },
-  matchGradientBorder: {
-    borderRadius: 10,
-    marginBottom: 15,
-    padding: 2,
-    width: "100%",
-  },
-  matchCardContent: {
-    backgroundColor: "#2A2A3C",
-    borderRadius: 8,
-    padding: 15,
-    alignItems: "center",
-  },
-  teamsMatchupContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 10,
-    width: "100%",
-    paddingHorizontal: 10,
-  },
-});

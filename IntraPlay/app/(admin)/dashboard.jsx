@@ -1,9 +1,9 @@
 import { Link, useRouter } from "expo-router";
 import {
-  StyleSheet,
   Text,
   View,
   SafeAreaView,
+  StyleSheet,
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   gradientBackground: {
     padding: 16,
     borderRadius: 16,
-    minHeight: 120, // Ensure consistent height even during loading
+    minHeight: 120,
   },
   cardHeader: {
     flexDirection: "row",
