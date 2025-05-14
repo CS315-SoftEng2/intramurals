@@ -75,7 +75,6 @@ const globalstyles = StyleSheet.create({
     alignItems: "center",
     padding: 3,
     borderRadius: 8,
-    // backgroundColor: "rgba(0, 123, 255, 0.1);",
   },
   backButtonText: {
     color: "#fff",

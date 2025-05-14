@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+// React and library imports
+import { useEffect, useMemo, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   View,
@@ -10,12 +11,20 @@ import {
 import { useMutation, useQuery } from "@apollo/client";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Toast from "react-native-toast-message";
+
+// Queries and mutations
 import USER_UPDATE_SCORE from "../../../mutations/userUpdateScoreMutation";
 import GET_TEAMS from "../../../queries/teamsQuery";
 import GET_MATCHES from "../../../queries/matchesQuery";
+
+// Styles
 import styles from "../../../assets/styles/scoreUpdateStyles";
 import globalstyles from "@/assets/styles/globalstyles";
-import Toast from "react-native-toast-message";
+
+// Context and utilities
+import { useAuth } from "../../../context/AuthContext";
+import { handleLogout } from "../../../utils/handleLogout";
 
 const ScoreUpdate = () => {
   const router = useRouter();
@@ -28,19 +37,25 @@ const ScoreUpdate = () => {
     user_assigned_id,
   } = useLocalSearchParams();
 
+  const { logout } = useAuth();
+
   const [scoreA, setScoreA] = useState(0);
   const [scoreB, setScoreB] = useState(0);
 
   const [updateScore] = useMutation(USER_UPDATE_SCORE);
   const { data: teamData } = useQuery(GET_TEAMS);
-  const { data: matchesData, loading: matchesLoading } = useQuery(GET_MATCHES);
+  const {
+    data: matchesData,
+    loading: matchesLoading,
+    refetch: refetchMatches,
+  } = useQuery(GET_MATCHES, { fetchPolicy: "network-only" });
 
+  // Load initial match scores
   useEffect(() => {
     if (matchesData?.getMatches && match_id) {
       const match = matchesData.getMatches.find(
         (m) => m.match_id === Number(match_id)
       );
-
       if (match) {
         setScoreA(match.score_a || 0);
         setScoreB(match.score_b || 0);
@@ -48,12 +63,21 @@ const ScoreUpdate = () => {
     }
   }, [matchesData, match_id]);
 
+  // Memoized team name lookup
+  const teamName = useMemo(
+    () => (id) =>
+      teamData?.teams?.find((team) => team.team_id === Number(id))?.team_name ||
+      "Unknown",
+    [teamData]
+  );
+
   const handleSubmit = async () => {
     const variables = {
       match: { score_a: Number(scoreA), score_b: Number(scoreB) },
       userId: Number(user_assigned_id),
       matchId: Number(match_id),
     };
+
     try {
       const { data } = await updateScore({
         variables,
@@ -87,17 +111,14 @@ const ScoreUpdate = () => {
           text2: data.userUpdateScore.message,
         });
 
-        const teamNameA = teamName(team_a_id);
-        const teamNameB = teamName(team_b_id);
-
         router.replace({
           pathname: "/(user)/leaderboard",
           params: {
             match_id,
             event_name,
             division,
-            team_name_a: teamNameA,
-            team_name_b: teamNameB,
+            team_name_a: teamName(team_a_id),
+            team_name_b: teamName(team_b_id),
             score_a: scoreA,
             score_b: scoreB,
           },
@@ -106,7 +127,7 @@ const ScoreUpdate = () => {
         Toast.show({
           type: "error",
           text1: "Update failed!",
-          text2: data.userUpdate.message,
+          text2: data.userUpdateScore.message,
         });
       }
     } catch (err) {
@@ -118,14 +139,12 @@ const ScoreUpdate = () => {
     }
   };
 
-  const teamName = (id) =>
-    teamData?.teams?.find((team) => team.team_id == id)?.team_name || "Unknown";
-
   return (
     <ScrollView style={{ backgroundColor: "#1E1E2E" }}>
+      {/* Logout button */}
       <View style={globalstyles.loginButtonContainer}>
-        <TouchableOpacity onPress={() => router.push("/login")}>
-          <MaterialIcons name="login" size={30} color="#fff" />
+        <TouchableOpacity onPress={() => handleLogout(logout)}>
+          <MaterialIcons name="logout" size={25} color="#fff" />
         </TouchableOpacity>
       </View>
 
@@ -140,6 +159,7 @@ const ScoreUpdate = () => {
           </Text>
 
           <View style={styles.teamScoreRow}>
+            {/* Team A */}
             <View style={styles.teamColumn}>
               <Text style={styles.teamTitle}>Team {teamName(team_a_id)}</Text>
               <View style={styles.scoreButtons}>
@@ -171,6 +191,7 @@ const ScoreUpdate = () => {
               </View>
             </View>
 
+            {/* Team B */}
             <View style={styles.teamColumn}>
               <Text style={styles.teamTitle}>Team {teamName(team_b_id)}</Text>
               <View style={styles.scoreButtons}>
@@ -203,6 +224,7 @@ const ScoreUpdate = () => {
             </View>
           </View>
 
+          {/* Save Button */}
           <TouchableOpacity style={styles.saveButton} onPress={handleSubmit}>
             <Text style={styles.saveText}>Save Update</Text>
           </TouchableOpacity>

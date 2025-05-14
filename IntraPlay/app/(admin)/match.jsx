@@ -1,4 +1,5 @@
-import { Link } from "expo-router";
+// React and library imports
+import { useMemo, useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import {
   View,
@@ -7,19 +8,30 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import { useState } from "react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import LoadingIndicator from "../components/LoadingIndicator";
-import Toast from "react-native-toast-message";
 import Modal from "react-native-modal";
+import Toast from "react-native-toast-message";
+
+// Components
+import LoadingIndicator from "../components/LoadingIndicator";
 import CustomAlert from "../components/customAlert";
+
+// Styles
 import styles from "../../assets/styles/matchStyles";
 import globalstyles from "../../assets/styles/globalstyles";
+
+// Context and utilities
+import { useAuth } from "../../context/AuthContext";
+import { handleLogout } from "../../utils/handleLogout";
+
+// Queries
 import GET_MATCHES from "../../queries/matchesQuery";
 import GET_CATEGORIES from "../../queries/categoriesQuery";
 import GET_SCHEDULES from "../../queries/scheduleQuery";
 import GET_EVENTS from "../../queries/eventsQuery";
+
+// Mutations
 import {
   ADD_MATCH,
   UPDATE_MATCH,
@@ -42,13 +54,18 @@ import {
 } from "../../mutations/categoryMutation";
 
 const Match = () => {
+  const { logout } = useAuth();
+
   return (
     <ScrollView style={styles.container}>
+      {/* Logout button */}
       <View style={globalstyles.loginButtonContainer}>
-        <Link href={"/login"}>
-          <MaterialIcons name="login" size={30} color="#fff" />
-        </Link>
+        <TouchableOpacity onPress={() => handleLogout(logout)}>
+          <MaterialIcons name="logout" size={25} color="#fff" />
+        </TouchableOpacity>
       </View>
+
+      {/* Tables */}
       <MatchTable />
       <ScheduleTable />
       <EventTable />
@@ -89,20 +106,11 @@ const MatchTable = () => {
     user_assigned_id: "",
   });
 
-  if (matchLoading) {
-    return <LoadingIndicator visible={true} message="Loading..." />;
-  }
-
-  if (matchError) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>Error occurred!</Text>
-      </View>
-    );
-  }
-
   const matches = matchData?.getMatches || [];
-  const sortedMatches = [...matches].sort((a, b) => a.match_id - b.match_id);
+  const sortedMatches = useMemo(
+    () => [...matches].sort((a, b) => a.match_id - b.match_id),
+    [matches]
+  );
 
   const handleSubmit = async () => {
     if (!formData.schedule_id.trim()) {
@@ -183,21 +191,17 @@ const MatchTable = () => {
           text1: type.charAt(0).toUpperCase() + type.slice(1),
           text2: message,
         });
-        if (type === "error") {
-          return;
-        }
+        if (type === "error") return;
       } else {
         const { matchId, ...addVariables } = variables;
         const response = await addMatch({ variables: addVariables });
-        const { type, message } = response.addmatch;
+        const { type, message } = response.data.addMatch;
         Toast.show({
           type: type === "success" ? "success" : "error",
           text1: type.charAt(0).toUpperCase() + type.slice(1),
           text2: message,
         });
-        if (type === "error") {
-          return;
-        }
+        if (type === "error") return;
       }
       await refetchMatches();
       setModalVisible(false);
@@ -255,9 +259,7 @@ const MatchTable = () => {
         text1: type.charAt(0).toUpperCase() + type.slice(1),
         text2: message,
       });
-      if (type === "error") {
-        return;
-      }
+      if (type === "error") return;
       await refetchMatches();
     } catch (err) {
       Toast.show({
@@ -282,8 +284,21 @@ const MatchTable = () => {
     setModalVisible(true);
   };
 
+  if (matchLoading) {
+    return <LoadingIndicator visible={true} message="Loading..." />;
+  }
+
+  if (matchError) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>Error occurred!</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.contentContainer}>
+      {/* Table header */}
       <View style={styles.tableAddButtonContainer}>
         <Text style={styles.tableTitle}>Match Table</Text>
         <TouchableOpacity onPress={openAddModal} style={styles.addMatchButton}>
@@ -291,6 +306,8 @@ const MatchTable = () => {
           <Text style={styles.addButtonText}>Add Match</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Table content */}
       <ScrollView horizontal showsHorizontalScrollIndicator>
         <View style={styles.matchTable}>
           <View style={styles.tableHeader}>
@@ -356,6 +373,8 @@ const MatchTable = () => {
           ))}
         </View>
       </ScrollView>
+
+      {/* Add/Edit modal */}
       <Modal
         isVisible={modalVisible}
         onBackdropPress={() => setModalVisible(false)}
@@ -424,6 +443,8 @@ const MatchTable = () => {
           </TouchableOpacity>
         </View>
       </Modal>
+
+      {/* Delete confirmation alert */}
       <CustomAlert
         isVisible={alertVisible}
         onClose={() => setAlertVisible(false)}
@@ -468,21 +489,10 @@ const ScheduleTable = () => {
     category_id: "",
   });
 
-  if (scheduleLoading) {
-    return <LoadingIndicator visible={true} message="Loading..." />;
-  }
-
-  if (scheduleError) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>Error occurred!</Text>
-      </View>
-    );
-  }
-
   const schedules = scheduleData?.schedules || [];
-  const sortedSchedules = [...schedules].sort(
-    (a, b) => a.schedule_id - b.schedule_id
+  const sortedSchedules = useMemo(
+    () => [...schedules].sort((a, b) => a.schedule_id - b.schedule_id),
+    [schedules]
   );
 
   const handleSubmit = async () => {
@@ -594,9 +604,7 @@ const ScheduleTable = () => {
           text1: type.charAt(0).toUpperCase() + type.slice(1),
           text2: message,
         });
-        if (type === "error") {
-          return;
-        }
+        if (type === "error") return;
       } else {
         const { scheduleId, ...addVariables } = variables;
         const response = await addSchedule({
@@ -612,9 +620,7 @@ const ScheduleTable = () => {
           text1: type.charAt(0).toUpperCase() + type.slice(1),
           text2: message,
         });
-        if (type === "error") {
-          return;
-        }
+        if (type === "error") return;
       }
       await refetchSchedules();
       setModalVisible(false);
@@ -665,9 +671,7 @@ const ScheduleTable = () => {
         text1: type.charAt(0).toUpperCase() + type.slice(1),
         text2: message,
       });
-      if (type === "error") {
-        return;
-      }
+      if (type === "error") return;
       await refetchSchedules();
     } catch (err) {
       Toast.show({
@@ -693,8 +697,21 @@ const ScheduleTable = () => {
     setModalVisible(true);
   };
 
+  if (scheduleLoading) {
+    return <LoadingIndicator visible={true} message="Loading..." />;
+  }
+
+  if (scheduleError) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>Error occurred!</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.otherContentContainer}>
+      {/* Table header */}
       <View style={styles.tableAddButtonContainer}>
         <Text style={styles.tableTitle}>Schedule Table</Text>
         <TouchableOpacity
@@ -705,6 +722,8 @@ const ScheduleTable = () => {
           <Text style={styles.addButtonText}>Add Schedule</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Table content */}
       <ScrollView horizontal showsHorizontalScrollIndicator>
         <View style={styles.matchTable}>
           <View style={styles.tableHeader}>
@@ -770,6 +789,8 @@ const ScheduleTable = () => {
           ))}
         </View>
       </ScrollView>
+
+      {/* Add/Edit modal */}
       <Modal
         isVisible={modalVisible}
         onBackdropPress={() => setModalVisible(false)}
@@ -846,6 +867,8 @@ const ScheduleTable = () => {
           </TouchableOpacity>
         </View>
       </Modal>
+
+      {/* Delete confirmation alert */}
       <CustomAlert
         isVisible={alertVisible}
         onClose={() => setAlertVisible(false)}
@@ -888,20 +911,11 @@ const EventTable = () => {
     category_id: "",
   });
 
-  if (eventLoading) {
-    return <LoadingIndicator visible={true} message="Loading..." />;
-  }
-
-  if (eventError) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>Error occurred!</Text>
-      </View>
-    );
-  }
-
   const events = eventData?.events || [];
-  const sortedEvents = [...events].sort((a, b) => a.event_id - b.event_id);
+  const sortedEvents = useMemo(
+    () => [...events].sort((a, b) => a.event_id - b.event_id),
+    [events]
+  );
 
   const handleSubmit = async () => {
     if (!formData.event_name.trim()) {
@@ -964,9 +978,7 @@ const EventTable = () => {
           text1: type.charAt(0).toUpperCase() + type.slice(1),
           text2: message,
         });
-        if (type === "error") {
-          return;
-        }
+        if (type === "error") return;
       } else {
         const { eventId, ...addVariables } = variables;
         const response = await addEvent({ variables: addVariables });
@@ -976,6 +988,7 @@ const EventTable = () => {
           text1: type.charAt(0).toUpperCase() + type.slice(1),
           text2: message,
         });
+        if (type === "error") return;
       }
       await refetchEvents();
       setModalVisible(false);
@@ -1022,9 +1035,7 @@ const EventTable = () => {
         text1: type.charAt(0).toUpperCase() + type.slice(1),
         text2: message,
       });
-      if (type === "error") {
-        return;
-      }
+      if (type === "error") return;
       await refetchEvents();
     } catch (err) {
       Toast.show({
@@ -1048,8 +1059,21 @@ const EventTable = () => {
     setModalVisible(true);
   };
 
+  if (eventLoading) {
+    return <LoadingIndicator visible={true} message="Loading..." />;
+  }
+
+  if (eventError) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>Error occurred!</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.otherContentContainer}>
+      {/* Table header */}
       <View style={styles.tableAddButtonContainer}>
         <Text style={styles.tableTitle}>Event Table</Text>
         <TouchableOpacity onPress={openAddModal} style={styles.addEventButton}>
@@ -1057,6 +1081,8 @@ const EventTable = () => {
           <Text style={styles.addButtonText}>Add Event</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Table content */}
       <ScrollView horizontal showsHorizontalScrollIndicator>
         <View style={styles.matchTable}>
           <View style={styles.tableHeader}>
@@ -1110,6 +1136,8 @@ const EventTable = () => {
           ))}
         </View>
       </ScrollView>
+
+      {/* Add/Edit modal */}
       <Modal
         isVisible={modalVisible}
         onBackdropPress={() => setModalVisible(false)}
@@ -1165,6 +1193,8 @@ const EventTable = () => {
           </TouchableOpacity>
         </View>
       </Modal>
+
+      {/* Delete confirmation alert */}
       <CustomAlert
         isVisible={alertVisible}
         onClose={() => setAlertVisible(false)}
@@ -1206,21 +1236,10 @@ const CategoryTable = () => {
     division: "",
   });
 
-  if (categoryLoading) {
-    return <LoadingIndicator visible={true} message="Loading..." />;
-  }
-
-  if (categoryError) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>Error occurred!</Text>
-      </View>
-    );
-  }
-
   const categories = categoryData?.categories || [];
-  const sortedCategories = [...categories].sort(
-    (a, b) => a.category_id - b.category_id
+  const sortedCategories = useMemo(
+    () => [...categories].sort((a, b) => a.category_id - b.category_id),
+    [categories]
   );
 
   const handleSubmit = async () => {
@@ -1265,9 +1284,7 @@ const CategoryTable = () => {
           text1: type.charAt(0).toUpperCase() + type.slice(1),
           text2: message,
         });
-        if (type === "error") {
-          return;
-        }
+        if (type === "error") return;
       } else {
         const { categoryId, ...addVariables } = variables;
         const response = await addCategory({ variables: addVariables });
@@ -1277,6 +1294,7 @@ const CategoryTable = () => {
           text1: type.charAt(0).toUpperCase() + type.slice(1),
           text2: message,
         });
+        if (type === "error") return;
       }
       await refetchCategories();
       setModalVisible(false);
@@ -1321,9 +1339,7 @@ const CategoryTable = () => {
         text1: type.charAt(0).toUpperCase() + type.slice(1),
         text2: message,
       });
-      if (type === "error") {
-        return;
-      }
+      if (type === "error") return;
       await refetchCategories();
     } catch (err) {
       Toast.show({
@@ -1346,8 +1362,21 @@ const CategoryTable = () => {
     setModalVisible(true);
   };
 
+  if (categoryLoading) {
+    return <LoadingIndicator visible={true} message="Loading..." />;
+  }
+
+  if (categoryError) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>Error occurred!</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.otherContentContainer}>
+      {/* Table header */}
       <View style={styles.tableAddButtonContainer}>
         <Text style={styles.tableTitle}>Category Table</Text>
         <TouchableOpacity
@@ -1358,6 +1387,8 @@ const CategoryTable = () => {
           <Text style={styles.addButtonText}>Add Category</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Table content */}
       <ScrollView horizontal showsHorizontalScrollIndicator>
         <View style={styles.matchTable}>
           <View style={styles.tableHeader}>
@@ -1411,6 +1442,8 @@ const CategoryTable = () => {
           ))}
         </View>
       </ScrollView>
+
+      {/* Add/Edit modal */}
       <Modal
         isVisible={modalVisible}
         onBackdropPress={() => setModalVisible(false)}
@@ -1457,6 +1490,8 @@ const CategoryTable = () => {
           </TouchableOpacity>
         </View>
       </Modal>
+
+      {/* Delete confirmation alert */}
       <CustomAlert
         isVisible={alertVisible}
         onClose={() => setAlertVisible(false)}

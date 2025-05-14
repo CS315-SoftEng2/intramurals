@@ -1,4 +1,5 @@
-import { useState } from "react";
+// React and library imports
+import { useState, useMemo } from "react";
 import { Link } from "expo-router";
 import {
   Text,
@@ -8,30 +9,31 @@ import {
   ScrollView,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { parse } from "date-fns";
+
+// Components
+import LoadingIndicator from "../components/LoadingIndicator";
+
+// Styles
 import styles from "../../assets/styles/scheduleStyles";
 import globalstyles from "../../assets/styles/globalstyles";
-import { useQuery } from "@apollo/client";
+
+// Queries
 import GET_MATCHES from "../../queries/matchesQuery";
 import GET_SCHEDULES from "../../queries/scheduleQuery";
 import GET_EVENTS from "../../queries/eventsQuery";
 import GET_CATEGORIES from "../../queries/categoriesQuery";
 import GET_TEAMS from "../../queries/teamsQuery";
-import { parse } from "date-fns";
-import LoadingIndicator from "../components/LoadingIndicator";
+
+// Apollo Client
+import { useQuery } from "@apollo/client";
 
 const Schedule = () => {
-  const today = new Date();
+  // State
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(today.getDate());
+  const [selectedDate, setSelectedDate] = useState(new Date().getDate());
 
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
-  const displayMonth = month + 1;
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-  const daysOfWeek = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-
+  // Queries
   const {
     data: matchesData,
     loading: matchesLoading,
@@ -58,19 +60,43 @@ const Schedule = () => {
     error: teamsError,
   } = useQuery(GET_TEAMS);
 
-  const events = [];
-  if (
-    !matchesLoading &&
-    !schedulesLoading &&
-    !eventsLoading &&
-    !categoriesLoading &&
-    !teamsLoading &&
-    matchesData &&
-    schedulesData &&
-    eventsData &&
-    categoriesData &&
-    teamsData
-  ) {
+  // Memoized calendar data
+  const calendarData = useMemo(() => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const displayMonth = month + 1;
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const dayOffset = (firstDay - 1 + 7) % 7;
+    const daysOfWeek = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+    return {
+      year,
+      month,
+      displayMonth,
+      firstDay,
+      daysInMonth,
+      dayOffset,
+      daysOfWeek,
+    };
+  }, [currentDate]);
+
+  // Memoized events
+  const events = useMemo(() => {
+    if (
+      matchesLoading ||
+      schedulesLoading ||
+      eventsLoading ||
+      categoriesLoading ||
+      teamsLoading ||
+      !matchesData ||
+      !schedulesData ||
+      !eventsData ||
+      !categoriesData ||
+      !teamsData
+    ) {
+      return [];
+    }
+
     const matches = matchesData.getMatches;
     const schedules = schedulesData.schedules;
     const eventsMap = new Map(eventsData.events.map((e) => [e.event_id, e]));
@@ -79,46 +105,64 @@ const Schedule = () => {
     );
     const teamsMap = new Map(teamsData.teams.map((t) => [t.team_id, t]));
 
-    matches.forEach((match) => {
-      const schedule = schedules.find(
-        (s) => s.schedule_id === match.schedule_id
-      );
-      if (!schedule) return;
+    return matches
+      .map((match) => {
+        const schedule = schedules.find(
+          (s) => s.schedule_id === match.schedule_id
+        );
+        if (!schedule) return null;
 
-      const event = eventsMap.get(schedule.event_id);
-      const category = categoriesMap.get(event?.category_id);
-      if (!event || !category) return;
+        const event = eventsMap.get(schedule.event_id);
+        const category = categoriesMap.get(event?.category_id);
+        if (!event || !category) return null;
 
-      const teamA = teamsMap.get(match.team_a_id);
-      const teamB = teamsMap.get(match.team_b_id);
-      if (!teamA || !teamB) return;
+        const teamA = teamsMap.get(match.team_a_id);
+        const teamB = teamsMap.get(match.team_b_id);
+        if (!teamA || !teamB) return null;
 
-      const eventDate = parse(schedule.date, "EEEE, MMMM d, yyyy", new Date());
-      if (isNaN(eventDate.getTime())) return;
+        const eventDate = parse(
+          schedule.date,
+          "EEEE, MMMM d, yyyy",
+          new Date()
+        );
+        if (isNaN(eventDate.getTime())) return null;
 
-      const timeRange = `${schedule.start_time} - ${schedule.end_time}`;
+        const timeRange = `${schedule.start_time} - ${schedule.end_time}`;
 
-      events.push({
-        id: match.match_id,
-        title: `${event.event_name} - ${category.division}`,
-        teams: {
-          red: match.team_a_name,
-          green: match.team_b_name,
-        },
-        teamColors: {
-          red: teamA.team_color,
-          green: teamB.team_color,
-        },
-        time: timeRange,
-        location: event.venue,
-        date: eventDate.getDate(),
-        month: eventDate.getMonth() + 1,
-        year: eventDate.getFullYear(),
-        formattedDate: schedule.date,
-      });
-    });
-  }
+        return {
+          id: match.match_id,
+          title: `${event.event_name} - ${category.division}`,
+          teams: {
+            red: match.team_a_name,
+            green: match.team_b_name,
+          },
+          teamColors: {
+            red: teamA.team_color || "#FF4A4A",
+            green: teamB.team_color || "#4AD991",
+          },
+          time: timeRange,
+          location: event.venue,
+          date: eventDate.getDate(),
+          month: eventDate.getMonth() + 1,
+          year: eventDate.getFullYear(),
+          formattedDate: schedule.date,
+        };
+      })
+      .filter(Boolean);
+  }, [
+    matchesData,
+    schedulesData,
+    eventsData,
+    categoriesData,
+    teamsData,
+    matchesLoading,
+    schedulesLoading,
+    eventsLoading,
+    categoriesLoading,
+    teamsLoading,
+  ]);
 
+  // Handlers
   const getPreviousMonth = () => {
     const prev = new Date(currentDate);
     prev.setMonth(currentDate.getMonth() - 1);
@@ -133,11 +177,13 @@ const Schedule = () => {
     setSelectedDate(1);
   };
 
-  const renderCalendarDays = () => {
-    const dayOffset = (firstDay - 1 + 7) % 7;
+  // Render calendar days
+  const renderCalendarDays = useMemo(() => {
+    const { dayOffset, daysInMonth, daysOfWeek, year, displayMonth } =
+      calendarData;
     const emptyDays = Array(dayOffset).fill(null);
     const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-    const allDays = [...emptyDays, ...days];
+    let allDays = [...emptyDays, ...days];
 
     while (allDays.length % 7 !== 0) {
       allDays.push(null);
@@ -147,15 +193,14 @@ const Schedule = () => {
     const allNull = lastRow.every((day) => day === null);
     const cleanedDays = allNull ? allDays.slice(0, -7) : allDays;
 
-    return (
+    return () => (
       <View style={styles.calendarGrid}>
         {daysOfWeek.map((day) => (
           <View key={day} style={styles.dayHeader}>
             <Text style={styles.dayHeaderText}>{day}</Text>
           </View>
         ))}
-
-        {allDays.map((day, index) => (
+        {cleanedDays.map((day, index) => (
           <View key={index} style={styles.dayCell}>
             {day && (
               <TouchableOpacity
@@ -185,64 +230,70 @@ const Schedule = () => {
         ))}
       </View>
     );
-  };
+  }, [calendarData, events, selectedDate]);
 
-  const renderEventCards = () => {
-    const filteredEvents = events.filter(
-      (event) =>
-        event.date === selectedDate &&
-        event.month === displayMonth &&
-        event.year === year
-    );
-
-    if (filteredEvents.length === 0) {
-      return (
-        <Text style={{ color: "#6E6E6E", textAlign: "center", marginTop: 20 }}>
-          No events for this day.
-        </Text>
+  // Render event cards
+  const renderEventCards = useMemo(() => {
+    return () => {
+      const filteredEvents = events.filter(
+        (event) =>
+          event.date === selectedDate &&
+          event.month === calendarData.displayMonth &&
+          event.year === calendarData.year
       );
-    }
 
-    return filteredEvents.map((event) => (
-      <View key={event.id} style={styles.eventCard}>
-        <Text style={styles.eventTitle}>{event.title}</Text>
-        <View style={styles.eventTeams}>
-          <View style={styles.teamContainer}>
-            <View
-              style={[
-                styles.teamIndicator,
-                { backgroundColor: event.teamColors.red || "#FF4A4A" },
-              ]}
-            />
-            <Text style={styles.teamText}>{event.teams.red}</Text>
-          </View>
-          <Text style={styles.vsText}>vs</Text>
-          <View style={styles.teamContainer}>
-            <View
-              style={[
-                styles.teamIndicator,
-                { backgroundColor: event.teamColors.green || "#4AD991" },
-              ]}
-            />
-            <Text style={styles.teamText}>{event.teams.green}</Text>
-          </View>
-        </View>
-        <View style={styles.eventDetails}>
-          <MaterialIcons name="calendar-today" size={16} color="#6E6E6E" />
-          <Text style={styles.eventDetailText}>{event.formattedDate}</Text>
-        </View>
-        <View style={styles.eventDetails}>
-          <MaterialIcons name="access-time" size={16} color="#6E6E6E" />
-          <Text style={styles.eventDetailText}>{event.time}</Text>
-        </View>
-        <View style={styles.eventDetails}>
-          <MaterialIcons name="location-on" size={16} color="#6E6E6E" />
-          <Text style={styles.eventDetailText}>{event.location}</Text>
-        </View>
-      </View>
-    ));
-  };
+      if (filteredEvents.length === 0) {
+        return (
+          <Text
+            style={{ color: "#6E6E6E", textAlign: "center", marginTop: 20 }}
+          >
+            No events for this day.
+          </Text>
+        );
+      }
 
+      return filteredEvents.map((event) => (
+        <View key={event.id} style={styles.eventCard}>
+          <Text style={styles.eventTitle}>{event.title}</Text>
+          <View style={styles.eventTeams}>
+            <View style={styles.teamContainer}>
+              <View
+                style={[
+                  styles.teamIndicator,
+                  { backgroundColor: event.teamColors.red },
+                ]}
+              />
+              <Text style={styles.teamText}>{event.teams.red}</Text>
+            </View>
+            <Text style={styles.vsText}>vs</Text>
+            <View style={styles.teamContainer}>
+              <View
+                style={[
+                  styles.teamIndicator,
+                  { backgroundColor: event.teamColors.green },
+                ]}
+              />
+              <Text style={styles.teamText}>{event.teams.green}</Text>
+            </View>
+          </View>
+          <View style={styles.eventDetails}>
+            <MaterialIcons name="calendar-today" size={16} color="#6E6E6E" />
+            <Text style={styles.eventDetailText}>{event.formattedDate}</Text>
+          </View>
+          <View style={styles.eventDetails}>
+            <MaterialIcons name="access-time" size={16} color="#6E6E6E" />
+            <Text style={styles.eventDetailText}>{event.time}</Text>
+          </View>
+          <View style={styles.eventDetails}>
+            <MaterialIcons name="location-on" size={16} color="#6E6E6E" />
+            <Text style={styles.eventDetailText}>{event.location}</Text>
+          </View>
+        </View>
+      ));
+    };
+  }, [events, selectedDate, calendarData]);
+
+  // Loading state
   if (
     matchesLoading ||
     schedulesLoading ||
@@ -253,6 +304,7 @@ const Schedule = () => {
     return <LoadingIndicator visible={true} />;
   }
 
+  // Error state
   if (
     matchesError ||
     schedulesError ||
@@ -260,24 +312,38 @@ const Schedule = () => {
     categoriesError ||
     teamsError
   ) {
-    return <Text>Error loading data</Text>;
+    return (
+      <SafeAreaView style={globalstyles.container}>
+        <Text style={{ color: "#F38BA8", textAlign: "center", marginTop: 20 }}>
+          Error loading data:{" "}
+          {matchesError?.message ||
+            schedulesError?.message ||
+            eventsError?.message ||
+            categoriesError?.message ||
+            teamsError?.message}
+        </Text>
+      </SafeAreaView>
+    );
   }
 
   return (
     <SafeAreaView style={globalstyles.container}>
+      {/* Login button */}
       <View style={globalstyles.loginButtonContainer}>
         <Link href={"/login"}>
           <MaterialIcons name="login" size={30} color="#fff" />
         </Link>
       </View>
 
+      {/* Calendar */}
       <View style={styles.calendarContainer}>
         <View style={styles.monthSelector}>
           <TouchableOpacity onPress={getPreviousMonth}>
             <MaterialIcons name="chevron-left" size={24} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.monthText}>
-            {currentDate.toLocaleString("default", { month: "long" })} {year}
+            {currentDate.toLocaleString("default", { month: "long" })}{" "}
+            {calendarData.year}
           </Text>
           <TouchableOpacity onPress={getNextMonth}>
             <MaterialIcons name="chevron-right" size={24} color="#fff" />
@@ -286,6 +352,7 @@ const Schedule = () => {
         {renderCalendarDays()}
       </View>
 
+      {/* Events */}
       <ScrollView style={styles.eventsContainer}>
         {renderEventCards()}
       </ScrollView>

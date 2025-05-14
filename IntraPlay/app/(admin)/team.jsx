@@ -1,5 +1,6 @@
+// React and library imports
+import { useState, useMemo } from "react";
 import { useMutation, useQuery } from "@apollo/client";
-import { Link } from "expo-router";
 import {
   View,
   Text,
@@ -10,27 +11,38 @@ import {
   StatusBar,
   Image,
 } from "react-native";
-import LoadingIndicator from "../components/LoadingIndicator";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useState, useMemo } from "react";
 import Modal from "react-native-modal";
+import Toast from "react-native-toast-message";
+
+// Components
+import LoadingIndicator from "../components/LoadingIndicator";
+import CustomAlert from "../components/customAlert";
+
+// Styles
 import styles from "../../assets/styles/adminTeamStyles";
 import globalstyles from "../../assets/styles/globalstyles";
+
+// Queries and mutations
 import GET_TEAMS from "../../queries/teamsQuery";
 import {
   ADD_TEAM,
   UPDATE_TEAM,
   DELETE_TEAM,
 } from "../../mutations/teamMutation";
-import Toast from "react-native-toast-message";
-import CustomAlert from "../components/customAlert";
 
+// Context and utilities
+import { useAuth } from "../../context/AuthContext";
+import { handleLogout } from "../../utils/handleLogout";
+
+// Team logos
 const teamLogos = {
   "team1.png": require("../../assets/images/team1.png"),
   "team2.png": require("../../assets/images/team2.png"),
   "team3.png": require("../../assets/images/team3.png"),
 };
 
+// Utility function for team logo
 const getTeamLogo = (filename) => {
   if (!filename) return require("../../assets/images/default_logo.png");
 
@@ -44,6 +56,7 @@ const getTeamLogo = (filename) => {
   return localImage || require("../../assets/images/default_logo.png");
 };
 
+// TeamItem component
 const TeamItem = ({ item, onEdit, onDelete }) => (
   <View style={styles.card}>
     <View style={styles.cardHeader}>
@@ -82,11 +95,16 @@ const TeamItem = ({ item, onEdit, onDelete }) => (
 );
 
 const Teams = () => {
+  // Context
+  const { logout } = useAuth();
+
+  // Queries and mutations
   const { loading, error, data, refetch } = useQuery(GET_TEAMS);
   const [addTeam] = useMutation(ADD_TEAM);
   const [updateTeam] = useMutation(UPDATE_TEAM);
   const [deleteTeam] = useMutation(DELETE_TEAM);
 
+  // State
   const [modalVisible, setModalVisible] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [deleteTeamId, setDeleteTeamId] = useState(null);
@@ -101,6 +119,7 @@ const Teams = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
 
+  // Memoized filtered and sorted teams
   const filteredAndSortedTeams = useMemo(() => {
     if (!data || !data.teams) return [];
 
@@ -125,8 +144,9 @@ const Teams = () => {
     return [...filteredTeams].sort((a, b) =>
       sortOrder === "asc" ? a.team_id - b.team_id : b.team_id - a.team_id
     );
-  }, [data, sortOrder, searchQuery]);
+  }, [data, searchQuery, sortOrder]);
 
+  // Handlers
   const handleSubmit = async () => {
     if (!formData.team_name.trim()) {
       Toast.show({
@@ -236,7 +256,7 @@ const Teams = () => {
   const openAddTeamModal = () => {
     setFormData({
       team_name: "",
-      team_color: "",
+      team_color: "#89B4FA",
       team_logo: "",
       team_motto: "",
     });
@@ -244,8 +264,10 @@ const Teams = () => {
     setModalVisible(true);
   };
 
+  // Loading state
   if (loading) return <LoadingIndicator visible={true} message="Loading..." />;
 
+  // Error state
   if (error)
     return (
       <SafeAreaView style={styles.container}>
@@ -261,12 +283,14 @@ const Teams = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
 
+      {/* Logout button */}
       <View style={globalstyles.loginButtonContainer}>
-        <Link href={"/login"}>
-          <MaterialIcons name="login" size={30} color="#fff" />
-        </Link>
+        <TouchableOpacity onPress={() => handleLogout(logout)}>
+          <MaterialIcons name="logout" size={25} color="#fff" />
+        </TouchableOpacity>
       </View>
 
+      {/* Title */}
       <View style={styles.titleContainer}>
         <Text style={styles.headerTitle}>Team Management</Text>
         <Text style={styles.subtitle}>
@@ -275,6 +299,7 @@ const Teams = () => {
         </Text>
       </View>
 
+      {/* Search and actions */}
       <View style={styles.searchBarContainer}>
         <View style={styles.searchBar}>
           <MaterialIcons name="search" size={20} color="#A6ADC8" />
@@ -313,6 +338,7 @@ const Teams = () => {
         </View>
       </View>
 
+      {/* Team list */}
       {filteredAndSortedTeams.length > 0 ? (
         <FlatList
           data={filteredAndSortedTeams}
@@ -332,6 +358,7 @@ const Teams = () => {
         </View>
       )}
 
+      {/* Add/Edit team modal */}
       <Modal
         isVisible={modalVisible}
         onBackdropPress={() => setModalVisible(false)}
@@ -412,6 +439,7 @@ const Teams = () => {
         </View>
       </Modal>
 
+      {/* Delete confirmation alert */}
       <CustomAlert
         isVisible={alertVisible}
         onClose={() => setAlertVisible(false)}

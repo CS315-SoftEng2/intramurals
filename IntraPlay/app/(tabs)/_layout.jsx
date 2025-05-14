@@ -1,4 +1,5 @@
 import { Tabs } from "expo-router";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import CustomTeamIcon from "../../assets/icons/teams";
 import ScheduleIcon from "../../assets/icons/schedules";
@@ -50,6 +51,16 @@ export default function GuestTabs() {
           title: "Scoreboard",
           headerShown: false,
           tabBarIcon: ({ color }) => <ScoreboardIcon color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="leaderboard"
+        options={{
+          title: "Leaderboard",
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="trophy" size={24} color={color} />
+          ),
         }}
       />
     </Tabs>

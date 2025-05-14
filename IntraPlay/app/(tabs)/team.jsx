@@ -1,3 +1,5 @@
+// React and library imports
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "expo-router";
 import {
   Text,
@@ -8,59 +10,129 @@ import {
   Image,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+
+// Components
+import SearchIcon from "../../assets/icons/search";
+import LoadingIndicator from "../components/LoadingIndicator";
+
+// Styles
 import globalstyles from "../../assets/styles/globalstyles";
 import styles from "../../assets/styles/teamStyles";
-import { useState, useEffect } from "react";
-import SearchIcon from "../../assets/icons/search";
-import { useQuery } from "@apollo/client";
+
+// Queries
 import GET_TEAMS from "../../queries/teamsQuery";
 import GET_MATCHES from "../../queries/matchesQuery";
 
+// Apollo Client
+import { useQuery } from "@apollo/client";
+
+// Team logos
 const teamLogos = {
   "team1.png": require("../../assets/images/team1.png"),
   "team2.png": require("../../assets/images/team2.png"),
   "team3.png": require("../../assets/images/team3.png"),
 };
 
+// Utility functions
 const getTeamLogo = (filename) => {
   if (!filename) return require("../../assets/images/default_logo.png");
-
   const cleaned = filename.trim().toLowerCase();
   const localImage = teamLogos[cleaned];
-
   if (!localImage) {
     console.warn(`Logo not found for: ${cleaned}`);
   }
-
   return localImage || require("../../assets/images/default_logo.png");
 };
 
+// MatchCard component
+const MatchCard = ({ item, getTeamDetails }) => (
+  <View
+    style={[
+      styles.matchCard,
+      { borderColor: item.winner_team_color || "#0000", borderWidth: 1 },
+    ]}
+  >
+    <View style={styles.eventHeader}>
+      <Text style={styles.eventName}>{item.event_name}</Text>
+      <Text style={styles.divisionText}>{item.division}</Text>
+    </View>
+
+    <View style={styles.teamsContainer}>
+      <View style={styles.teamContainer}>
+        <Image
+          style={styles.teamCircle}
+          source={getTeamLogo(item.team_a_logo)}
+        />
+        <Text style={styles.teamName}>Team {item.team_a_name}</Text>
+        <Text style={styles.teamMotto}>
+          {getTeamDetails(item.team_a_id).team_motto || ""}
+        </Text>
+      </View>
+
+      <View style={styles.scoreContainer}>
+        <Text style={styles.vsText}>VS</Text>
+        {item.score_a !== null &&
+        item.score_b !== null &&
+        !(item.score_a === 0 && item.score_b === 0) ? (
+          <View style={styles.scoreBox}>
+            <Text style={styles.scoreText}>
+              {item.score_a} - {item.score_b}
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.upcomingBox}>
+            <Text style={styles.upcomingText}>Upcoming</Text>
+          </View>
+        )}
+      </View>
+
+      <View style={styles.teamContainer}>
+        <Image
+          style={styles.teamCircle}
+          source={getTeamLogo(item.team_b_logo)}
+        />
+        <Text style={styles.teamName}>Team {item.team_b_name}</Text>
+        <Text style={styles.teamMotto}>
+          {getTeamDetails(item.team_b_id).team_motto || ""}
+        </Text>
+      </View>
+    </View>
+
+    {item.winner_team_id && (
+      <View style={styles.winnerContainer}>
+        <Text style={styles.winnerText}>
+          Winner: Team{" "}
+          {item.winner_team_id === item.team_a_id
+            ? item.team_a_name
+            : item.team_b_name}
+        </Text>
+      </View>
+    )}
+  </View>
+);
+
 const Team = () => {
+  // State
   const [searchQuery, setSearchQuery] = useState("");
   const [isDropdownVisible, setDropdownVisible] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState("All Events");
-  const [matches, setMatches] = useState([]);
-  const [filteredMatches, setFilteredMatches] = useState([]);
 
-  const { data: teamData } = useQuery(GET_TEAMS);
-  const { data: matchData } = useQuery(GET_MATCHES);
+  // Queries
+  const { data: teamData, loading: teamLoading } = useQuery(GET_TEAMS);
+  const { data: matchData, loading: matchLoading } = useQuery(GET_MATCHES);
 
-  const teamsData = teamData?.teams || [];
-  const matchesData = matchData?.getMatches || [];
+  // Memoized data
+  const teamsData = useMemo(() => teamData?.teams || [], [teamData]);
+  const matchesData = useMemo(() => matchData?.getMatches || [], [matchData]);
 
-  const events = [
-    "All Events",
-    ...Array.from(new Set(matchesData.map((match) => match.event_name))),
-  ];
-
-  useEffect(() => {
-    if (matchesData.length > 0) {
-      setMatches(matchesData);
-      setFilteredMatches(matchesData);
-    }
+  const events = useMemo(() => {
+    return [
+      "All Events",
+      ...new Set(matchesData.map((match) => match.event_name)),
+    ];
   }, [matchesData]);
 
-  useEffect(() => {
+  const filteredMatches = useMemo(() => {
     let filtered = matchesData;
 
     if (searchQuery) {
@@ -77,9 +149,10 @@ const Team = () => {
       filtered = filtered.filter((match) => match.event_name === selectedEvent);
     }
 
-    setFilteredMatches(filtered);
-  }, [searchQuery, selectedEvent, matches]);
+    return filtered;
+  }, [matchesData, searchQuery, selectedEvent]);
 
+  // Handlers
   const toggleDropdown = () => {
     setDropdownVisible(!isDropdownVisible);
   };
@@ -93,80 +166,21 @@ const Team = () => {
     return teamsData.find((team) => team.team_id === teamId) || {};
   };
 
-  const renderMatchCard = ({ item }) => {
-    return (
-      <View
-        style={[
-          styles.matchCard,
-          { borderColor: item.winner_team_color, borderWidth: 1 },
-        ]}
-      >
-        <View style={styles.eventHeader}>
-          <Text style={styles.eventName}>{item.event_name}</Text>
-          <Text style={styles.divisionText}>{item.division}</Text>
-        </View>
-
-        <View style={styles.teamsContainer}>
-          <View style={styles.teamContainer}>
-            <Image
-              style={styles.teamCircle}
-              source={getTeamLogo(item.team_a_logo)}
-            />
-            <Text style={styles.teamName}>Team {item.team_a_name}</Text>
-            <Text style={styles.teamMotto}>
-              {getTeamDetails(item.team_a_id).team_motto || ""}
-            </Text>
-          </View>
-
-          <View style={styles.scoreContainer}>
-            <Text style={styles.vsText}>VS</Text>
-            {item.score_a !== null && item.score_b !== null ? (
-              <View style={styles.scoreBox}>
-                <Text style={styles.scoreText}>
-                  {item.score_a} - {item.score_b}
-                </Text>
-              </View>
-            ) : (
-              <View style={styles.upcomingBox}>
-                <Text style={styles.upcomingText}>Upcoming</Text>
-              </View>
-            )}
-          </View>
-
-          <View style={styles.teamContainer}>
-            <Image
-              style={styles.teamCircle}
-              source={getTeamLogo(item.team_b_logo)}
-            />
-            <Text style={styles.teamName}>Team {item.team_b_name}</Text>
-            <Text style={styles.teamMotto}>
-              {getTeamDetails(item.team_b_id).team_motto || ""}
-            </Text>
-          </View>
-        </View>
-
-        {item.winner_team_id && (
-          <View style={styles.winnerContainer}>
-            <Text style={styles.winnerText}>
-              Winner:{" Team "}
-              {item.winner_team_id === item.team_a_id
-                ? item.team_a_name
-                : item.team_b_name}
-            </Text>
-          </View>
-        )}
-      </View>
-    );
-  };
+  // Loading state
+  if (teamLoading || matchLoading) {
+    return <LoadingIndicator visible={true} />;
+  }
 
   return (
     <View style={[globalstyles.container, styles.mainContainer]}>
+      {/* Login button */}
       <View style={globalstyles.loginButtonContainer}>
         <Link href={"/login"}>
           <MaterialIcons name="login" size={30} color="#fff" />
         </Link>
       </View>
 
+      {/* Search and filter */}
       <View style={styles.searchContainer}>
         <View style={styles.searchRow}>
           <View style={styles.searchInputField}>
@@ -210,9 +224,9 @@ const Team = () => {
                   <Text style={styles.dropdownItemText}>{item}</Text>
                 </TouchableOpacity>
               )}
-              nestedScrollEnabled={true}
-              showsVerticalScrollIndicator={true}
-              scrollEnabled={true}
+              nestedScrollEnabled
+              showsVerticalScrollIndicator
+              scrollEnabled
               maxToRenderPerBatch={events.length}
               initialNumToRender={events.length}
               windowSize={events.length}
@@ -221,10 +235,13 @@ const Team = () => {
         )}
       </View>
 
+      {/* Matches list */}
       <FlatList
         data={filteredMatches}
         keyExtractor={(item) => item.match_id.toString()}
-        renderItem={renderMatchCard}
+        renderItem={({ item }) => (
+          <MatchCard item={item} getTeamDetails={getTeamDetails} />
+        )}
         style={styles.matchesList}
         contentContainerStyle={styles.matchesListContent}
         showsVerticalScrollIndicator={false}

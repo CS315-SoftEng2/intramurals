@@ -1,25 +1,39 @@
-import { useEffect, useState } from "react";
-import { Link, useRouter } from "expo-router";
-import storage from "../../utils/storage";
+// React and library imports
+import { useRouter } from "expo-router";
 import { useQuery } from "@apollo/client";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { ScrollView, View, Text, TouchableOpacity } from "react-native";
+
+// Styles and UI components
 import styles from "../../assets/styles/userDashboard";
 import globalstyles from "@/assets/styles/globalstyles";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import LoadingIndicator from "../components/LoadingIndicator";
+
+// GraphQL queries
 import GET_MATCHES from "../../queries/matchesQuery";
 import GET_SCHEDULE from "../../queries/scheduleQuery";
 import GET_EVENTS from "../../queries/eventsQuery";
 import GET_TEAMS from "../../queries/teamsQuery";
-import LoadingIndicator from "../components/LoadingIndicator";
+
+// Utilities and context
 import useAuthGuard from "@/utils/authGuard";
+import storage from "../../utils/storage";
 import { useDimensions } from "../../context/DimensionsContext";
+import { useAuth } from "../../context/AuthContext";
+import { handleLogout } from "../../utils/handleLogout";
 
 const Dashboard = () => {
+  // Check if user has proper access
   useAuthGuard("user");
+
+  // Context and navigation hooks
   const { width } = useDimensions();
   const router = useRouter();
+  const { logout } = useAuth();
 
+  // GraphQL queries for data
   const {
     loading: matchLoading,
     error: matchError,
@@ -41,23 +55,21 @@ const Dashboard = () => {
     data: teamData,
   } = useQuery(GET_TEAMS);
 
+  // Local state to store and manage user data
   const [userId, setUserId] = useState(null);
   const [userLoading, setUserLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
 
+  // Retrieve user info from local storage
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const userString = await storage.getItem("user_data");
-        if (!userString) {
-          throw new Error(
-            "No user data found in storage. Please log in again."
-          );
-        }
+        if (!userString)
+          throw new Error("User data missing. Please log in again.");
         const user = JSON.parse(userString);
-        if (!user?.user_id) {
-          throw new Error("Invalid user data. Please log in again.");
-        }
+        if (!user?.user_id)
+          throw new Error("Invalid user info. Please log in again.");
         setUserId(user.user_id);
       } catch (error) {
         setAuthError(error.message);
@@ -67,20 +79,118 @@ const Dashboard = () => {
       }
     };
     fetchUser();
-  }, [router]);
+  }, []);
 
+  // Memoized values for performance
+  const schedules = useMemo(
+    () => scheduleData?.schedules || [],
+    [scheduleData]
+  );
+  const venueEvent = useMemo(() => venueData?.events || [], [venueData]);
+  const teamName = useMemo(() => teamData?.teams || [], [teamData]);
+
+  // Helper functions to extract venue and team details
+  const getEventVenue = useCallback(
+    (schedule_id) => {
+      const schedule = schedules.find(
+        (s) => String(s.schedule_id) === String(schedule_id)
+      );
+      const event = venueEvent.find(
+        (e) => String(e.event_id) === String(schedule?.event_id)
+      );
+      return event?.venue || "Venue TBD";
+    },
+    [schedules, venueEvent]
+  );
+
+  const getScheduleDetails = useCallback(
+    (scheduleId) => schedules.find((s) => s.schedule_id === scheduleId),
+    [schedules]
+  );
+
+  const getTeamAName = useCallback(
+    (team_a_id) =>
+      teamName.find((team) => team.team_id == team_a_id)?.team_name ||
+      "Unknown Team A",
+    [teamName]
+  );
+
+  const getTeamBName = useCallback(
+    (team_b_id) =>
+      teamName.find((team) => team.team_id == team_b_id)?.team_name ||
+      "Unknown Team B",
+    [teamName]
+  );
+
+  // Filter matches based on assignment and score status
+  const assignedMatches = useMemo(
+    () =>
+      matchData?.getMatches?.filter(
+        (match) => String(match.user_assigned_id) === String(userId)
+      ) || [],
+    [matchData, userId]
+  );
+
+  const unscoredMatches = useMemo(
+    () =>
+      assignedMatches.filter(
+        (match) =>
+          match.score_a === null ||
+          match.score_b === null ||
+          match.score_a === 0 ||
+          match.score_b === 0
+      ),
+    [assignedMatches]
+  );
+
+  const scoredMatches = useMemo(
+    () =>
+      assignedMatches.filter(
+        (match) =>
+          match.score_a !== null &&
+          match.score_b !== null &&
+          match.score_a !== 0 &&
+          match.score_b !== 0
+      ),
+    [assignedMatches]
+  );
+
+  // Determine screen size
+  const isTablet = useMemo(() => width >= 768, [width]);
+
+  // Go to score update page
+  const handleManageScores = useCallback(
+    (match) => {
+      router.push({
+        pathname: `/score-update/${match.match_id}`,
+        params: {
+          event_name: match.event_name,
+          division: match.division,
+          team_a_id: match.team_a_id,
+          team_b_id: match.team_b_id,
+          score_a: match.score_a || 0,
+          score_b: match.score_b || 0,
+          user_assigned_id: match.user_assigned_id,
+        },
+      });
+    },
+    [router]
+  );
+
+  // Show loading spinner while data is loading
   if (
     matchLoading ||
     scheduleLoading ||
     venueLoading ||
-    userLoading ||
     teamLoading ||
+    userLoading ||
     userId === null ||
     userId === undefined
   ) {
     return <LoadingIndicator visible={true} />;
   }
 
+  // Show error if any occurs
   if (matchError || scheduleError || venueError || teamError || authError) {
     return (
       <View style={styles.centered}>
@@ -96,38 +206,7 @@ const Dashboard = () => {
     );
   }
 
-  const schedules = scheduleData?.schedules || [];
-  const venueEvent = venueData?.events || [];
-  const teamName = teamData?.teams || [];
-
-  const getEventVenue = (schedule_id) => {
-    const schedule = schedules.find(
-      (s) => String(s.schedule_id) === String(schedule_id)
-    );
-    if (!schedule) return "Venue TBD";
-
-    const event = venueEvent.find(
-      (e) => String(e.event_id) === String(schedule.event_id)
-    );
-    return event?.venue || "Venue TBD";
-  };
-
-  const getScheduleDetails = (scheduleId) =>
-    schedules.find((s) => s.schedule_id === scheduleId);
-
-  const getTeamAName = (team_a_id) =>
-    teamName.find((team) => team.team_id == team_a_id)?.team_name ||
-    "Unknown Team A";
-
-  const getTeamBName = (team_b_id) =>
-    teamName.find((team) => team.team_id == team_b_id)?.team_name ||
-    "Unknown Team B";
-
-  const assignedMatches =
-    matchData?.getMatches?.filter(
-      (match) => String(match.user_assigned_id) === String(userId)
-    ) || [];
-
+  // If no matches are assigned to this user
   if (assignedMatches.length === 0) {
     return (
       <View style={styles.centered}>
@@ -138,30 +217,14 @@ const Dashboard = () => {
     );
   }
 
-  const unscoredMatches = assignedMatches.filter(
-    (match) =>
-      match.score_a === null ||
-      match.score_b === null ||
-      match.score_a === 0 ||
-      match.score_b === 0
-  );
-
-  const scoredMatches = assignedMatches.filter(
-    (match) =>
-      match.score_a !== null &&
-      match.score_b !== null &&
-      match.score_a !== 0 &&
-      match.score_b !== 0
-  );
-
-  const isTablet = width >= 768;
-
+  // Main UI rendering
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
+      {/* Logout button */}
       <View style={globalstyles.loginButtonContainer}>
-        <Link href={"/login"}>
-          <MaterialIcons name="login" size={30} color="#fff" />
-        </Link>
+        <TouchableOpacity onPress={() => handleLogout(logout)}>
+          <MaterialIcons name="logout" size={25} color="#fff" />
+        </TouchableOpacity>
       </View>
 
       <View
@@ -173,6 +236,7 @@ const Dashboard = () => {
           },
         ]}
       >
+        {/* Unscored Matches */}
         <Text
           style={[
             styles.headerTitle,
@@ -200,10 +264,7 @@ const Dashboard = () => {
                 key={match.match_id}
                 style={[
                   styles.assignedEventContainer,
-                  {
-                    height: isTablet ? 200 : 170,
-                    padding: isTablet ? 20 : 15,
-                  },
+                  { height: isTablet ? 200 : 170, padding: isTablet ? 20 : 15 },
                 ]}
               >
                 <Text
@@ -266,20 +327,7 @@ const Dashboard = () => {
                       paddingVertical: isTablet ? 10 : 8,
                     },
                   ]}
-                  onPress={() =>
-                    router.push({
-                      pathname: `/score-update/${match.match_id}`,
-                      params: {
-                        event_name: match.event_name,
-                        division: match.division,
-                        team_a_id: match.team_a_id,
-                        team_b_id: match.team_b_id,
-                        score_a: match.score_a || 0,
-                        score_b: match.score_b || 0,
-                        user_assigned_id: match.user_assigned_id,
-                      },
-                    })
-                  }
+                  onPress={() => handleManageScores(match)}
                 >
                   <Text
                     style={[
@@ -295,6 +343,7 @@ const Dashboard = () => {
           })
         )}
 
+        {/* Scored Matches */}
         {scoredMatches.length > 0 && (
           <>
             <Text
@@ -386,20 +435,7 @@ const Dashboard = () => {
                         paddingVertical: isTablet ? 10 : 8,
                       },
                     ]}
-                    onPress={() =>
-                      router.push({
-                        pathname: `/score-update/${match.match_id}`,
-                        params: {
-                          event_name: match.event_name,
-                          division: match.division,
-                          team_a_id: match.team_a_id,
-                          team_b_id: match.team_b_id,
-                          score_a: match.score_a || 0,
-                          score_b: match.score_b || 0,
-                          user_assigned_id: match.user_assigned_id,
-                        },
-                      })
-                    }
+                    onPress={() => handleManageScores(match)}
                   >
                     <Text
                       style={[

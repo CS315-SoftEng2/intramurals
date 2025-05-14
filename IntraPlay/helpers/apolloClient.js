@@ -7,7 +7,7 @@ import {
 import { onError } from "@apollo/client/link/error";
 import storage from "../utils/storage";
 
-const API_ENDPOINT = "http://192.168.1.10:4002/graphql";
+const API_ENDPOINT = "http://192.168.1.7:4002/graphql";
 
 const authLink = new ApolloLink(async (operation, forward) => {
   const token = await storage.getItem("user_token");

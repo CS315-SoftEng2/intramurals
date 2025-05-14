@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (token, userType, userData) => {
     await storage.setItem("user_token", token);
     await storage.setItem("user_type", userType);
-    await storage.setItem("user_data", JSON.stringify(userData)); // Store the full user object
+    await storage.setItem("user_data", JSON.stringify(userData)); 
     setUser({ token, userType, userData });
 
     if (userType === "admin") {
@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     await storage.deleteItem("user_token");
     await storage.deleteItem("user_type");
-    await storage.deleteItem("user_data"); // Clear the user data
+    await storage.deleteItem("user_data"); 
     setUser(null);
     router.replace("/login");
   };

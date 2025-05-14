@@ -1,5 +1,6 @@
+// React and library imports
+import { useState, useMemo } from "react";
 import { useMutation, useQuery } from "@apollo/client";
-import { Link } from "expo-router";
 import {
   View,
   Text,
@@ -9,21 +10,31 @@ import {
   SafeAreaView,
   StatusBar,
 } from "react-native";
-import LoadingIndicator from "../components/LoadingIndicator";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useState, useMemo } from "react";
 import Modal from "react-native-modal";
+import Toast from "react-native-toast-message";
+
+// Components
+import LoadingIndicator from "../components/LoadingIndicator";
+import CustomAlert from "../components/customAlert";
+
+// Styles
 import styles from "../../assets/styles/userAccountStyles";
 import globalstyles from "../../assets/styles/globalstyles";
+
+// Queries and mutations
 import GET_USERS from "../../queries/userAccountQuery";
 import {
   ADD_USER,
   UPDATE_USER,
   DELETE_USER,
 } from "../../mutations/userAccountMutation";
-import Toast from "react-native-toast-message";
-import CustomAlert from "../components/customAlert";
 
+// Context and utilities
+import { useAuth } from "../../context/AuthContext";
+import { handleLogout } from "../../utils/handleLogout";
+
+// UserItem component
 const UserItem = ({ item, onEdit, onDelete }) => (
   <View style={styles.card}>
     <View style={styles.cardHeader}>
@@ -68,11 +79,16 @@ const UserItem = ({ item, onEdit, onDelete }) => (
 );
 
 const Users = () => {
+  // Context
+  const { logout } = useAuth();
+
+  // Queries and mutations
   const { loading, error, data, refetch } = useQuery(GET_USERS);
   const [addUser] = useMutation(ADD_USER);
   const [updateUser] = useMutation(UPDATE_USER);
   const [deleteUser] = useMutation(DELETE_USER);
 
+  // State
   const [modalVisible, setModalVisible] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [deleteUserId, setDeleteUserId] = useState(null);
@@ -86,6 +102,7 @@ const Users = () => {
   const [sortOrder, setSortOrder] = useState("asc");
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Memoized filtered and sorted users
   const filteredAndSortedUsers = useMemo(() => {
     if (!data || !data.users) return [];
 
@@ -103,8 +120,9 @@ const Users = () => {
     return [...filteredUsers].sort((a, b) =>
       sortOrder === "asc" ? a.user_id - b.user_id : b.user_id - a.user_id
     );
-  }, [data, sortOrder, searchQuery]);
+  }, [data, searchQuery, sortOrder]);
 
+  // Handlers
   const handleSubmit = async () => {
     if (!formData.user_name.trim()) {
       Toast.show({
@@ -124,7 +142,7 @@ const Users = () => {
       return;
     }
 
-    if (!formData.password.trim()) {
+    if (!editMode && !formData.password.trim()) {
       Toast.show({
         type: "error",
         text1: "Missing field",
@@ -147,7 +165,6 @@ const Users = () => {
         const { data: updateData } = await updateUser({
           variables: { ...variables, userId: editUserId },
         });
-
         Toast.show({
           type: updateData.updateUserAccount.type.toLowerCase(),
           text1: updateData.updateUserAccount.message,
@@ -179,11 +196,12 @@ const Users = () => {
 
   const confirmDelete = async () => {
     try {
-      await deleteUser({ variables: { adminId: 1, userId: deleteUserId } });
+      const { data: deleteData } = await deleteUser({
+        variables: { adminId: 1, userId: deleteUserId },
+      });
       Toast.show({
-        type: "success",
-        text1: "User deleted",
-        text2: "The user was successfully deleted.",
+        type: deleteData.deleteUserAccount.type.toLowerCase(),
+        text1: deleteData.deleteUserAccount.message,
       });
       refetch();
     } catch (err) {
@@ -199,7 +217,11 @@ const Users = () => {
   };
 
   const handleEdit = (user) => {
-    setFormData({ user_name: user.user_name, user_type: user.user_type });
+    setFormData({
+      user_name: user.user_name,
+      user_type: user.user_type,
+      password: "",
+    });
     setEditMode(true);
     setEditUserId(user.user_id);
     setModalVisible(true);
@@ -210,13 +232,15 @@ const Users = () => {
   };
 
   const openAddUserModal = () => {
-    setFormData({ user_name: "", user_type: "user" });
+    setFormData({ user_name: "", user_type: "user", password: "" });
     setEditMode(false);
     setModalVisible(true);
   };
 
+  // Loading state
   if (loading) return <LoadingIndicator visible={true} message="Loading..." />;
 
+  // Error state
   if (error)
     return (
       <SafeAreaView style={styles.container}>
@@ -232,12 +256,14 @@ const Users = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
 
+      {/* Logout button */}
       <View style={globalstyles.loginButtonContainer}>
-        <Link href={"/login"}>
-          <MaterialIcons name="login" size={30} color="#fff" />
-        </Link>
+        <TouchableOpacity onPress={() => handleLogout(logout)}>
+          <MaterialIcons name="logout" size={25} color="#fff" />
+        </TouchableOpacity>
       </View>
 
+      {/* Title */}
       <View style={styles.titleContainer}>
         <Text style={styles.headerTitle}>User Management</Text>
         <Text style={styles.subtitle}>
@@ -246,6 +272,7 @@ const Users = () => {
         </Text>
       </View>
 
+      {/* Search and actions */}
       <View style={styles.searchBarContainer}>
         <View style={styles.searchBar}>
           <MaterialIcons name="search" size={20} color="#A6ADC8" />
@@ -279,6 +306,7 @@ const Users = () => {
         </View>
       </View>
 
+      {/* User list */}
       {filteredAndSortedUsers.length > 0 ? (
         <FlatList
           data={filteredAndSortedUsers}
@@ -298,6 +326,7 @@ const Users = () => {
         </View>
       )}
 
+      {/* Add/Edit user modal */}
       <Modal
         isVisible={modalVisible}
         onBackdropPress={() => setModalVisible(false)}
@@ -328,16 +357,21 @@ const Users = () => {
               style={styles.input}
               placeholderTextColor="#A6ADC8"
             />
-            <Text style={styles.formLabel}>Password</Text>
-            <TextInput
-              placeholder="Enter password"
-              value={formData.password}
-              onChangeText={(text) =>
-                setFormData({ ...formData, password: text })
-              }
-              style={styles.input}
-              placeholderTextColor="#A6ADC8"
-            />
+            {!editMode && (
+              <>
+                <Text style={styles.formLabel}>Password</Text>
+                <TextInput
+                  placeholder="Enter password"
+                  value={formData.password}
+                  onChangeText={(text) =>
+                    setFormData({ ...formData, password: text })
+                  }
+                  style={styles.input}
+                  placeholderTextColor="#A6ADC8"
+                  secureTextEntry
+                />
+              </>
+            )}
           </View>
 
           <View style={styles.formGroup}>
@@ -387,6 +421,7 @@ const Users = () => {
         </View>
       </Modal>
 
+      {/* Delete confirmation alert */}
       <CustomAlert
         isVisible={alertVisible}
         onClose={() => setAlertVisible(false)}

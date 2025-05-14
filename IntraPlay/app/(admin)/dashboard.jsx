@@ -1,4 +1,6 @@
-import { Link, useRouter } from "expo-router";
+// React and library imports
+import { useMemo } from "react";
+import { useRouter } from "expo-router";
 import {
   Text,
   View,
@@ -11,8 +13,16 @@ import {
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useQuery } from "@apollo/client";
-import useAuthGuard from "../../utils/authGuard";
+
+// Styles
 import globalstyles from "@/assets/styles/globalstyles";
+
+// Context and utilities
+import useAuthGuard from "../../utils/authGuard";
+import { useAuth } from "../../context/AuthContext";
+import { handleLogout } from "../../utils/handleLogout";
+
+// Queries
 import GET_USERS from "../../queries/userAccountQuery";
 import GET_TEAMS from "../../queries/teamsQuery";
 import GET_MATCHES from "../../queries/matchesQuery";
@@ -60,6 +70,7 @@ const DashboardCard = ({
       router.push(link);
     }
   };
+
   return (
     <TouchableOpacity onPress={handlePress} style={styles.card}>
       <LinearGradient
@@ -90,115 +101,124 @@ const DashboardCard = ({
 
 const Dashboard = () => {
   useAuthGuard("admin");
+  const { logout } = useAuth();
+
   const {
     loading: usersLoading,
     error: usersError,
     data: usersData,
   } = useQuery(GET_USERS);
-
   const {
     loading: teamsLoading,
     error: teamsError,
     data: teamsData,
   } = useQuery(GET_TEAMS);
-
   const {
     loading: matchesLoading,
     error: matchesError,
     data: matchesData,
   } = useQuery(GET_MATCHES);
-
   const {
     loading: schedulesLoading,
     error: schedulesError,
     data: schedulesData,
   } = useQuery(GET_SCHEDULES);
-
   const {
     loading: eventsLoading,
     error: eventsError,
     data: eventsData,
   } = useQuery(GET_EVENTS);
-
   const {
     loading: categoriesLoading,
     error: categoriesError,
     data: categoriesData,
   } = useQuery(GET_CATEGORIES);
 
-  const userCount = usersData?.users?.length || 0;
-  const teamCount = teamsData?.teams?.length || 0;
-  const matchCount = matchesData?.getMatches?.length || 0;
-  const scheduleCount = schedulesData?.schedules?.length || 0;
-  const eventCount = eventsData?.events?.length || 0;
-  const categoryCount = categoriesData?.categories?.length || 0;
-
   const formatNumber = (num) => {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
 
-  const dashboardItems = [
-    {
-      title: "Users",
-      count: formatNumber(userCount),
-      icon: "people",
-      colors: colors.gradients.users,
-      isLoading: usersLoading,
-      link: "/useraccount",
-    },
-    {
-      title: "Teams",
-      count: formatNumber(teamCount),
-      icon: "groups",
-      colors: colors.gradients.teams,
-      isLoading: teamsLoading,
-      link: "/team",
-    },
-    {
-      title: "Matches",
-      count: formatNumber(matchCount),
-      icon: "sports-cricket",
-      colors: colors.gradients.matches,
-      isLoading: matchesLoading,
-      link: "/match",
-    },
-    {
-      title: "Schedules",
-      count: formatNumber(scheduleCount),
-      icon: "event",
-      colors: colors.gradients.schedule,
-      isLoading: schedulesLoading,
-      link: "/match",
-    },
-    {
-      title: "Events",
-      count: formatNumber(eventCount),
-      icon: "emoji-events",
-      colors: colors.gradients.events,
-      isLoading: eventsLoading,
-      link: "/match",
-    },
-    {
-      title: "Categories",
-      count: formatNumber(categoryCount),
-      icon: "category",
-      colors: colors.gradients.categories,
-      isLoading: categoriesLoading,
-      link: "/match",
-    },
-  ];
+  const dashboardItems = useMemo(
+    () => [
+      {
+        title: "Users",
+        count: formatNumber(usersData?.users?.length || 0),
+        icon: "people",
+        colors: colors.gradients.users,
+        isLoading: usersLoading,
+        link: "/useraccount",
+      },
+      {
+        title: "Teams",
+        count: formatNumber(teamsData?.teams?.length || 0),
+        icon: "groups",
+        colors: colors.gradients.teams,
+        isLoading: teamsLoading,
+        link: "/team",
+      },
+      {
+        title: "Matches",
+        count: formatNumber(matchesData?.getMatches?.length || 0),
+        icon: "sports-cricket",
+        colors: colors.gradients.matches,
+        isLoading: matchesLoading,
+        link: "/match",
+      },
+      {
+        title: "Schedules",
+        count: formatNumber(schedulesData?.schedules?.length || 0),
+        icon: "event",
+        colors: colors.gradients.schedule,
+        isLoading: schedulesLoading,
+        link: "/match",
+      },
+      {
+        title: "Events",
+        count: formatNumber(eventsData?.events?.length || 0),
+        icon: "emoji-events",
+        colors: colors.gradients.events,
+        isLoading: eventsLoading,
+        link: "/match",
+      },
+      {
+        title: "Categories",
+        count: formatNumber(categoriesData?.categories?.length || 0),
+        icon: "category",
+        colors: colors.gradients.categories,
+        isLoading: categoriesLoading,
+        link: "/match",
+      },
+    ],
+    [
+      usersData,
+      teamsData,
+      matchesData,
+      schedulesData,
+      eventsData,
+      categoriesData,
+      usersLoading,
+      teamsLoading,
+      matchesLoading,
+      schedulesLoading,
+      eventsLoading,
+      categoriesLoading,
+    ]
+  );
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header with logout button */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Admin Dashboard</Text>
+        {/* Logout button */}
         <View style={globalstyles.loginButtonContainer}>
-          <Link href={"/login"}>
-            <MaterialIcons name="login" size={30} color={colors.text.primary} />
-          </Link>
+          <TouchableOpacity onPress={() => handleLogout(logout)}>
+            <MaterialIcons name="logout" size={25} color="#fff" />
+          </TouchableOpacity>
         </View>
       </View>
 
+      {/* Stats overview */}
       <View style={styles.statsContainer}>
         <Text style={styles.statsTitle}>Overview</Text>
         {(usersError ||
@@ -207,10 +227,11 @@ const Dashboard = () => {
           schedulesError ||
           eventsError ||
           categoriesError) && (
-          <Text style={styles.errorText}>Error loading users data</Text>
+          <Text style={styles.errorText}>Error loading data</Text>
         )}
       </View>
 
+      {/* Dashboard cards */}
       <ScrollView style={styles.scrollView}>
         <View style={styles.cardsContainer}>
           {dashboardItems.map((item, index) => (
@@ -251,11 +272,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: colors.text.primary,
   },
-  loginButton: {
-    padding: 6,
-    backgroundColor: colors.border,
-    borderRadius: 8,
-  },
   statsContainer: {
     paddingHorizontal: 20,
     paddingVertical: 15,
@@ -264,11 +280,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: colors.text.primary,
-  },
-  statsSubtitle: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginTop: 4,
   },
   errorText: {
     color: "#ff6b6b",
@@ -318,52 +329,5 @@ const styles = StyleSheet.create({
   },
   loader: {
     marginTop: 15,
-  },
-  recentSection: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 30,
-  },
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: colors.text.primary,
-  },
-  seeAllText: {
-    fontSize: 14,
-    color: colors.text.secondary,
-  },
-  activityCard: {
-    backgroundColor: colors.cardBackground,
-    borderRadius: 16,
-    padding: 16,
-  },
-  activityItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.activityBorder,
-  },
-  activityDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 12,
-  },
-  activityText: {
-    flex: 1,
-    fontSize: 14,
-    color: colors.text.primary,
-  },
-  activityTime: {
-    fontSize: 12,
-    color: colors.text.secondary,
   },
 });
