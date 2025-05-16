@@ -253,7 +253,13 @@ const Index = () => {
         "EEEE, MMMM d, yyyy",
         new Date()
       );
-      return !isNaN(eventDate.getTime()) && eventDate >= today;
+      const startTime = convertToDateTime(event.event_date, event.start_time);
+      const endTime = convertToDateTime(event.event_date, event.end_time);
+
+      const isOngoing =
+        startTime && endTime && now >= startTime && now <= endTime;
+
+      return !isNaN(eventDate.getTime()) && eventDate >= today && !isOngoing;
     });
   }, [eventDetails, today]);
 

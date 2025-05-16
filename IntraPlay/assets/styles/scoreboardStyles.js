@@ -1,27 +1,46 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#fff",
-    marginTop: 40,
-    marginLeft: 25,
-    marginBottom: 20,
+  container: {
+    backgroundColor: "#1E1E2E",
+    paddingTop: 20,
+    alignItems: "stretch",
+    justifyContent: "flex-start",
   },
-  sectionTitle: {
+  contentContainer: {
+    flexGrow: 1,
+    backgroundColor: "#1E1E2E",
+    paddingTop: 20,
+    alignItems: "stretch",
+    justifyContent: "flex-start",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    margin: 20,
+  },
+  headerTitle: {
     fontSize: 22,
     fontWeight: "700",
     color: "#fff",
-    justifyContent: "flex-start",
-    alignSelf: "flex-start",
-    margin: 20,
+    marginRight: 10,
+  },
+  icon: {
+    marginLeft: 5,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#3A3A50",
+    marginHorizontal: 10,
+    marginBottom: 10,
   },
   matchesContainer: {
     width: "98%",
     borderRadius: 15,
     padding: 15,
     marginBottom: 20,
+    alignSelf: "center",
   },
   matchCardBorder: {
     borderRadius: 10,

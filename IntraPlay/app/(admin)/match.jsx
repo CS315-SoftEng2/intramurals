@@ -1,5 +1,5 @@
 // React and library imports
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import {
   View,
@@ -7,11 +7,15 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  Platform,
+  ActivityIndicator,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Modal from "react-native-modal";
 import Toast from "react-native-toast-message";
+import { format, parse, isValid } from "date-fns";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 // Components
 import LoadingIndicator from "../components/LoadingIndicator";
@@ -80,19 +84,11 @@ const MatchTable = () => {
     error: matchError,
     data: matchData,
     refetch: refetchMatches,
-  } = useQuery(GET_MATCHES, {
-    onError: (err) => console.error("GET_MATCHES error:", err),
-  });
+  } = useQuery(GET_MATCHES);
 
-  const [addMatch] = useMutation(ADD_MATCH, {
-    onError: (err) => console.error("ADD_MATCH error:", err),
-  });
-  const [updateMatch] = useMutation(UPDATE_MATCH, {
-    onError: (err) => console.error("UPDATE_MATCH error:", err),
-  });
-  const [deleteMatch] = useMutation(DELETE_MATCH, {
-    onError: (err) => console.error("DELETE_MATCH error:", err),
-  });
+  const [addMatch] = useMutation(ADD_MATCH);
+  const [updateMatch] = useMutation(UPDATE_MATCH);
+  const [deleteMatch] = useMutation(DELETE_MATCH);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -456,31 +452,32 @@ const MatchTable = () => {
   );
 };
 
-const ScheduleTable = () => {
+const ScheduleTable = ({ adminId = 1 }) => {
   const {
     loading: scheduleLoading,
     error: scheduleError,
     data: scheduleData,
     refetch: refetchSchedules,
-  } = useQuery(GET_SCHEDULES, {
-    onError: (err) => console.error("GET_SCHEDULES error:", err),
-  });
+  } = useQuery(GET_SCHEDULES);
 
-  const [addSchedule] = useMutation(ADD_SCHEDULE, {
-    onError: (err) => console.error("ADD_SCHEDULE error:", err),
-  });
-  const [updateSchedule] = useMutation(UPDATE_SCHEDULE, {
-    onError: (err) => console.error("UPDATE_SCHEDULE error:", err),
-  });
-  const [deleteSchedule] = useMutation(DELETE_SCHEDULE, {
-    onError: (err) => console.error("DELETE_SCHEDULE error:", err),
-  });
+  const [addSchedule] = useMutation(ADD_SCHEDULE);
+  const [updateSchedule] = useMutation(UPDATE_SCHEDULE);
+  const [deleteSchedule] = useMutation(DELETE_SCHEDULE);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
   const [alertVisible, setAlertVisible] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const [dateObj, setDateObj] = useState(new Date());
+  const [startTimeObj, setStartTimeObj] = useState(new Date());
+  const [endTimeObj, setEndTimeObj] = useState(new Date());
+
   const [formData, setFormData] = useState({
     date: "",
     start_time: "",
@@ -495,182 +492,82 @@ const ScheduleTable = () => {
     [schedules]
   );
 
-  const handleSubmit = async () => {
-    if (!formData.date.trim()) {
-      Toast.show({
-        type: "error",
-        text1: "Missing Field!",
-        text2: "Date cannot be empty.",
-      });
-      return;
-    }
-    if (!formData.start_time.trim()) {
-      Toast.show({
-        type: "error",
-        text1: "Missing Field!",
-        text2: "Start time cannot be empty.",
-      });
-      return;
-    }
-    if (!formData.end_time.trim()) {
-      Toast.show({
-        type: "error",
-        text1: "Missing Field!",
-        text2: "End time cannot be empty.",
-      });
-      return;
-    }
-    if (!formData.event_id.trim()) {
-      Toast.show({
-        type: "error",
-        text1: "Missing Field!",
-        text2: "Event ID cannot be empty.",
-      });
-      return;
-    }
-    if (!formData.category_id.trim()) {
-      Toast.show({
-        type: "error",
-        text1: "Missing Field!",
-        text2: "Category ID cannot be empty.",
-      });
-      return;
-    }
-
-    const eventId = parseInt(formData.event_id);
-    const categoryId = parseInt(formData.category_id);
-    if (isNaN(eventId)) {
-      Toast.show({
-        type: "error",
-        text1: "Invalid Input!",
-        text2: "Event ID must be a valid number.",
-      });
-      return;
-    }
-    if (isNaN(categoryId)) {
-      Toast.show({
-        type: "error",
-        text1: "Invalid Input!",
-        text2: "Category ID must be a valid number.",
-      });
-      return;
-    }
-
-    const formattedDate = formData.date;
-    const formattedStartTime = formData.start_time;
-    const formattedEndTime = formData.end_time;
-
-    if (!formattedDate) {
-      Toast.show({
-        type: "error",
-        text1: "Invalid Input!",
-        text2: "Invalid date format. Use: Monday, April 21, 2025",
-      });
-      return;
-    }
-    if (!formattedStartTime || !formattedEndTime) {
-      Toast.show({
-        type: "error",
-        text1: "Invalid Input!",
-        text2: "Invalid time format. Use: 10:00 AM",
-      });
-      return;
-    }
-
-    const variables = {
-      schedule: {
-        date: formattedDate,
-        start_time: formattedStartTime,
-        end_time: formattedEndTime,
-        event_id: eventId,
-        category_id: categoryId,
-      },
-      adminId: 1,
-      scheduleId: editMode ? parseInt(editId) : undefined,
-    };
-
+  // Parse date/time with fallback
+  const parseDate = (dateStr, fallback = new Date()) => {
     try {
-      if (editMode) {
-        const response = await updateSchedule({
-          variables,
-          update: (cache) => {
-            cache.evict({ fieldName: "schedules" });
-            cache.gc();
-          },
-        });
-        const { type, message } = response.data.updateSchedule;
-        Toast.show({
-          type: type === "success" ? "success" : "error",
-          text1: type.charAt(0).toUpperCase() + type.slice(1),
-          text2: message,
-        });
-        if (type === "error") return;
-      } else {
-        const { scheduleId, ...addVariables } = variables;
-        const response = await addSchedule({
-          variables: addVariables,
-          update: (cache) => {
-            cache.evict({ fieldName: "schedules" });
-            cache.gc();
-          },
-        });
-        const { type, message } = response.data.addSchedule;
-        Toast.show({
-          type: type === "success" ? "success" : "error",
-          text1: type.charAt(0).toUpperCase() + type.slice(1),
-          text2: message,
-        });
-        if (type === "error") return;
-      }
-      await refetchSchedules();
-      setModalVisible(false);
-      setFormData({
-        date: "",
-        start_time: "",
-        end_time: "",
-        event_id: "",
-        category_id: "",
-      });
-      setEditMode(false);
-      setEditId(null);
+      const parsed = parse(dateStr, "EEEE, MMMM d, yyyy", new Date());
+      return isValid(parsed) ? parsed : fallback;
     } catch (err) {
-      Toast.show({
-        type: "error",
-        text1: "Error!",
-        text2: err.message,
-      });
+      return fallback;
     }
   };
 
-  const handleEdit = (schedule) => {
+  const parseTime = (timeStr, fallback = new Date()) => {
+    try {
+      const parsed = parse(timeStr, "hh:mm a", new Date());
+      return isValid(parsed) ? parsed : fallback;
+    } catch (err) {
+      return fallback;
+    }
+  };
+
+  const openAddModal = useCallback(() => {
     setFormData({
-      date: schedule.date,
-      start_time: schedule.start_time,
-      end_time: schedule.end_time,
-      event_id: parseInt(schedule.event_id).toString(),
-      category_id: parseInt(schedule.category_id).toString(),
+      date: "",
+      start_time: "",
+      end_time: "",
+      event_id: "",
+      category_id: "",
     });
+    setDateObj(new Date());
+    setStartTimeObj(new Date());
+    setEndTimeObj(new Date());
+    setEditMode(false);
+    setModalVisible(true);
+  }, []);
+
+  const handleEdit = useCallback((schedule) => {
+    const parsedDate = parseDate(schedule.date);
+    const parsedStartTime = parseTime(schedule.start_time, parsedDate);
+    const parsedEndTime = parseTime(schedule.end_time, parsedDate);
+
+    setFormData({
+      date: schedule.date || "",
+      start_time: schedule.start_time || "",
+      end_time: schedule.end_time || "",
+      event_id: String(schedule.event_id || ""),
+      category_id: String(schedule.category_id || ""),
+    });
+    setDateObj(parsedDate);
+    setStartTimeObj(parsedStartTime);
+    setEndTimeObj(parsedEndTime);
     setEditMode(true);
     setEditId(schedule.schedule_id);
     setModalVisible(true);
-  };
+  }, []);
 
-  const handleDelete = (schedule_id) => {
+  const handleDelete = useCallback((schedule_id) => {
     setDeleteId(schedule_id);
     setAlertVisible(true);
-  };
+  }, []);
 
   const confirmDelete = async () => {
     try {
-      const response = await deleteSchedule({
-        variables: { adminId: 1, scheduleId: deleteId },
+      const { data } = await deleteSchedule({
+        variables: { adminId, scheduleId: deleteId },
+        update: (cache) => {
+          cache.evict({ fieldName: "schedules" });
+          cache.gc();
+        },
       });
-      const { type, message } = response.data.deleteSchedule;
+
+      const { type, message } = data.deleteSchedule;
       Toast.show({
         type: type === "success" ? "success" : "error",
         text1: type.charAt(0).toUpperCase() + type.slice(1),
         text2: message,
       });
+
       if (type === "error") return;
       await refetchSchedules();
     } catch (err) {
@@ -685,33 +582,114 @@ const ScheduleTable = () => {
     }
   };
 
-  const openAddModal = () => {
-    setFormData({
-      date: "",
-      start_time: "",
-      end_time: "",
-      event_id: "",
-      category_id: "",
-    });
-    setEditMode(false);
-    setModalVisible(true);
+  const handleSubmit = async () => {
+    if (
+      !formData.date ||
+      !formData.start_time ||
+      !formData.end_time ||
+      !formData.event_id ||
+      !formData.category_id
+    ) {
+      Toast.show({
+        type: "error",
+        text1: "Missing Fields!",
+        text2: "All fields are required.",
+      });
+      return;
+    }
+
+    const eventId = parseInt(formData.event_id);
+    const categoryId = parseInt(formData.category_id);
+    if (isNaN(eventId) || isNaN(categoryId)) {
+      Toast.show({
+        type: "error",
+        text1: "Invalid IDs",
+        text2: "Event and Category ID must be numbers.",
+      });
+      return;
+    }
+
+    // Validate time: end_time should be after start_time
+    const start = parseTime(formData.start_time);
+    const end = parseTime(formData.end_time);
+    if (end <= start) {
+      Toast.show({
+        type: "error",
+        text1: "Invalid Time",
+        text2: "End time must be after start time.",
+      });
+      return;
+    }
+
+    const variables = {
+      schedule: {
+        date: formData.date,
+        start_time: formData.start_time,
+        end_time: formData.end_time,
+        event_id: eventId,
+        category_id: categoryId,
+      },
+      adminId,
+      scheduleId: editMode ? parseInt(editId) : undefined,
+    };
+
+    try {
+      setSubmitting(true);
+      let data;
+      if (editMode) {
+        ({ data } = await updateSchedule({ variables }));
+      } else {
+        const { scheduleId, ...addVariables } = variables;
+        ({ data } = await addSchedule({ variables: addVariables }));
+      }
+
+      const { type, message } = editMode
+        ? data.updateSchedule
+        : data.addSchedule;
+      Toast.show({
+        type: type === "success" ? "success" : "error",
+        text1: type.charAt(0).toUpperCase() + type.slice(1),
+        text2: message,
+      });
+
+      if (type === "error") return;
+      await refetchSchedules();
+      setModalVisible(false);
+      setFormData({
+        date: "",
+        start_time: "",
+        end_time: "",
+        event_id: "",
+        category_id: "",
+      });
+      setDateObj(new Date());
+      setStartTimeObj(new Date());
+      setEndTimeObj(new Date());
+      setEditMode(false);
+      setEditId(null);
+    } catch (err) {
+      Toast.show({
+        type: "error",
+        text1: "Error!",
+        text2: err.message,
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  if (scheduleLoading) {
+  if (scheduleLoading)
     return <LoadingIndicator visible={true} message="Loading..." />;
-  }
-
-  if (scheduleError) {
+  if (scheduleError)
     return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>Error occurred!</Text>
-      </View>
+      <Text style={styles.errorText}>
+        Error loading schedules: {scheduleError.message}
+      </Text>
     );
-  }
 
   return (
     <View style={styles.otherContentContainer}>
-      {/* Table header */}
+      {/* Header */}
       <View style={styles.tableAddButtonContainer}>
         <Text style={styles.tableTitle}>Schedule Table</Text>
         <TouchableOpacity
@@ -723,7 +701,7 @@ const ScheduleTable = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Table content */}
+      {/* Table */}
       <ScrollView horizontal showsHorizontalScrollIndicator>
         <View style={styles.matchTable}>
           <View style={styles.tableHeader}>
@@ -736,41 +714,17 @@ const ScheduleTable = () => {
           </View>
           {sortedSchedules.map((s, idx) => (
             <View key={idx} style={styles.tableRow}>
-              <Text
-                style={[styles.cell, styles.smallCell]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
+              <Text style={[styles.cell, styles.smallCell]}>
                 {s.schedule_id}
               </Text>
-              <Text
-                style={[styles.cell, styles.smallCell]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
+              <Text style={[styles.cell, styles.smallCell]}>
                 {s.category_id}
               </Text>
-              <Text
-                style={[styles.cell, styles.smallCell]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {s.event_id}
-              </Text>
-              <Text
-                style={[styles.cell, styles.extraLargeCell]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
+              <Text style={[styles.cell, styles.smallCell]}>{s.event_id}</Text>
+              <Text style={[styles.cell, styles.extraLargeCell]}>
                 {s.start_time} - {s.end_time}
               </Text>
-              <Text
-                style={[styles.cell, styles.extraLargeCell]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {s.date}
-              </Text>
+              <Text style={[styles.cell, styles.extraLargeCell]}>{s.date}</Text>
               <View style={[styles.cell, styles.mediumCell, styles.actionCell]}>
                 <TouchableOpacity
                   onPress={() => handleEdit(s)}
@@ -790,7 +744,7 @@ const ScheduleTable = () => {
         </View>
       </ScrollView>
 
-      {/* Add/Edit modal */}
+      {/* Modal */}
       <Modal
         isVisible={modalVisible}
         onBackdropPress={() => setModalVisible(false)}
@@ -808,67 +762,156 @@ const ScheduleTable = () => {
             </TouchableOpacity>
           </View>
           <View style={styles.modalDivider} />
+
+          {/* Form */}
           <View style={styles.formGroup}>
+            {/* Date Picker */}
             <Text style={styles.formLabel}>Date</Text>
-            <TextInput
-              placeholder="Enter date (e.g., April 21, 2025)"
-              value={formData.date}
-              onChangeText={(text) => setFormData({ ...formData, date: text })}
+            <TouchableOpacity
               style={styles.input}
-              placeholderTextColor="#A6ADC8"
-            />
+              onPress={() => setShowDatePicker(true)}
+            >
+              <Text style={{ color: formData.date ? "#fff" : "#A6ADC8" }}>
+                {formData.date || "Select Date"}
+              </Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={dateObj}
+                mode="date"
+                display={Platform.OS === "ios" ? "inline" : "default"}
+                onChange={(event, selectedDate) => {
+                  if (Platform.OS === "android") setShowDatePicker(false);
+                  if (selectedDate && isValid(selectedDate)) {
+                    setDateObj(selectedDate);
+                    setFormData({
+                      ...formData,
+                      date: format(selectedDate, "EEEE, MMMM d, yyyy"),
+                    });
+                  }
+                }}
+              />
+            )}
+            {Platform.OS === "ios" && showDatePicker && (
+              <TouchableOpacity
+                onPress={() => setShowDatePicker(false)}
+                style={styles.doneButton}
+              >
+                <Text style={styles.doneButtonText}>Done</Text>
+              </TouchableOpacity>
+            )}
+
+            {/* Start Time Picker */}
             <Text style={styles.formLabel}>Start Time</Text>
-            <TextInput
-              placeholder="Enter start time (e.g., 10:00 AM)"
-              value={formData.start_time}
-              onChangeText={(text) =>
-                setFormData({ ...formData, start_time: text })
-              }
+            <TouchableOpacity
               style={styles.input}
-              placeholderTextColor="#A6ADC8"
-            />
+              onPress={() => setShowStartPicker(true)}
+            >
+              <Text style={{ color: formData.start_time ? "#fff" : "#A6ADC8" }}>
+                {formData.start_time || "Select Start Time"}
+              </Text>
+            </TouchableOpacity>
+            {showStartPicker && (
+              <DateTimePicker
+                value={startTimeObj}
+                mode="time"
+                is24Hour={false}
+                display={Platform.OS === "ios" ? "inline" : "default"}
+                onChange={(event, selectedTime) => {
+                  if (Platform.OS === "android") setShowStartPicker(false);
+                  if (selectedTime && isValid(selectedTime)) {
+                    setStartTimeObj(selectedTime);
+                    setFormData({
+                      ...formData,
+                      start_time: format(selectedTime, "hh:mm a"),
+                    });
+                  }
+                }}
+              />
+            )}
+            {/* End Time Picker */}
             <Text style={styles.formLabel}>End Time</Text>
-            <TextInput
-              placeholder="Enter end time (e.g., 11:30 PM)"
-              value={formData.end_time}
-              onChangeText={(text) =>
-                setFormData({ ...formData, end_time: text })
-              }
+            <TouchableOpacity
               style={styles.input}
-              placeholderTextColor="#A6ADC8"
-            />
+              onPress={() => setShowEndPicker(true)}
+            >
+              <Text style={{ color: formData.end_time ? "#fff" : "#A6ADC8" }}>
+                {formData.end_time || "Select End Time"}
+              </Text>
+            </TouchableOpacity>
+            {showEndPicker && (
+              <DateTimePicker
+                value={endTimeObj}
+                mode="time"
+                is24Hour={false}
+                display={Platform.OS === "ios" ? "inline" : "default"}
+                onChange={(event, selectedTime) => {
+                  if (Platform.OS === "android") setShowEndPicker(false);
+                  if (selectedTime && isValid(selectedTime)) {
+                    setEndTimeObj(selectedTime);
+                    setFormData({
+                      ...formData,
+                      end_time: format(selectedTime, "hh:mm a"),
+                    });
+                  }
+                }}
+              />
+            )}
+            {Platform.OS === "ios" && showEndPicker && (
+              <TouchableOpacity
+                onPress={() => setShowEndPicker(false)}
+                style={styles.doneButton}
+              >
+                <Text style={styles.doneButtonText}>Done</Text>
+              </TouchableOpacity>
+            )}
+
+            {/* IDs */}
             <Text style={styles.formLabel}>Event ID</Text>
             <TextInput
-              placeholder="Enter event id"
+              placeholder="Enter event ID"
               value={formData.event_id}
               onChangeText={(text) =>
                 setFormData({ ...formData, event_id: text })
               }
               style={styles.input}
-              placeholderTextColor="#A6ADC8"
               keyboardType="numeric"
+              placeholderTextColor="#A6ADC8"
             />
             <Text style={styles.formLabel}>Category ID</Text>
             <TextInput
-              placeholder="Enter category id"
+              placeholder="Enter category ID"
               value={formData.category_id}
               onChangeText={(text) =>
                 setFormData({ ...formData, category_id: text })
               }
               style={styles.input}
-              placeholderTextColor="#A6ADC8"
               keyboardType="numeric"
+              placeholderTextColor="#A6ADC8"
             />
           </View>
-          <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
-            <Text style={styles.submitButtonText}>
-              {editMode ? "Update Schedule" : "Create Schedule"}
-            </Text>
+
+          {/* Submit Button */}
+          <TouchableOpacity
+            onPress={handleSubmit}
+            style={[
+              styles.submitButton,
+              submitting && styles.submitButtonDisabled,
+            ]}
+            disabled={submitting}
+          >
+            {submitting ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.submitButtonText}>
+                {editMode ? "Update Schedule" : "Create Schedule"}
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
       </Modal>
 
-      {/* Delete confirmation alert */}
+      {/* Confirmation Alert */}
       <CustomAlert
         isVisible={alertVisible}
         onClose={() => setAlertVisible(false)}
@@ -886,19 +929,11 @@ const EventTable = () => {
     error: eventError,
     data: eventData,
     refetch: refetchEvents,
-  } = useQuery(GET_EVENTS, {
-    onError: (err) => console.error("GET_EVENTS error:", err),
-  });
+  } = useQuery(GET_EVENTS);
 
-  const [addEvent] = useMutation(ADD_EVENT, {
-    onError: (err) => console.error("ADD_EVENT error:", err),
-  });
-  const [updateEvent] = useMutation(UPDATE_EVENT, {
-    onError: (err) => console.error("UPDATE_EVENT error:", err),
-  });
-  const [deleteEvent] = useMutation(DELETE_EVENT, {
-    onError: (err) => console.error("DELETE_EVENT error:", err),
-  });
+  const [addEvent] = useMutation(ADD_EVENT);
+  const [updateEvent] = useMutation(UPDATE_EVENT);
+  const [deleteEvent] = useMutation(DELETE_EVENT);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -1212,19 +1247,11 @@ const CategoryTable = () => {
     error: categoryError,
     data: categoryData,
     refetch: refetchCategories,
-  } = useQuery(GET_CATEGORIES, {
-    onError: (err) => console.error("GET_CATEGORIES error:", err),
-  });
+  } = useQuery(GET_CATEGORIES);
 
-  const [addCategory] = useMutation(ADD_CATEGORY, {
-    onError: (err) => console.error("ADD_CATEGORY error:", err),
-  });
-  const [updateCategory] = useMutation(UPDATE_CATEGORY, {
-    onError: (err) => console.error("UPDATE_CATEGORY error:", err),
-  });
-  const [deleteCategory] = useMutation(DELETE_CATEGORY, {
-    onError: (err) => console.error("DELETE_CATEGORY error:", err),
-  });
+  const [addCategory] = useMutation(ADD_CATEGORY);
+  const [updateCategory] = useMutation(UPDATE_CATEGORY);
+  const [deleteCategory] = useMutation(DELETE_CATEGORY);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [editMode, setEditMode] = useState(false);

@@ -66,7 +66,7 @@ const TeamItem = ({ item, index }) => {
       <Image style={styles.teamLogo} source={getTeamLogo(item.team_logo)} />
       <View style={styles.teamInfo}>
         <Text style={styles.teamName}>{item.team_name}</Text>
-        <Text style={styles.scoreText}>Score: {item.total_score}</Text>
+        <Text style={styles.scoreText}>Total Score: {item.total_score}</Text>
       </View>
     </View>
   );

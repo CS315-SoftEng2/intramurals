@@ -252,7 +252,7 @@ const Scoreboard = () => {
   }
 
   return (
-    <ScrollView contentContainerStyle={globalstyles.container}>
+    <ScrollView contentContainerStyle={styles.contentContainer}>
       {/* Login button */}
       <View style={globalstyles.loginButtonContainer}>
         <Link href={"/login"}>
@@ -260,8 +260,21 @@ const Scoreboard = () => {
         </Link>
       </View>
 
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Completed Matches</Text>
+        <MaterialIcons
+          name="sports-score"
+          size={30}
+          color="#fff"
+          style={styles.icon}
+        />
+      </View>
+
+      {/* Divider */}
+      <View style={styles.divider} />
+
       {/* Completed matches */}
-      <Text style={styles.sectionTitle}>Completed Matches</Text>
       <View style={styles.matchesContainer}>
         {completedMatches.length === 0 ? (
           <Text style={styles.emptyStateText}>
