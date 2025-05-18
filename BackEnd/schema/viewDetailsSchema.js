@@ -22,4 +22,4 @@ scalar Time
     total_score: Int!
     overall_ranking: Int!
 }
-  `;
+`;

@@ -6,15 +6,16 @@ import {
   TimeScalar,
 } from "../helpers/scalarHandler.js";
 
+// Combines date and time into a local datetime object.
 const combineDateTime = (date, time) => {
   const combinedDateTime = `${date} ${time}`;
   const dateObject = new Date(combinedDateTime);
-  const localDateTime = new Date(
+  return new Date(
     dateObject.getTime() - dateObject.getTimezoneOffset() * 60000
   );
-  return localDateTime;
 };
 
+// Formats a date string into a readable format (e.g., "Monday, May 18, 2025").
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
   return date.toLocaleDateString("en-US", {
@@ -25,6 +26,7 @@ const formatDate = (dateStr) => {
   });
 };
 
+// Formats a time string into a readable format (e.g., "9:44 PM").
 const formatTime = (timeStr) => {
   const [hours, minutes] = timeStr.split(":");
   const date = new Date();
@@ -36,6 +38,7 @@ const formatTime = (timeStr) => {
   });
 };
 
+// Handles schedule-related queries and mutations.
 export const scheduleResolver = {
   Date: DateScalar,
   Time: TimeScalar,
@@ -43,84 +46,81 @@ export const scheduleResolver = {
   CustomDateTime: CustomDateTimeScalar,
 
   Query: {
+    // Gets all schedules from the database.
     schedules: async () => {
       const client = await pool.connect();
 
       try {
-        const query = {
-          text: "SELECT * FROM schedule",
-        };
-
+        // Queries all schedules.
+        const query = { text: "SELECT * FROM schedule" };
         const result = await client.query(query);
 
-        return result.rows.map((row) => {
-          const customDateTime = combineDateTime(row.date, row.start_time);
-
-          return {
-            schedule_id: row.schedule_id,
-            date: formatDate(row.date),
-            start_time: formatTime(row.start_time),
-            end_time: formatTime(row.end_time),
-            customDateTime,
-            event_id: row.event_id,
-            category_id: row.category_id,
-          };
-        });
+        // Formats and returns the schedule list.
+        return result.rows.map((row) => ({
+          schedule_id: row.schedule_id,
+          date: formatDate(row.date),
+          start_time: formatTime(row.start_time),
+          end_time: formatTime(row.end_time),
+          customDateTime: combineDateTime(row.date, row.start_time),
+          event_id: row.event_id,
+          category_id: row.category_id,
+        }));
       } catch (err) {
+        // Logs and throws error.
         console.error("Error:", err);
         throw new Error("Failed to fetch schedules.");
       } finally {
+        // Closes the database connection.
         client.release();
       }
     },
 
+    // Gets a schedule by ID.
     schedule: async (_, { id }) => {
       const client = await pool.connect();
 
       try {
+        // Queries a schedule by ID.
         const query = {
           text: "SELECT * FROM schedule WHERE schedule_id = $1",
           values: [id],
         };
-
         const result = await client.query(query);
         const row = result.rows[0];
 
-        const customDateTime = combineDateTime(row.date, row.start_time);
-
+        // Formats and returns the schedule.
         return {
           schedule_id: row.schedule_id,
           date: formatDate(row.date),
           start_time: formatTime(row.start_time),
           end_time: formatTime(row.end_time),
-          customDateTime,
+          customDateTime: combineDateTime(row.date, row.start_time),
           event_id: row.event_id,
           category_id: row.category_id,
         };
       } catch (err) {
+        // Logs and throws error.
         console.error("Error:", err);
         throw new Error("Failed to fetch the schedule.");
       } finally {
+        // Closes the database connection.
         client.release();
       }
     },
   },
 
   Mutation: {
-    // Mutations unchanged - these can keep sending raw values to the DB
-    // No need to format them unless you return data (currently not the case)
-
+    // Adds a new schedule.
     addSchedule: async (_, { admin_id, schedule }, context) => {
+      // Checks for expired token.
       if (context.type == "error") {
-        return {
-          type: "error",
-          message: "Token expired.",
-        };
+        return { type: "error", message: "Token expired." };
       }
 
       const client = await pool.connect();
 
       try {
+        // Queries to add a schedule.
         const query = {
           text: "SELECT fn_admin_add_schedule($1, $2, $3, $4, $5, $6) AS result",
           values: [
@@ -132,40 +132,38 @@ export const scheduleResolver = {
             schedule.category_id,
           ],
         };
-
         const result = await client.query(query);
         const res = result.rows[0]?.result;
 
+        // Returns the query result or an error.
         return res
-          ? {
-              content: res.content,
-              type: res.type,
-              message: res.message,
-            }
+          ? { content: res.content, type: res.type, message: res.message }
           : {
               content: null,
               type: "error",
               message: "Failed to add schedule.",
             };
       } catch (err) {
+        // Logs and throws error.
         console.error("Error:", err);
         throw new Error("Failed to add new schedule.");
       } finally {
+        // Closes the database connection.
         client.release();
       }
     },
 
+    // Updates an existing schedule.
     updateSchedule: async (_, { admin_id, schedule_id, schedule }, context) => {
+      // Checks for expired token.
       if (context.type == "error") {
-        return {
-          type: "error",
-          message: "Token expired.",
-        };
+        return { type: "error", message: "Token expired." };
       }
 
       const client = await pool.connect();
 
       try {
+        // Queries to update a schedule.
         const query = {
           text: "SELECT * FROM fn_admin_update_schedule($1, $2, $3, $4, $5, $6, $7) AS result",
           values: [
@@ -178,59 +176,51 @@ export const scheduleResolver = {
             schedule.category_id,
           ],
         };
-
         const result = await client.query(query);
         const res = result.rows[0]?.result;
 
+        // Returns the query result or an error.
         return res
-          ? {
-              type: res.type,
-              message: res.message,
-            }
-          : {
-              type: "error",
-              message: "Failed to update schedule.",
-            };
+          ? { type: res.type, message: res.message }
+          : { type: "error", message: "Failed to update schedule." };
       } catch (err) {
+        // Logs and throws error.
         console.error("Error:", err);
         throw new Error("Failed to update the schedule.");
       } finally {
+        // Closes the database connection.
         client.release();
       }
     },
 
+    // Deletes a schedule.
     deleteSchedule: async (_, { admin_id, schedule_id }, context) => {
+      // Checks for expired token.
       if (context.type == "error") {
-        return {
-          type: "error",
-          message: "Token expired.",
-        };
+        return { type: "error", message: "Token expired." };
       }
 
       const client = await pool.connect();
 
       try {
+        // Queries to delete a schedule.
         const query = {
           text: "SELECT * FROM fn_admin_delete_schedule($1, $2) AS result",
           values: [admin_id, schedule_id],
         };
-
         const result = await client.query(query);
         const res = result.rows[0]?.result;
 
+        // Returns the query result or an error.
         return res
-          ? {
-              type: res.type,
-              message: res.message,
-            }
-          : {
-              type: "error",
-              message: "Failed to delete schedule.",
-            };
+          ? { type: res.type, message: res.message }
+          : { type: "error", message: "Failed to delete schedule." };
       } catch (err) {
+        // Logs and throws error.
         console.error("Error:", err);
         throw new Error("Failed to delete the schedule.");
       } finally {
+        // Closes the database connection.
         client.release();
       }
     },

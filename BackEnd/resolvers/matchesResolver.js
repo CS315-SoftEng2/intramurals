@@ -1,78 +1,56 @@
 import { pool } from "../helpers/dbHelper.js";
 
+// Handles match-related queries and mutations.
 export const matchesResolver = {
   Query: {
+    // Gets all matches from the database.
     getMatches: async () => {
       const client = await pool.connect();
       try {
-        const query = {
-          text: `
-            SELECT 
-              m.match_id,
-              m.schedule_id,
-              m.team_a_id,
-              m.team_b_id,
-              m.score_a,
-              m.score_b,
-              ta.team_logo AS team_a_logo,
-              tb.team_logo AS team_b_logo,
-              ta.team_color AS team_a_color,
-              tb.team_color AS team_b_color,
-              m.user_assigned_id,
-              CASE 
-                WHEN m.score_a > m.score_b THEN ta.team_color
-                WHEN m.score_b > m.score_a THEN tb.team_color
-                ELSE NULL
-              END AS winner_team_color,
-              CASE 
-                WHEN m.score_a > m.score_b THEN m.team_a_id
-                WHEN m.score_b > m.score_a THEN m.team_b_id
-                ELSE NULL
-              END AS winner_team_id,
-              e.event_name,
-              c.division,
-              ta.team_name AS team_a_name,
-              tb.team_name AS team_b_name,
-              m.score_updated_at
-            FROM match m
-            LEFT JOIN team ta ON m.team_a_id = ta.team_id
-            LEFT JOIN team tb ON m.team_b_id = tb.team_id
-            LEFT JOIN schedule s ON m.schedule_id = s.schedule_id
-            LEFT JOIN events e ON s.event_id = e.event_id
-            LEFT JOIN category c ON e.category_id = c.category_id;
-          `,
-        };
-
+        // Queries all matches.
+        const query = { text: "SELECT * FROM vw_matches" };
         const result = await client.query(query);
+
+        // Returns the match list.
         return result.rows;
       } catch (err) {
+        // Logs and throws error.
         console.error("Error:", err);
         throw new Error("Failed to fetch matches.");
       } finally {
+        // Closes the database connection.
         client.release();
       }
     },
 
+    // Gets a match by ID.
     getMatchById: async (_, { match_id }) => {
       const client = await pool.connect();
       try {
+        // Queries a match by ID.
         const query = {
           text: "SELECT * FROM match WHERE match_id = $1",
           values: [match_id],
         };
         const result = await client.query(query);
+
+        // Returns the match.
         return result.rows[0];
       } catch (err) {
+        // Logs and throws error.
         console.error("Error:", err);
         throw new Error("Failed to fetch match.");
       } finally {
+        // Closes the database connection.
         client.release();
       }
     },
   },
 
   Mutation: {
+    // Adds a new match.
     addMatch: async (_, { match, admin_id }, context) => {
+      // Checks for expired token.
       if (context.type === "error") {
         return { type: "error", message: "Token expired." };
       }
@@ -87,7 +65,7 @@ export const matchesResolver = {
           user_assigned_id,
         } = match;
 
-        // Map team names to team_ids
+        // Maps team names to team IDs.
         const teamQuery = {
           text: `SELECT team_id, team_name FROM team WHERE LOWER(team_name) IN ($1, $2)`,
           values: [team_a_name.toLowerCase(), team_b_name.toLowerCase()],
@@ -102,13 +80,15 @@ export const matchesResolver = {
         const teamAId = teamMap[team_a_name.toLowerCase()];
         const teamBId = teamMap[team_b_name.toLowerCase()];
 
+        // Returns error if team IDs are not found.
         if (!teamAId || !teamBId) {
           return {
             type: "error",
-            message: `One or both team names not found: ${team_a_name}, ${team_b_name}`,
+            message: `Team not found: ${team_a_name}, ${team_b_name}`,
           };
         }
 
+        // Queries to add a match.
         const matchQuery = {
           text: `SELECT * FROM fn_admin_add_match($1, $2, $3, $4, $5, $6, $7)`,
           values: [
@@ -121,32 +101,38 @@ export const matchesResolver = {
             user_assigned_id,
           ],
         };
-
         const result = await client.query(matchQuery);
+
+        // Returns error if no result.
         if (!result.rows[0]) {
           return {
             type: "error",
-            message: "Failed to add match: No result returned from database.",
+            message: "Failed to add match: No result from database.",
           };
         }
 
+        // Returns success response.
         return {
           content: result.rows[0],
           type: "success",
           message: "Match added successfully.",
         };
       } catch (err) {
+        // Logs and returns error.
         console.error("Error adding match:", err);
         return {
           type: "error",
           message: `Failed to add match: ${err.message}`,
         };
       } finally {
+        // Closes the database connection.
         client.release();
       }
     },
 
+    // Updates an existing match.
     updateMatch: async (_, { admin_id, match_id, match }, context) => {
+      // Checks for expired token.
       if (context.type === "error") {
         return { type: "error", message: "Token expired." };
       }
@@ -161,7 +147,7 @@ export const matchesResolver = {
           user_assigned_id,
         } = match;
 
-        // Map team names to team_ids
+        // Maps team names to team IDs.
         const teamQuery = {
           text: `SELECT team_id, team_name FROM team WHERE LOWER(team_name) IN ($1, $2)`,
           values: [team_a_name.toLowerCase(), team_b_name.toLowerCase()],
@@ -176,13 +162,15 @@ export const matchesResolver = {
         const teamAId = teamMap[team_a_name.toLowerCase()];
         const teamBId = teamMap[team_b_name.toLowerCase()];
 
+        // Returns error if team IDs are not found.
         if (!teamAId || !teamBId) {
           return {
             type: "error",
-            message: `One or both team names not found: ${team_a_name}, ${team_b_name}`,
+            message: `Team not found: ${team_a_name}, ${team_b_name}`,
           };
         }
 
+        // Queries to update a match.
         const matchQuery = {
           text: `SELECT * FROM fn_admin_update_match($1, $2, $3, $4, $5, $6, $7, $8)`,
           values: [
@@ -196,50 +184,60 @@ export const matchesResolver = {
             user_assigned_id,
           ],
         };
-
         const result = await client.query(matchQuery);
+
+        // Returns error if no result.
         if (!result.rows[0]) {
           return {
             type: "error",
-            message:
-              "Failed to update match: No result returned from database.",
+            message: "Failed to update match: No result from database.",
           };
         }
 
+        // Returns success response.
         return {
           type: "success",
           message: "Match updated successfully.",
         };
       } catch (err) {
+        // Logs and returns error.
         console.error("Error updating match:", err);
         return {
           type: "error",
           message: `Failed to update match: ${err.message}`,
         };
       } finally {
+        // Closes the database connection.
         client.release();
       }
     },
 
+    // Deletes a match.
     deleteMatch: async (_, { admin_id, match_id }, context) => {
+      // Checks for expired token.
       if (context.type === "error") {
         return { type: "error", message: "Token expired." };
       }
       const client = await pool.connect();
       try {
+        // Queries to delete a match.
         const query = {
           text: "SELECT * FROM fn_admin_delete_match($1, $2) AS result",
           values: [admin_id, match_id],
         };
         const result = await client.query(query);
+
+        // Returns the query result.
         return {
           type: result.rows[0].result.type,
           message: result.rows[0].result.message,
         };
       } catch (err) {
+        // Logs and throws error.
         console.error("Error:", err);
         throw new Error("Failed to delete match.");
       } finally {
+        // Closes the database connection.
         client.release();
       }
     },

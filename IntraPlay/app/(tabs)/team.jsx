@@ -1,5 +1,5 @@
 // React and library imports
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "expo-router";
 import {
   Text,
