@@ -160,6 +160,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     color: "#CDD6F4",
     fontSize: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   submitButton: {
     backgroundColor: "#89B4FA",
@@ -184,6 +187,59 @@ const styles = StyleSheet.create({
     color: "#89B4FA",
     fontSize: 12,
     marginLeft: 4,
+  },
+  pickerItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#3A3A50",
+  },
+  pickerItemText: {
+    color: "#CDD6F4",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  pickerText: {
+    flex: 1,
+    fontSize: 14,
+  },
+  selectedText: {
+    color: "#CDD6F4",
+  },
+  placeholderText: {
+    color: "#A6ADC8",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  pickerModal: {
+    backgroundColor: "#24273A",
+    borderRadius: 12,
+    width: width - 40,
+    maxHeight: "60%",
+  },
+  pickerList: {
+    maxHeight: 300,
+  },
+  pickerDoneButton: {
+    backgroundColor: "#89B4FA",
+    paddingVertical: 14,
+    alignItems: "center",
+    marginHorizontal: 20,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  pickerDoneButtonText: {
+    color: "#1E1E2E",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  disabledInput: {
+    backgroundColor: "#2D3748",
+    opacity: 0.6,
   },
 });
 

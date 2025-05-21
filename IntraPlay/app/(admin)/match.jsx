@@ -20,6 +20,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 // Components
 import LoadingIndicator from "../components/LoadingIndicator";
 import CustomAlert from "../components/customAlert";
+import StyledPicker from "../components/styledPicker";
 
 // Styles
 import styles from "../../assets/styles/matchStyles";
@@ -34,6 +35,7 @@ import GET_MATCHES from "../../queries/matchesQuery";
 import GET_CATEGORIES from "../../queries/categoriesQuery";
 import GET_SCHEDULES from "../../queries/scheduleQuery";
 import GET_EVENTS from "../../queries/eventsQuery";
+import GET_USERS from "../../queries/userAccountQuery";
 
 // Mutations
 import {
@@ -86,6 +88,30 @@ const MatchTable = () => {
     refetch: refetchMatches,
   } = useQuery(GET_MATCHES);
 
+  const {
+    loading: usersLoading,
+    error: usersError,
+    data: usersData,
+  } = useQuery(GET_USERS);
+
+  const {
+    loading: schedulesLoading,
+    error: schedulesError,
+    data: schedulesData,
+  } = useQuery(GET_SCHEDULES);
+
+  const {
+    loading: categoriesLoading,
+    error: categoriesError,
+    data: categoriesData,
+  } = useQuery(GET_CATEGORIES);
+
+  const {
+    loading: eventsLoading,
+    error: eventsError,
+    data: eventsData,
+  } = useQuery(GET_EVENTS); // Fetch events data
+
   const [addMatch] = useMutation(ADD_MATCH);
   const [updateMatch] = useMutation(UPDATE_MATCH);
   const [deleteMatch] = useMutation(DELETE_MATCH);
@@ -101,6 +127,46 @@ const MatchTable = () => {
     team_b_name: "",
     user_assigned_id: "",
   });
+
+  // Filter out Admin users and memoize the result
+  const filteredUsers = useMemo(() => {
+    if (!usersData?.users) return [];
+    return usersData.users
+      .filter((user) => user.user_type !== "Admin")
+      .sort((a, b) => a.user_id - b.user_id);
+  }, [usersData]);
+
+  // Combine schedules with event and category data
+  const scheduleOptions = useMemo(() => {
+    if (
+      !schedulesData?.schedules ||
+      !categoriesData?.categories ||
+      !eventsData?.events
+    )
+      return [];
+    const categoriesMap = new Map(
+      categoriesData.categories.map((cat) => [
+        cat.category_id,
+        `${cat.category_name} - ${cat.division}`,
+      ])
+    );
+    const eventsMap = new Map(
+      eventsData.events.map((event) => [event.event_id, event.event_name])
+    );
+    return [
+      { label: "Select Schedule", value: "", enabled: false },
+      ...schedulesData.schedules.map((schedule) => ({
+        label: `ID: ${schedule.schedule_id}, ${schedule.date}, ${
+          schedule.start_time
+        }-${schedule.end_time}, ${
+          eventsMap.get(schedule.event_id) || "Unknown Event"
+        }, ${categoriesMap.get(schedule.category_id) || "Unknown Category"}`,
+        value: schedule.schedule_id.toString(),
+      })),
+    ].sort((a, b) =>
+      a.value === "" ? -1 : parseInt(a.value) - parseInt(b.value)
+    );
+  }, [schedulesData, categoriesData, eventsData]);
 
   const matches = matchData?.getMatches || [];
   const sortedMatches = useMemo(
@@ -280,14 +346,62 @@ const MatchTable = () => {
     setModalVisible(true);
   };
 
-  if (matchLoading) {
+  if (
+    matchLoading ||
+    usersLoading ||
+    schedulesLoading ||
+    categoriesLoading ||
+    eventsLoading
+  ) {
     return <LoadingIndicator visible={true} message="Loading..." />;
   }
 
   if (matchError) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.errorText}>Error occurred!</Text>
+        <Text style={styles.errorText}>
+          Error occurred: {matchError.message}
+        </Text>
+      </View>
+    );
+  }
+
+  if (usersError) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>
+          Error loading users: {usersError.message}
+        </Text>
+      </View>
+    );
+  }
+
+  if (schedulesError) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>
+          Error loading schedules: {schedulesError.message}
+        </Text>
+      </View>
+    );
+  }
+
+  if (categoriesError) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>
+          Error loading categories: {categoriesError.message}
+        </Text>
+      </View>
+    );
+  }
+
+  if (eventsError) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>
+          Error loading events: {eventsError.message}
+        </Text>
       </View>
     );
   }
@@ -390,16 +504,52 @@ const MatchTable = () => {
           <View style={styles.modalDivider} />
           <View style={styles.formGroup}>
             <Text style={styles.formLabel}>Schedule ID</Text>
-            <TextInput
-              placeholder="Enter schedule id"
-              value={formData.schedule_id}
-              onChangeText={(text) =>
-                setFormData({ ...formData, schedule_id: text })
+            <StyledPicker
+              selectedValue={formData.schedule_id}
+              onValueChange={(value) =>
+                setFormData({ ...formData, schedule_id: value })
               }
-              style={styles.input}
-              placeholderTextColor="#A6ADC8"
-              keyboardType="numeric"
+              items={scheduleOptions}
+              placeholder="Select Schedule"
+              disabled={
+                schedulesLoading ||
+                schedulesError ||
+                categoriesLoading ||
+                categoriesError ||
+                eventsLoading ||
+                eventsError ||
+                scheduleOptions.length <= 1
+              }
             />
+            {schedulesLoading || categoriesLoading || eventsLoading ? (
+              <ActivityIndicator color="#A6ADC8" />
+            ) : null}
+            {schedulesError && (
+              <Text style={{ color: "#F38BA8", fontSize: 14 }}>
+                Failed to load schedules
+              </Text>
+            )}
+            {categoriesError && (
+              <Text style={{ color: "#F38BA8", fontSize: 14 }}>
+                Failed to load categories
+              </Text>
+            )}
+            {eventsError && (
+              <Text style={{ color: "#F38BA8", fontSize: 14 }}>
+                Failed to load events
+              </Text>
+            )}
+            {!schedulesLoading &&
+              !schedulesError &&
+              !categoriesLoading &&
+              !categoriesError &&
+              !eventsLoading &&
+              !eventsError &&
+              scheduleOptions.length <= 1 && (
+                <Text style={{ color: "#F38BA8", fontSize: 14 }}>
+                  No schedules available
+                </Text>
+              )}
             <Text style={styles.formLabel}>Team A Name</Text>
             <TextInput
               placeholder="Enter team A name"
@@ -421,18 +571,68 @@ const MatchTable = () => {
               placeholderTextColor="#A6ADC8"
             />
             <Text style={styles.formLabel}>User Assigned ID</Text>
-            <TextInput
-              placeholder="Enter user assigned ID"
-              value={formData.user_assigned_id}
-              onChangeText={(text) =>
-                setFormData({ ...formData, user_assigned_id: text })
+            <StyledPicker
+              selectedValue={formData.user_assigned_id}
+              onValueChange={(value) =>
+                setFormData({ ...formData, user_assigned_id: value })
               }
-              style={styles.input}
-              placeholderTextColor="#A6ADC8"
-              keyboardType="numeric"
+              items={
+                usersLoading || usersError || filteredUsers.length === 0
+                  ? []
+                  : [
+                      { label: "Select User", value: "", enabled: false },
+                      ...filteredUsers.map((user) => ({
+                        label: `(ID: ${user.user_id}) ${user.user_name}`,
+                        value: user.user_id.toString(),
+                      })),
+                    ]
+              }
+              placeholder="Select User"
+              disabled={
+                usersLoading || usersError || filteredUsers.length === 0
+              }
             />
+            {usersLoading && <ActivityIndicator color="#A6ADC8" />}
+            {usersError && (
+              <Text style={{ color: "#F38BA8", fontSize: 14 }}>
+                Failed to load users
+              </Text>
+            )}
+            {!usersLoading && !usersError && filteredUsers.length === 0 && (
+              <Text style={{ color: "#F38BA8", fontSize: 14 }}>
+                No users available
+              </Text>
+            )}
           </View>
-          <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
+          <TouchableOpacity
+            onPress={handleSubmit}
+            style={[
+              styles.submitButton,
+              (usersLoading ||
+                usersError ||
+                filteredUsers.length === 0 ||
+                schedulesLoading ||
+                schedulesError ||
+                categoriesLoading ||
+                categoriesError ||
+                eventsLoading ||
+                eventsError ||
+                scheduleOptions.length <= 1) &&
+                styles.submitButtonDisabled,
+            ]}
+            disabled={
+              usersLoading ||
+              usersError ||
+              filteredUsers.length === 0 ||
+              schedulesLoading ||
+              schedulesError ||
+              categoriesLoading ||
+              categoriesError ||
+              eventsLoading ||
+              eventsError ||
+              scheduleOptions.length <= 1
+            }
+          >
             <Text style={styles.submitButtonText}>
               {editMode ? "Update Match" : "Create Match"}
             </Text>
@@ -459,6 +659,18 @@ const ScheduleTable = ({ adminId = 1 }) => {
     data: scheduleData,
     refetch: refetchSchedules,
   } = useQuery(GET_SCHEDULES);
+
+  const {
+    loading: eventsLoading,
+    error: eventsError,
+    data: eventsData,
+  } = useQuery(GET_EVENTS);
+
+  const {
+    loading: categoriesLoading,
+    error: categoriesError,
+    data: categoriesData,
+  } = useQuery(GET_CATEGORIES);
 
   const [addSchedule] = useMutation(ADD_SCHEDULE);
   const [updateSchedule] = useMutation(UPDATE_SCHEDULE);
@@ -510,6 +722,34 @@ const ScheduleTable = ({ adminId = 1 }) => {
       return fallback;
     }
   };
+
+  // Event options for StyledPicker
+  const eventOptions = useMemo(() => {
+    if (!eventsData?.events) return [];
+    return [
+      { label: "Select Event", value: "", enabled: false },
+      ...eventsData.events.map((event) => ({
+        label: `ID: ${event.event_id}, ${event.event_name}, ${event.venue}`,
+        value: event.event_id.toString(),
+      })),
+    ].sort((a, b) =>
+      a.value === "" ? -1 : parseInt(a.value) - parseInt(b.value)
+    );
+  }, [eventsData]);
+
+  // Category options for StyledPicker
+  const categoryOptions = useMemo(() => {
+    if (!categoriesData?.categories) return [];
+    return [
+      { label: "Select Category", value: "", enabled: false },
+      ...categoriesData.categories.map((category) => ({
+        label: `ID: ${category.category_id}, ${category.category_name} - ${category.division}`,
+        value: category.category_id.toString(),
+      })),
+    ].sort((a, b) =>
+      a.value === "" ? -1 : parseInt(a.value) - parseInt(b.value)
+    );
+  }, [categoriesData]);
 
   const openAddModal = useCallback(() => {
     setFormData({
@@ -678,14 +918,39 @@ const ScheduleTable = ({ adminId = 1 }) => {
     }
   };
 
-  if (scheduleLoading)
+  if (scheduleLoading || eventsLoading || categoriesLoading) {
     return <LoadingIndicator visible={true} message="Loading..." />;
-  if (scheduleError)
+  }
+
+  if (scheduleError) {
     return (
-      <Text style={styles.errorText}>
-        Error loading schedules: {scheduleError.message}
-      </Text>
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>
+          Error loading schedules: {scheduleError.message}
+        </Text>
+      </View>
     );
+  }
+
+  if (eventsError) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>
+          Error loading events: {eventsError.message}
+        </Text>
+      </View>
+    );
+  }
+
+  if (categoriesError) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>
+          Error loading categories: {categoriesError.message}
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.otherContentContainer}>
@@ -829,6 +1094,15 @@ const ScheduleTable = ({ adminId = 1 }) => {
                 }}
               />
             )}
+            {Platform.OS === "ios" && showStartPicker && (
+              <TouchableOpacity
+                onPress={() => setShowStartPicker(false)}
+                style={styles.doneButton}
+              >
+                <Text style={styles.doneButtonText}>Done</Text>
+              </TouchableOpacity>
+            )}
+
             {/* End Time Picker */}
             <Text style={styles.formLabel}>End Time</Text>
             <TouchableOpacity
@@ -866,29 +1140,59 @@ const ScheduleTable = ({ adminId = 1 }) => {
               </TouchableOpacity>
             )}
 
-            {/* IDs */}
+            {/* Event ID Picker */}
             <Text style={styles.formLabel}>Event ID</Text>
-            <TextInput
-              placeholder="Enter event ID"
-              value={formData.event_id}
-              onChangeText={(text) =>
-                setFormData({ ...formData, event_id: text })
+            <StyledPicker
+              selectedValue={formData.event_id}
+              onValueChange={(value) =>
+                setFormData({ ...formData, event_id: value })
               }
-              style={styles.input}
-              keyboardType="numeric"
-              placeholderTextColor="#A6ADC8"
+              items={eventOptions}
+              placeholder="Select Event"
+              disabled={
+                eventsLoading || eventsError || eventOptions.length <= 1
+              }
             />
+            {eventsLoading && <ActivityIndicator color="#A6ADC8" />}
+            {eventsError && (
+              <Text style={{ color: "#F38BA8", fontSize: 14 }}>
+                Failed to load events
+              </Text>
+            )}
+            {!eventsLoading && !eventsError && eventOptions.length <= 1 && (
+              <Text style={{ color: "#F38BA8", fontSize: 14 }}>
+                No events available
+              </Text>
+            )}
+
+            {/* Category ID Picker */}
             <Text style={styles.formLabel}>Category ID</Text>
-            <TextInput
-              placeholder="Enter category ID"
-              value={formData.category_id}
-              onChangeText={(text) =>
-                setFormData({ ...formData, category_id: text })
+            <StyledPicker
+              selectedValue={formData.category_id}
+              onValueChange={(value) =>
+                setFormData({ ...formData, category_id: value })
               }
-              style={styles.input}
-              keyboardType="numeric"
-              placeholderTextColor="#A6ADC8"
+              items={categoryOptions}
+              placeholder="Select Category"
+              disabled={
+                categoriesLoading ||
+                categoriesError ||
+                categoryOptions.length <= 1
+              }
             />
+            {categoriesLoading && <ActivityIndicator color="#A6ADC8" />}
+            {categoriesError && (
+              <Text style={{ color: "#F38BA8", fontSize: 14 }}>
+                Failed to load categories
+              </Text>
+            )}
+            {!categoriesLoading &&
+              !categoriesError &&
+              categoryOptions.length <= 1 && (
+                <Text style={{ color: "#F38BA8", fontSize: 14 }}>
+                  No categories available
+                </Text>
+              )}
           </View>
 
           {/* Submit Button */}
@@ -896,9 +1200,24 @@ const ScheduleTable = ({ adminId = 1 }) => {
             onPress={handleSubmit}
             style={[
               styles.submitButton,
-              submitting && styles.submitButtonDisabled,
+              (submitting ||
+                eventsLoading ||
+                eventsError ||
+                eventOptions.length <= 1 ||
+                categoriesLoading ||
+                categoriesError ||
+                categoryOptions.length <= 1) &&
+                styles.submitButtonDisabled,
             ]}
-            disabled={submitting}
+            disabled={
+              submitting ||
+              eventsLoading ||
+              eventsError ||
+              eventOptions.length <= 1 ||
+              categoriesLoading ||
+              categoriesError ||
+              categoryOptions.length <= 1
+            }
           >
             {submitting ? (
               <ActivityIndicator color="#fff" />

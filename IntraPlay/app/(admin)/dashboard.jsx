@@ -15,7 +15,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useQuery } from "@apollo/client";
 
 // Styles
-import globalstyles from "@/assets/styles/globalstyles";
+import globalstyles from "../../assets/styles/globalstyles";
 
 // Context and utilities
 import useAuthGuard from "../../utils/authGuard";
