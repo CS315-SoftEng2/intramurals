@@ -9,6 +9,7 @@ import {
   TextInput,
   Platform,
   ActivityIndicator,
+  FlatList,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -63,20 +64,38 @@ const Match = () => {
   const { logout } = useAuth();
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Logout button */}
+    <View style={styles.container}>
       <View style={globalstyles.loginButtonContainer}>
         <TouchableOpacity onPress={() => handleLogout(logout)}>
           <MaterialIcons name="logout" size={25} color="#22C55E" />
         </TouchableOpacity>
       </View>
 
-      {/* Tables */}
-      <MatchTable />
-      <ScheduleTable />
-      <EventTable />
-      <CategoryTable />
-    </ScrollView>
+      <FlatList
+        data={[
+          { key: "match" },
+          { key: "schedule" },
+          { key: "event" },
+          { key: "category" },
+        ]}
+        keyExtractor={(item) => item.key}
+        renderItem={({ item }) => {
+          switch (item.key) {
+            case "match":
+              return <MatchTable />;
+            case "schedule":
+              return <ScheduleTable />;
+            case "event":
+              return <EventTable />;
+            case "category":
+              return <CategoryTable />;
+            default:
+              return null;
+          }
+        }}
+        contentContainerStyle={{ paddingBottom: 40 }}
+      />
+    </View>
   );
 };
 
@@ -418,71 +437,50 @@ const MatchTable = () => {
       </View>
 
       {/* Table content */}
-      <ScrollView horizontal showsHorizontalScrollIndicator>
-        <View style={styles.matchTable}>
-          <View style={styles.tableHeader}>
-            <Text style={[styles.headerCell, styles.smallCell]}>ID</Text>
-            <Text style={[styles.headerCell, styles.smallCell]}>Sched</Text>
-            <Text style={[styles.headerCell, styles.mediumCell]}>Team A</Text>
-            <Text style={[styles.headerCell, styles.mediumCell]}>Team B</Text>
-            <Text style={[styles.headerCell, styles.smallCell]}>User ID</Text>
-            <Text style={[styles.headerCell, styles.mediumCell]}>Actions</Text>
-          </View>
-          {sortedMatches.map((match, idx) => (
-            <View key={idx} style={styles.tableRow}>
-              <Text
-                style={[styles.cell, styles.smallCell]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
+      <FlatList
+        data={sortedMatches}
+        keyExtractor={(item) => item.match_id.toString()}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        renderItem={({ item }) => (
+          <View style={styles.matchCard}>
+            <Text style={styles.cardText}>
+              <Text style={styles.cardLabel}>Match ID:</Text> {item.match_id}
+            </Text>
+            <Text style={styles.cardText}>
+              <Text style={styles.cardLabel}>Schedule ID:</Text>{" "}
+              {item.schedule_id}
+            </Text>
+            <Text style={styles.cardText}>
+              <Text style={styles.cardLabel}>Team A:</Text> {item.team_a_name}
+            </Text>
+            <Text style={styles.cardText}>
+              <Text style={styles.cardLabel}>Team B:</Text> {item.team_b_name}
+            </Text>
+            <Text style={styles.cardText}>
+              <Text style={styles.cardLabel}>User ID:</Text>{" "}
+              {item.user_assigned_id}
+            </Text>
+
+            <View style={styles.actionCell}>
+              <TouchableOpacity
+                onPress={() => handleEdit(item)}
+                style={styles.editButton}
               >
-                {match.match_id}
-              </Text>
-              <Text
-                style={[styles.cell, styles.smallCell]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
+                <Ionicons name="create" size={18} color="#22C55E" />
+                <Text style={styles.editButtonText}>Update Match</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleDelete(item.match_id)}
+                style={styles.deleteButton}
               >
-                {match.schedule_id}
-              </Text>
-              <Text
-                style={[styles.cell, styles.mediumCell]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {match.team_a_name}
-              </Text>
-              <Text
-                style={[styles.cell, styles.mediumCell]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {match.team_b_name}
-              </Text>
-              <Text
-                style={[styles.cell, styles.smallCell]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {match.user_assigned_id}
-              </Text>
-              <View style={[styles.cell, styles.mediumCell, styles.actionCell]}>
-                <TouchableOpacity
-                  onPress={() => handleEdit(match)}
-                  style={styles.editButton}
-                >
-                  <Ionicons name="create" size={18} color="#22C55E" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => handleDelete(match.match_id)}
-                  style={styles.deleteButton}
-                >
-                  <MaterialIcons name="delete" size={18} color="#F38BA8" />
-                </TouchableOpacity>
-              </View>
+                <MaterialIcons name="delete" size={18} color="#F38BA8" />
+                <Text style={styles.deleteButtonText}>Delete Match</Text>
+              </TouchableOpacity>
             </View>
-          ))}
-        </View>
-      </ScrollView>
+          </View>
+        )}
+        ListEmptyComponent={<Text>No matches available.</Text>}
+      />
 
       {/* Add/Edit modal */}
       <Modal
@@ -967,47 +965,51 @@ const ScheduleTable = ({ adminId = 1 }) => {
       </View>
 
       {/* Table */}
-      <ScrollView horizontal showsHorizontalScrollIndicator>
-        <View style={styles.matchTable}>
-          <View style={styles.tableHeader}>
-            <Text style={[styles.headerCell, styles.smallCell]}>ID</Text>
-            <Text style={[styles.headerCell, styles.smallCell]}>Category</Text>
-            <Text style={[styles.headerCell, styles.smallCell]}>Event</Text>
-            <Text style={[styles.headerCell, styles.extraLargeCell]}>Time</Text>
-            <Text style={[styles.headerCell, styles.extraLargeCell]}>Date</Text>
-            <Text style={[styles.headerCell, styles.mediumCell]}>Actions</Text>
-          </View>
-          {sortedSchedules.map((s, idx) => (
-            <View key={idx} style={styles.tableRow}>
-              <Text style={[styles.cell, styles.smallCell]}>
-                {s.schedule_id}
-              </Text>
-              <Text style={[styles.cell, styles.smallCell]}>
-                {s.category_id}
-              </Text>
-              <Text style={[styles.cell, styles.smallCell]}>{s.event_id}</Text>
-              <Text style={[styles.cell, styles.extraLargeCell]}>
-                {s.start_time} - {s.end_time}
-              </Text>
-              <Text style={[styles.cell, styles.extraLargeCell]}>{s.date}</Text>
-              <View style={[styles.cell, styles.mediumCell, styles.actionCell]}>
-                <TouchableOpacity
-                  onPress={() => handleEdit(s)}
-                  style={styles.editButton}
-                >
-                  <Ionicons name="create" size={18} color="#22C55E" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => handleDelete(s.schedule_id)}
-                  style={styles.deleteButton}
-                >
-                  <MaterialIcons name="delete" size={18} color="#F38BA8" />
-                </TouchableOpacity>
-              </View>
+      <FlatList
+        data={sortedSchedules}
+        keyExtractor={(item) => item.schedule_id.toString()}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        renderItem={({ item }) => (
+          <View style={styles.matchCard}>
+            <Text style={styles.cardText}>
+              <Text style={styles.cardLabel}>Schedule ID:</Text>{" "}
+              {item.schedule_id}
+            </Text>
+            <Text style={styles.cardText}>
+              <Text style={styles.cardLabel}>Category ID:</Text>{" "}
+              {item.category_id}
+            </Text>
+            <Text style={styles.cardText}>
+              <Text style={styles.cardLabel}>Event ID:</Text> {item.event_id}
+            </Text>
+            <Text style={styles.cardText}>
+              <Text style={styles.cardLabel}>Date:</Text> {item.date}
+            </Text>
+            <Text style={styles.cardText}>
+              <Text style={styles.cardLabel}>Time:</Text> {item.start_time} -{" "}
+              {item.end_time}
+            </Text>
+
+            <View style={styles.actionCell}>
+              <TouchableOpacity
+                onPress={() => handleEdit(item)}
+                style={styles.editButton}
+              >
+                <Ionicons name="create" size={18} color="#22C55E" />
+                <Text style={styles.editButtonText}>Update Schedule</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleDelete(item.schedule_id)}
+                style={styles.deleteButton}
+              >
+                <MaterialIcons name="delete" size={18} color="#F38BA8" />
+                <Text style={styles.deleteButtonText}>Delete Schedule</Text>
+              </TouchableOpacity>
             </View>
-          ))}
-        </View>
-      </ScrollView>
+          </View>
+        )}
+        ListEmptyComponent={<Text>No schedules available.</Text>}
+      />
 
       {/* Modal */}
       <Modal
@@ -1437,59 +1439,42 @@ const EventTable = () => {
       </View>
 
       {/* Table content */}
-      <ScrollView horizontal showsHorizontalScrollIndicator>
-        <View style={styles.matchTable}>
-          <View style={styles.tableHeader}>
-            <Text style={[styles.headerCell, styles.smallCell]}>ID</Text>
-            <Text style={[styles.headerCell, styles.extraLargeCell]}>
-              Event Name
+      <FlatList
+        data={sortedEvents}
+        keyExtractor={(item) => item.event_id.toString()}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        renderItem={({ item }) => (
+          <View style={styles.matchCard}>
+            <Text style={styles.cardText}>
+              <Text style={styles.cardLabel}>Event ID:</Text> {item.event_id}
             </Text>
-            <Text style={[styles.headerCell, styles.extraLargeCell]}>
-              Venue
+            <Text style={styles.cardText}>
+              <Text style={styles.cardLabel}>Name:</Text> {item.event_name}
             </Text>
-            <Text style={[styles.headerCell, styles.mediumCell]}>Actions</Text>
-          </View>
-          {sortedEvents.map((e, idx) => (
-            <View key={idx} style={styles.tableRow}>
-              <Text
-                style={[styles.cell, styles.smallCell]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
+            <Text style={styles.cardText}>
+              <Text style={styles.cardLabel}>Venue:</Text> {item.venue}
+            </Text>
+
+            <View style={styles.actionCell}>
+              <TouchableOpacity
+                onPress={() => handleEdit(item)}
+                style={styles.editButton}
               >
-                {e.event_id}
-              </Text>
-              <Text
-                style={[styles.cell, styles.extraLargeCell]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
+                <Ionicons name="create" size={18} color="#22C55E" />
+                <Text style={styles.editButtonText}>Update Event</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleDelete(item.event_id)}
+                style={styles.deleteButton}
               >
-                {e.event_name}
-              </Text>
-              <Text
-                style={[styles.cell, styles.extraLargeCell]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {e.venue}
-              </Text>
-              <View style={[styles.cell, styles.mediumCell, styles.actionCell]}>
-                <TouchableOpacity
-                  onPress={() => handleEdit(e)}
-                  style={styles.editButton}
-                >
-                  <Ionicons name="create" size={18} color="#22C55E" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => handleDelete(e.event_id)}
-                  style={styles.deleteButton}
-                >
-                  <MaterialIcons name="delete" size={18} color="#F38BA8" />
-                </TouchableOpacity>
-              </View>
+                <MaterialIcons name="delete" size={18} color="#F38BA8" />
+                <Text style={styles.deleteButtonText}>Delete Event</Text>
+              </TouchableOpacity>
             </View>
-          ))}
-        </View>
-      </ScrollView>
+          </View>
+        )}
+        ListEmptyComponent={<Text>No events available.</Text>}
+      />
 
       {/* Add/Edit modal */}
       <Modal
@@ -1735,59 +1720,43 @@ const CategoryTable = () => {
       </View>
 
       {/* Table content */}
-      <ScrollView horizontal showsHorizontalScrollIndicator>
-        <View style={styles.matchTable}>
-          <View style={styles.tableHeader}>
-            <Text style={[styles.headerCell, styles.smallCell]}>ID</Text>
-            <Text style={[styles.headerCell, styles.extraLargeCell]}>
-              Category Name
+      <FlatList
+        data={sortedCategories}
+        keyExtractor={(item) => item.category_id.toString()}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        renderItem={({ item }) => (
+          <View style={styles.matchCard}>
+            <Text style={styles.cardText}>
+              <Text style={styles.cardLabel}>Category ID:</Text>{" "}
+              {item.category_id}
             </Text>
-            <Text style={[styles.headerCell, styles.extraLargeCell]}>
-              Division
+            <Text style={styles.cardText}>
+              <Text style={styles.cardLabel}>Name:</Text> {item.category_name}
             </Text>
-            <Text style={[styles.headerCell, styles.mediumCell]}>Actions</Text>
-          </View>
-          {sortedCategories.map((c, idx) => (
-            <View key={idx} style={styles.tableRow}>
-              <Text
-                style={[styles.cell, styles.smallCell]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
+            <Text style={styles.cardText}>
+              <Text style={styles.cardLabel}>Division:</Text> {item.division}
+            </Text>
+
+            <View style={styles.actionCell}>
+              <TouchableOpacity
+                onPress={() => handleEdit(item)}
+                style={styles.editButton}
               >
-                {c.category_id}
-              </Text>
-              <Text
-                style={[styles.cell, styles.extraLargeCell]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
+                <Ionicons name="create" size={18} color="#22C55E" />
+                <Text style={styles.editButtonText}>Update Category</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => handleDelete(item.category_id)}
+                style={styles.deleteButton}
               >
-                {c.category_name}
-              </Text>
-              <Text
-                style={[styles.cell, styles.extraLargeCell]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {c.division}
-              </Text>
-              <View style={[styles.cell, styles.mediumCell, styles.actionCell]}>
-                <TouchableOpacity
-                  onPress={() => handleEdit(c)}
-                  style={styles.editButton}
-                >
-                  <Ionicons name="create" size={18} color="#22C55E" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => handleDelete(c.category_id)}
-                  style={styles.deleteButton}
-                >
-                  <MaterialIcons name="delete" size={18} color="#F38BA8" />
-                </TouchableOpacity>
-              </View>
+                <MaterialIcons name="delete" size={18} color="#F38BA8" />
+                <Text style={styles.deleteButtonText}>Delete Category</Text>
+              </TouchableOpacity>
             </View>
-          ))}
-        </View>
-      </ScrollView>
+          </View>
+        )}
+        ListEmptyComponent={<Text>No categories available.</Text>}
+      />
 
       {/* Add/Edit modal */}
       <Modal

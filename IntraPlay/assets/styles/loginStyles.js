@@ -22,8 +22,14 @@ const styles = StyleSheet.create({
     paddingTop: 25,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    shadowColor: "#22C55E",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   loginContainer: {
     width: "100%",
@@ -88,7 +94,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   buttonText: {
-    color: "#1E3A8A",
+    color: "#22C55E",
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",

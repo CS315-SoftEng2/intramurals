@@ -23,6 +23,26 @@ const styles = StyleSheet.create({
     color: "#1F2937",
     marginBottom: 10,
   },
+  matchCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cardText: {
+    fontSize: 14,
+    color: "#1F2937",
+    marginBottom: 6,
+  },
+  cardLabel: {
+    fontWeight: "600",
+    color: "#374151",
+  },
   matchTable: {
     borderRadius: 8,
     overflow: "hidden",
@@ -112,11 +132,15 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(166, 227, 161, 0.1)",
     borderRadius: 8,
     padding: 5,
+    flexDirection: "row",
+    alignItems: "center",
   },
   deleteButton: {
     backgroundColor: "rgba(243, 139, 168, 0.1)",
     borderRadius: 8,
     padding: 5,
+    flexDirection: "row",
+    alignItems: "center",
   },
   modal: {
     backgroundColor: "#FFFFFF",
@@ -185,6 +209,16 @@ const styles = StyleSheet.create({
   },
   addButtonText: {
     color: "#1E88E5",
+    fontSize: 12,
+    marginLeft: 4,
+  },
+  editButtonText: {
+    color: "#22C55E",
+    fontSize: 12,
+    marginLeft: 4,
+  },
+  deleteButtonText: {
+    color: "#F38BA8",
     fontSize: 12,
     marginLeft: 4,
   },
