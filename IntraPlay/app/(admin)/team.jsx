@@ -80,7 +80,7 @@ const TeamItem = ({ item, onEdit, onDelete }) => (
         style={styles.actionButton}
         onPress={() => onEdit(item)}
       >
-        <MaterialIcons name="edit" size={16} color="#89B4FA" />
+        <MaterialIcons name="edit" size={16} color="#1E88E5" />
         <Text style={styles.actionText}>Edit</Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -110,7 +110,7 @@ const Teams = () => {
   const [deleteTeamId, setDeleteTeamId] = useState(null);
   const [formData, setFormData] = useState({
     team_name: "",
-    team_color: "#89B4FA",
+    team_color: "",
     team_logo: "",
     team_motto: "",
   });
@@ -196,7 +196,7 @@ const Teams = () => {
       setModalVisible(false);
       setFormData({
         team_name: "",
-        team_color: "#89B4FA",
+        team_color: "",
         team_logo: "",
         team_motto: "",
       });
@@ -256,7 +256,7 @@ const Teams = () => {
   const openAddTeamModal = () => {
     setFormData({
       team_name: "",
-      team_color: "#89B4FA",
+      team_color: "",
       team_logo: "",
       team_motto: "",
     });
@@ -286,7 +286,7 @@ const Teams = () => {
       {/* Logout button */}
       <View style={globalstyles.loginButtonContainer}>
         <TouchableOpacity onPress={() => handleLogout(logout)}>
-          <MaterialIcons name="logout" size={25} color="#fff" />
+          <MaterialIcons name="logout" size={25} color="#22C55E" />
         </TouchableOpacity>
       </View>
 
@@ -302,11 +302,11 @@ const Teams = () => {
       {/* Search and actions */}
       <View style={styles.searchBarContainer}>
         <View style={styles.searchBar}>
-          <MaterialIcons name="search" size={20} color="#A6ADC8" />
+          <MaterialIcons name="search" size={20} color="grey" />
           <TextInput
             style={styles.searchInput}
             placeholder="Search teams..."
-            placeholderTextColor="#A6ADC8"
+            placeholderTextColor="grey"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -322,7 +322,7 @@ const Teams = () => {
             <MaterialIcons
               name={sortOrder === "asc" ? "arrow-upward" : "arrow-downward"}
               size={18}
-              color="#CDD6F4"
+              color="#1A7F3C"
             />
           </TouchableOpacity>
 
@@ -330,7 +330,7 @@ const Teams = () => {
             <MaterialIcons
               name="group-add"
               size={18}
-              color="#1E1E2E"
+              color="#FFFFFF"
               style={{ transform: [{ scaleX: -1 }] }}
             />
             <Text style={styles.addButtonText}>Add Team</Text>
@@ -387,7 +387,7 @@ const Teams = () => {
                 setFormData({ ...formData, team_name: text })
               }
               style={styles.input}
-              placeholderTextColor="#A6ADC8"
+              placeholderTextColor="grey"
             />
           </View>
 
@@ -400,7 +400,7 @@ const Teams = () => {
                 setFormData({ ...formData, team_color: text })
               }
               style={styles.input}
-              placeholderTextColor="#A6ADC8"
+              placeholderTextColor="grey"
             />
           </View>
 
@@ -413,7 +413,7 @@ const Teams = () => {
                 setFormData({ ...formData, team_logo: text })
               }
               style={styles.input}
-              placeholderTextColor="#A6ADC8"
+              placeholderTextColor="grey"
             />
           </View>
 
@@ -426,7 +426,7 @@ const Teams = () => {
                 setFormData({ ...formData, team_motto: text })
               }
               style={styles.input}
-              placeholderTextColor="#A6ADC8"
+              placeholderTextColor="grey"
               multiline
             />
           </View>

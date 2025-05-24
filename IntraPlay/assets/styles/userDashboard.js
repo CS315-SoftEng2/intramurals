@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
-    backgroundColor: "#1E1E2E",
+    backgroundColor: "#F9FAFB",
     paddingBottom: 20,
   },
   contentContainer: {
@@ -13,11 +13,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#fff",
+    color: "#1F2937",
     marginBottom: 20,
   },
   assignedEventContainer: {
-    backgroundColor: "#2A2A3C",
+    backgroundColor: "#FFFFFF",
     width: "100%",
     marginBottom: 20,
     borderRadius: 15,
@@ -25,13 +25,13 @@ const styles = StyleSheet.create({
   },
   eventNameAndDivision: {
     fontSize: 15,
-    color: "#fff",
+    color: "#1F2937",
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 10,
   },
   assignEventMatch: {
-    color: "#aaa",
+    color: "#111827",
     fontSize: 13,
     textAlign: "center",
     marginBottom: 5,
@@ -45,12 +45,12 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   assignEventText: {
-    color: "#aaa",
+    color: "#6B7280",
     fontSize: 13,
     flexShrink: 1,
   },
   manageScoreButton: {
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#16A34A",
     borderRadius: 8,
     marginBottom: 30,
     alignItems: "center",

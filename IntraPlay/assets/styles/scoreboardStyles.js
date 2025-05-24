@@ -2,14 +2,14 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#1E1E2E",
+    backgroundColor: "#F9FAFB",
     paddingTop: 20,
     alignItems: "stretch",
     justifyContent: "flex-start",
   },
   contentContainer: {
     flexGrow: 1,
-    backgroundColor: "#1E1E2E",
+    backgroundColor: "#F9FAFB",
     paddingTop: 20,
     alignItems: "stretch",
     justifyContent: "flex-start",
@@ -23,15 +23,14 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#fff",
-    marginRight: 10,
+    color: "#1F2937",
   },
   icon: {
     marginLeft: 5,
   },
   divider: {
     height: 1,
-    backgroundColor: "#3A3A50",
+    backgroundColor: "#6B7280",
     marginHorizontal: 10,
     marginBottom: 10,
   },
@@ -48,13 +47,13 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   matchCardContent: {
-    backgroundColor: "#2A2A3C",
+    backgroundColor: "#FFFFF",
     borderRadius: 8,
     padding: 15,
     alignItems: "center",
   },
   completedMatchCard: {
-    backgroundColor: "#2A2A3C",
+    backgroundColor: "#FFFFFF",
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
@@ -65,7 +64,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   eventName: {
-    color: "#fff",
+    color: "#1F2937",
     fontSize: 18,
     fontWeight: "bold",
     fontFamily: "Racing Sans One-Regular",
@@ -89,7 +88,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   teamName: {
-    color: "#fff",
+    color: "#111827",
     fontSize: 16,
     fontFamily: "Oswald-Semi-Bold",
     textAlign: "center",
@@ -101,8 +100,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   versus: {
-    color: "#fff",
-    fontSize: 18,
+    color: "#6B7280",
+    fontSize: 20,
     fontWeight: "bold",
     marginHorizontal: 10,
   },
@@ -113,7 +112,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   venueText: {
-    color: "#aaa",
+    color: "#6B7280",
     fontSize: 14,
     marginLeft: 5,
   },
@@ -125,7 +124,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   emptyStateText: {
-    color: "#fff",
+    color: "#111827",
     textAlign: "center",
     fontSize: 16,
     padding: 10,

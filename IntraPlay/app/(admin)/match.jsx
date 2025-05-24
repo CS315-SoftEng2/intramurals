@@ -67,7 +67,7 @@ const Match = () => {
       {/* Logout button */}
       <View style={globalstyles.loginButtonContainer}>
         <TouchableOpacity onPress={() => handleLogout(logout)}>
-          <MaterialIcons name="logout" size={25} color="#fff" />
+          <MaterialIcons name="logout" size={25} color="#22C55E" />
         </TouchableOpacity>
       </View>
 
@@ -110,7 +110,7 @@ const MatchTable = () => {
     loading: eventsLoading,
     error: eventsError,
     data: eventsData,
-  } = useQuery(GET_EVENTS); // Fetch events data
+  } = useQuery(GET_EVENTS);
 
   const [addMatch] = useMutation(ADD_MATCH);
   const [updateMatch] = useMutation(UPDATE_MATCH);
@@ -412,7 +412,7 @@ const MatchTable = () => {
       <View style={styles.tableAddButtonContainer}>
         <Text style={styles.tableTitle}>Match Table</Text>
         <TouchableOpacity onPress={openAddModal} style={styles.addMatchButton}>
-          <MaterialIcons name="assignment-add" size={18} color="#89B4FA" />
+          <MaterialIcons name="assignment-add" size={18} color="#1E88E5" />
           <Text style={styles.addButtonText}>Add Match</Text>
         </TouchableOpacity>
       </View>
@@ -558,7 +558,7 @@ const MatchTable = () => {
                 setFormData({ ...formData, team_a_name: text })
               }
               style={styles.input}
-              placeholderTextColor="#A6ADC8"
+              placeholderTextColor="grey"
             />
             <Text style={styles.formLabel}>Team B Name</Text>
             <TextInput
@@ -568,7 +568,7 @@ const MatchTable = () => {
                 setFormData({ ...formData, team_b_name: text })
               }
               style={styles.input}
-              placeholderTextColor="#A6ADC8"
+              placeholderTextColor="grey"
             />
             <Text style={styles.formLabel}>User Assigned ID</Text>
             <StyledPicker
@@ -961,7 +961,7 @@ const ScheduleTable = ({ adminId = 1 }) => {
           onPress={openAddModal}
           style={styles.addScheduleButton}
         >
-          <MaterialIcons name="assignment-add" size={18} color="#89B4FA" />
+          <MaterialIcons name="assignment-add" size={18} color="#1E88E5" />
           <Text style={styles.addButtonText}>Add Schedule</Text>
         </TouchableOpacity>
       </View>
@@ -1431,7 +1431,7 @@ const EventTable = () => {
       <View style={styles.tableAddButtonContainer}>
         <Text style={styles.tableTitle}>Event Table</Text>
         <TouchableOpacity onPress={openAddModal} style={styles.addEventButton}>
-          <MaterialIcons name="assignment-add" size={18} color="#89B4FA" />
+          <MaterialIcons name="assignment-add" size={18} color="#1E88E5" />
           <Text style={styles.addButtonText}>Add Event</Text>
         </TouchableOpacity>
       </View>
@@ -1518,7 +1518,7 @@ const EventTable = () => {
                 setFormData({ ...formData, event_name: text })
               }
               style={styles.input}
-              placeholderTextColor="#A6ADC8"
+              placeholderTextColor="grey"
             />
             <Text style={styles.formLabel}>Venue</Text>
             <TextInput
@@ -1526,7 +1526,7 @@ const EventTable = () => {
               value={formData.venue}
               onChangeText={(text) => setFormData({ ...formData, venue: text })}
               style={styles.input}
-              placeholderTextColor="#A6ADC8"
+              placeholderTextColor="grey"
             />
             <Text style={styles.formLabel}>Category ID</Text>
             <TextInput
@@ -1536,7 +1536,7 @@ const EventTable = () => {
                 setFormData({ ...formData, category_id: text })
               }
               style={styles.input}
-              placeholderTextColor="#A6ADC8"
+              placeholderTextColor="grey"
               keyboardType="numeric"
             />
           </View>
@@ -1729,7 +1729,7 @@ const CategoryTable = () => {
           onPress={openAddModal}
           style={styles.addCategoryButton}
         >
-          <MaterialIcons name="assignment-add" size={18} color="#89B4FA" />
+          <MaterialIcons name="assignment-add" size={18} color="#1E88E5" />
           <Text style={styles.addButtonText}>Add Category</Text>
         </TouchableOpacity>
       </View>
@@ -1816,7 +1816,7 @@ const CategoryTable = () => {
                 setFormData({ ...formData, category_name: text })
               }
               style={styles.input}
-              placeholderTextColor="#A6ADC8"
+              placeholderTextColor="grey"
             />
             <Text style={styles.formLabel}>Division</Text>
             <TextInput
@@ -1826,7 +1826,7 @@ const CategoryTable = () => {
                 setFormData({ ...formData, division: text })
               }
               style={styles.input}
-              placeholderTextColor="#A6ADC8"
+              placeholderTextColor="grey"
             />
           </View>
           <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>

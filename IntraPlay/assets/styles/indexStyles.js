@@ -1,10 +1,25 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    backgroundColor: "#F9FAFB",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    paddingTop: 10,
+  },
+  loginButtonContainer: {
+    justifyContent: "flex-start",
+    alignItems: "flex-end",
+    position: "absolute",
+    right: 15,
+    top: 15,
+    zIndex: 10,
+  },
   headerTitleUpcomingEvents: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#fff",
+    color: "#1F2937",
     marginTop: 40,
     alignSelf: "flex-start",
     marginLeft: 25,
@@ -12,7 +27,7 @@ const styles = StyleSheet.create({
   headerTitleLeadingTeam: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#fff",
+    color: "#1F2937",
     marginTop: 20,
     alignSelf: "flex-start",
     marginLeft: 25,
@@ -20,7 +35,7 @@ const styles = StyleSheet.create({
   headerTitleJustNow: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#fff",
+    color: "#1F2937",
     marginLeft: 25,
     alignSelf: "flex-start",
     marginBottom: 5,
@@ -28,14 +43,14 @@ const styles = StyleSheet.create({
   headerTitleOngoingMatches: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#fff",
+    color: "#1F2937",
     marginTop: 10,
     marginBottom: 5,
     marginLeft: 25,
     alignSelf: "flex-start",
   },
   upcomingEventsContainer: {
-    backgroundColor: "#2A2A3C",
+    backgroundColor: "#FFFFFF",
     width: "90%",
     marginTop: 15,
     marginBottom: 20,
@@ -54,7 +69,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   eventCard: {
-    backgroundColor: "#1E1E2E",
+    backgroundColor: "#F3F4F6",
     borderRadius: 10,
     marginBottom: 8,
     padding: 12,
@@ -73,7 +88,7 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
   eventName: {
-    color: "#fff",
+    color: "#111827",
     fontSize: 15,
     fontWeight: "600",
     marginBottom: 4,
@@ -84,23 +99,23 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   eventTime: {
-    color: "#aaa",
+    color: "#111827",
     fontSize: 12,
   },
   venueText: {
-    color: "#aaa",
+    color: "#6B7280",
     fontSize: 12,
   },
   locationContainer: {
     alignItems: "flex-end",
   },
   locationText: {
-    color: "#ddd",
+    color: "#374151",
     fontSize: 12,
     marginBottom: 2,
   },
   teamText: {
-    color: "#aaa",
+    color: "#9CA3AF",
     fontSize: 11,
   },
   leadingTeamContainer: {
@@ -131,13 +146,13 @@ const styles = StyleSheet.create({
   totalScoreLabel: {
     fontFamily: "Oswald-Semi-Bold",
     fontSize: 18,
-    color: "#fff",
+    color: "#1F2937",
     marginBottom: 5,
   },
   totalScoreValue: {
     fontFamily: "Racing Sans One-Regular",
     fontSize: 50,
-    color: "#fff",
+    color: "#111827",
   },
   justNowContainer: {
     width: "95%",
@@ -163,24 +178,24 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   justNowTitle: {
-    color: "#fff",
+    color: "#111827",
     fontSize: 14,
     fontWeight: "bold",
     textTransform: "uppercase",
     marginBottom: 2,
   },
   justNowSubtitle: {
-    color: "#fff",
+    color: "#6B7280",
     fontSize: 12,
     textTransform: "uppercase",
   },
   justNowEmptyText: {
-    color: "#fff",
+    color: "#111827",
     textAlign: "center",
     padding: 10,
   },
   eventNameMatch: {
-    color: "#fff",
+    color: "#111827",
     fontSize: 18,
     fontWeight: "bold",
     fontFamily: "Racing Sans One-Regular",
@@ -189,7 +204,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   matchingTeamNames: {
-    color: "#fff",
+    color: "#111827",
     fontSize: 18,
     fontFamily: "Oswald-Semi-Bold",
     textAlign: "center",
@@ -210,7 +225,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   emptyStateText: {
-    color: "#fff",
+    color: "#111827",
     textAlign: "center",
     padding: 10,
   },
@@ -221,7 +236,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   matchCardContent: {
-    backgroundColor: "#2A2A3C",
+    backgroundColor: "#FFFFFF",
     borderRadius: 8,
     padding: 15,
     alignItems: "center",

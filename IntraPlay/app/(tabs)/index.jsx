@@ -61,7 +61,7 @@ const normalizeColor = (color) => {
   return hexPattern.test(color) ? color : "#22C55E";
 };
 
-const darkenColor = (hex) => {
+const lightenColor = (hex) => {
   let color = hex.startsWith("#") ? hex.slice(1) : hex;
   if (color.length === 3)
     color = color
@@ -72,9 +72,10 @@ const darkenColor = (hex) => {
   const g = parseInt(color.slice(2, 4), 16);
   const b = parseInt(color.slice(4, 6), 16);
   const factor = 0.6;
-  return `rgb(${Math.round(r * factor)}, ${Math.round(
-    g * factor
-  )}, ${Math.round(b * factor)})`;
+
+  return `rgb(${Math.round(r + (255 - r) * factor)}, ${Math.round(
+    g + (255 - g) * factor
+  )}, ${Math.round(b + (255 - b) * factor)})`;
 };
 
 const convertToDateTime = (dateStr, timeStr) => {
@@ -368,11 +369,11 @@ const Index = () => {
   }
 
   return (
-    <ScrollView contentContainerStyle={globalstyles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       {/* Login button */}
-      <View style={globalstyles.loginButtonContainer}>
+      <View style={styles.loginButtonContainer}>
         <Link href={"/login"}>
-          <MaterialIcons name="login" size={30} color="#fff" />
+          <MaterialIcons name="login" size={30} color="#22C55E" />
         </Link>
       </View>
 
@@ -493,7 +494,7 @@ const Index = () => {
                   <MaterialIcons
                     name="location-on"
                     size={15}
-                    color="#6E6E6E"
+                    color="#111827"
                     style={{ marginRight: 2 }}
                   />
                   <Text style={styles.venueText}>
@@ -533,7 +534,7 @@ const Index = () => {
                 ? match.team_a_logo
                 : match.team_b_logo;
             const winnerColor = normalizeColor(match.winner_team_color);
-            const darkerColor = darkenColor(winnerColor);
+            const darkerColor = lightenColor(winnerColor);
 
             return (
               <LinearGradient

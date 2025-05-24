@@ -140,11 +140,11 @@ const ScoreUpdate = () => {
   };
 
   return (
-    <ScrollView style={{ backgroundColor: "#1E1E2E" }}>
+    <ScrollView style={{ backgroundColor: "#F9FAFB" }}>
       {/* Logout button */}
       <View style={globalstyles.loginButtonContainer}>
         <TouchableOpacity onPress={() => handleLogout(logout)}>
-          <MaterialIcons name="logout" size={25} color="#fff" />
+          <MaterialIcons name="logout" size={25} color="#22C55E" />
         </TouchableOpacity>
       </View>
 

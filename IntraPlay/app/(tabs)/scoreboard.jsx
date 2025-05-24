@@ -256,7 +256,7 @@ const Scoreboard = () => {
       {/* Login button */}
       <View style={globalstyles.loginButtonContainer}>
         <Link href={"/login"}>
-          <MaterialIcons name="login" size={30} color="#fff" />
+          <MaterialIcons name="login" size={30} color="#22C55E" />
         </Link>
       </View>
 
@@ -266,7 +266,7 @@ const Scoreboard = () => {
         <MaterialIcons
           name="sports-score"
           size={30}
-          color="#fff"
+          color="#1F2937"
           style={styles.icon}
         />
       </View>

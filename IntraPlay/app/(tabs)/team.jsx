@@ -176,7 +176,7 @@ const Team = () => {
       {/* Login button */}
       <View style={globalstyles.loginButtonContainer}>
         <Link href={"/login"}>
-          <MaterialIcons name="login" size={30} color="#fff" />
+          <MaterialIcons name="login" size={30} color="#22C55E" />
         </Link>
       </View>
 
@@ -204,7 +204,7 @@ const Team = () => {
               <MaterialIcons
                 name="keyboard-arrow-down"
                 size={15}
-                color="#fff"
+                color="#111827"
                 style={styles.dropdownIcon}
               />
             </View>

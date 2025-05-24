@@ -223,7 +223,7 @@ const Dashboard = () => {
       {/* Logout button */}
       <View style={globalstyles.loginButtonContainer}>
         <TouchableOpacity onPress={() => handleLogout(logout)}>
-          <MaterialIcons name="logout" size={25} color="#fff" />
+          <MaterialIcons name="logout" size={25} color="#22C55E" />
         </TouchableOpacity>
       </View>
 

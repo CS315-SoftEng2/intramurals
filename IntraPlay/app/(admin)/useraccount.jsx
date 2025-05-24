@@ -64,7 +64,7 @@ const UserItem = ({ item, onEdit, onDelete }) => (
         style={styles.actionButton}
         onPress={() => onEdit(item)}
       >
-        <MaterialIcons name="edit" size={16} color="#89B4FA" />
+        <MaterialIcons name="edit" size={16} color="#1E88E5" />
         <Text style={styles.actionText}>Edit</Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -259,7 +259,7 @@ const Users = () => {
       {/* Logout button */}
       <View style={globalstyles.loginButtonContainer}>
         <TouchableOpacity onPress={() => handleLogout(logout)}>
-          <MaterialIcons name="logout" size={25} color="#fff" />
+          <MaterialIcons name="logout" size={25} color="#22C55E" />
         </TouchableOpacity>
       </View>
 
@@ -295,12 +295,12 @@ const Users = () => {
             <MaterialIcons
               name={sortOrder === "asc" ? "arrow-upward" : "arrow-downward"}
               size={18}
-              color="#CDD6F4"
+              color="#1A7F3C"
             />
           </TouchableOpacity>
 
           <TouchableOpacity onPress={openAddUserModal} style={styles.addButton}>
-            <MaterialIcons name="person-add" size={18} color="#1E1E2E" />
+            <MaterialIcons name="person-add" size={18} color="#FFFFFF" />
             <Text style={styles.addButtonText}>Add User</Text>
           </TouchableOpacity>
         </View>
@@ -355,7 +355,18 @@ const Users = () => {
                 setFormData({ ...formData, user_name: text })
               }
               style={styles.input}
-              placeholderTextColor="#A6ADC8"
+              placeholderTextColor="grey"
+            />
+            <Text style={styles.formLabel}>Password</Text>
+            <TextInput
+              placeholder="Enter Password"
+              value={formData.password}
+              onChangeText={(text) =>
+                setFormData({ ...formData, password: text })
+              }
+              style={styles.input}
+              placeholderTextColor="grey"
+              secureTextEntry
             />
             {!editMode && (
               <>
@@ -367,7 +378,7 @@ const Users = () => {
                     setFormData({ ...formData, password: text })
                   }
                   style={styles.input}
-                  placeholderTextColor="#A6ADC8"
+                  placeholderTextColor=""
                   secureTextEntry
                 />
               </>
@@ -391,23 +402,6 @@ const Users = () => {
                   ]}
                 >
                   User
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.radioButton,
-                  formData.user_type === "admin" && styles.radioSelected,
-                ]}
-                onPress={() => setFormData({ ...formData, user_type: "admin" })}
-              >
-                <Text
-                  style={[
-                    styles.radioText,
-                    formData.user_type === "admin" && styles.radioTextSelected,
-                  ]}
-                >
-                  Admin
                 </Text>
               </TouchableOpacity>
             </View>

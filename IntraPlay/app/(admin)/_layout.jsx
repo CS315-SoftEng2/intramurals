@@ -9,14 +9,19 @@ export default function AdminTabs() {
     <Tabs
       screenOptions={{
         tabBarStyle: {
-          backgroundColor: "#151521",
+          backgroundColor: "#FFFFFF",
           height: 60,
           paddingBottom: 5,
           paddingTop: 5,
+          borderTopColor: "#E5E7EB",
+          shadowColor: "#000000",
+          shadowOpacity: 0.1,
+          shadowOffset: { width: 0, height: -2 },
+          shadowRadius: 8,
+          elevation: 8,
         },
-        tabBarActiveTintColor: "#A4F168",
-        tabBarInactiveTintColor: "gray",
-        headerShown: false,
+        tabBarActiveTintColor: "#22C55E",
+        tabBarInactiveTintColor: "#6B7280",
       }}
     >
       <Tabs.Screen
@@ -33,6 +38,7 @@ export default function AdminTabs() {
         name="useraccount"
         options={{
           title: "Accounts",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <Ionicons name="person-sharp" size={24} color={color} />
           ),

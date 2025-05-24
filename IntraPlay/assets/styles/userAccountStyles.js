@@ -5,7 +5,7 @@ const { width } = Dimensions.get("window");
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1A1B26",
+    backgroundColor: "#F9FAFB",
   },
   centered: {
     flex: 1,
@@ -20,11 +20,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#CDD6F4",
+    color: "#1F2937",
   },
   subtitle: {
     fontSize: 14,
-    color: "#A6ADC8",
+    color: "#6B7280",
     marginTop: 4,
   },
   searchBarContainer: {
@@ -38,17 +38,17 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#24273A",
+    backgroundColor: "#F3F4F6",
     paddingHorizontal: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#313244",
+    borderColor: "#E5E7EB",
     marginRight: 8,
     height: 40,
   },
   searchInput: {
     flex: 1,
-    color: "#CDD6F4",
+    color: "#111827",
     marginLeft: 8,
     fontSize: 14,
   },
@@ -58,7 +58,9 @@ const styles = StyleSheet.create({
   },
   sortButton: {
     padding: 8,
-    backgroundColor: "#313244",
+    backgroundColor: "#D1FADF",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
     borderRadius: 8,
     marginRight: 8,
     alignItems: "center",
@@ -69,13 +71,15 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#89B4FA",
+    backgroundColor: "#16A34A",
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
   addButtonText: {
-    color: "#1E1E2E",
+    color: "#FFFFFF",
     marginLeft: 4,
     fontWeight: "600",
     fontSize: 14,
@@ -85,11 +89,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   card: {
-    backgroundColor: "#24273A",
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#313244",
+    borderColor: "#E5E7EB",
     overflow: "hidden",
   },
   cardHeader: {
@@ -100,7 +104,7 @@ const styles = StyleSheet.create({
   },
   cardDivider: {
     height: 1,
-    backgroundColor: "#313244",
+    backgroundColor: "#F3F4F6",
   },
   userInfo: {
     flexDirection: "row",
@@ -110,14 +114,14 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#89B4FA",
+    backgroundColor: "#D1FADF",
     justifyContent: "center",
     alignItems: "center",
   },
   avatarText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#1E1E2E",
+    color: "#1A7F3C",
   },
   userTextInfo: {
     marginLeft: 12,
@@ -125,10 +129,10 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#CDD6F4",
+    color: "#111827",
   },
   userId: {
-    color: "#A6ADC8",
+    color: "#6B7280",
     fontSize: 12,
     marginTop: 2,
   },
@@ -138,13 +142,13 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   adminTag: {
-    backgroundColor: "#F5C2E7",
+    backgroundColor: "#BBF7D0",
   },
   userTag: {
-    backgroundColor: "#89B4FA",
+    backgroundColor: "#D1E9FA",
   },
   tag: {
-    color: "#1E1E2E",
+    color: "#065F46",
     fontSize: 12,
     fontWeight: "600",
   },
@@ -158,14 +162,14 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 6,
-    backgroundColor: "#313244",
+    backgroundColor: "#D1E9FA",
     marginRight: 8,
   },
   deleteButton: {
     backgroundColor: "rgba(243, 139, 168, 0.1)",
   },
   actionText: {
-    color: "#89B4FA",
+    color: "#1E88E5",
     fontSize: 14,
     fontWeight: "500",
     marginLeft: 4,
@@ -189,12 +193,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   noDataText: {
-    color: "#A6ADC8",
+    color: "#111827",
     fontSize: 16,
     marginTop: 12,
   },
   modal: {
-    backgroundColor: "#24273A",
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     width: width - 40,
     alignSelf: "center",
@@ -208,13 +212,13 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   modalTitle: {
-    color: "#CDD6F4",
+    color: "#1F2937",
     fontSize: 18,
     fontWeight: "700",
   },
   modalDivider: {
     height: 1,
-    backgroundColor: "#313244",
+    backgroundColor: "#F3F4F6",
     marginBottom: 16,
   },
   formGroup: {
@@ -223,17 +227,18 @@ const styles = StyleSheet.create({
   },
   formLabel: {
     fontSize: 14,
-    color: "#CDD6F4",
+    color: "#1F2937",
     marginBottom: 8,
+    marginTop: 8,
     fontWeight: "500",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#45475A",
-    backgroundColor: "#1E1E2E",
+    borderColor: "#E5E7EB",
+    backgroundColor: "#F3F4F6",
     padding: 12,
     borderRadius: 8,
-    color: "#CDD6F4",
+    color: "#111827",
     fontSize: 14,
   },
   radioContainer: {
@@ -241,26 +246,26 @@ const styles = StyleSheet.create({
   },
   radioButton: {
     borderWidth: 1,
-    borderColor: "#45475A",
+    borderColor: "#D1FADF",
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
     marginRight: 10,
   },
   radioSelected: {
-    backgroundColor: "#89B4FA",
-    borderColor: "#89B4FA",
+    backgroundColor: "#D1FADF",
+    borderColor: "#E5E7EB",
   },
   radioText: {
-    color: "#CDD6F4",
+    color: "#1A7F3C",
     fontSize: 14,
   },
   radioTextSelected: {
-    color: "#1E1E2E",
+    color: "#1A7F3C",
     fontWeight: "600",
   },
   submitButton: {
-    backgroundColor: "#89B4FA",
+    backgroundColor: "#16A34A",
     paddingVertical: 14,
     marginTop: 8,
     alignItems: "center",
@@ -269,7 +274,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   submitButtonText: {
-    color: "#1E1E2E",
+    color: "#FFFFFF",
     fontWeight: "700",
     fontSize: 16,
   },

@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
     margin: 0,
   },
   container: {
-    backgroundColor: "#24273A",
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     width: width - 40,
     alignSelf: "center",
@@ -19,17 +19,17 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   title: {
-    color: "#CDD6F4",
+    color: "#1F2937",
     fontSize: 18,
     fontWeight: "700",
   },
   divider: {
     height: 1,
-    backgroundColor: "#313244",
+    backgroundColor: "grey",
     marginBottom: 16,
   },
   message: {
-    color: "#A6ADC8",
+    color: "#6B7280",
     fontSize: 14,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   cancelButtonText: {
-    color: "#A6ADC8",
+    color: "#6B7280",
     fontSize: 14,
     fontWeight: "600",
   },
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   confirmButtonText: {
-    color: "#1E1E2E",
+    color: "#111827",
     fontSize: 14,
     fontWeight: "600",
   },

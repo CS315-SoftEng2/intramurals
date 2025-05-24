@@ -331,7 +331,7 @@ const Schedule = () => {
       {/* Login button */}
       <View style={globalstyles.loginButtonContainer}>
         <Link href={"/login"}>
-          <MaterialIcons name="login" size={30} color="#fff" />
+          <MaterialIcons name="login" size={30} color="#22C55E" />
         </Link>
       </View>
 
@@ -339,14 +339,14 @@ const Schedule = () => {
       <View style={styles.calendarContainer}>
         <View style={styles.monthSelector}>
           <TouchableOpacity onPress={getPreviousMonth}>
-            <MaterialIcons name="chevron-left" size={24} color="#fff" />
+            <MaterialIcons name="chevron-left" size={24} color="#1F2937" />
           </TouchableOpacity>
           <Text style={styles.monthText}>
             {currentDate.toLocaleString("default", { month: "long" })}{" "}
             {calendarData.year}
           </Text>
           <TouchableOpacity onPress={getNextMonth}>
-            <MaterialIcons name="chevron-right" size={24} color="#fff" />
+            <MaterialIcons name="chevron-right" size={24} color="#1F2937" />
           </TouchableOpacity>
         </View>
         {renderCalendarDays()}

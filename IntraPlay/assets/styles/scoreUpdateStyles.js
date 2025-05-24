@@ -8,18 +8,18 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#fff",
+    color: "#111827",
     marginBottom: 20,
     textAlign: "left",
   },
   scoreCard: {
-    backgroundColor: "#2A2A3C",
+    backgroundColor: "#FFFFFF",
     borderRadius: 15,
     padding: 20,
   },
   vsText: {
-    fontSize: 16,
-    color: "#fff",
+    fontSize: 18,
+    color: "#111827",
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 10,
@@ -34,13 +34,13 @@ const styles = StyleSheet.create({
     width: "45%",
   },
   teamTitle: {
-    color: "#ccc",
+    color: "#111827",
     marginBottom: 5,
   },
   scoreNumber: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#fff",
+    color: "#111827",
     marginHorizontal: 15,
   },
   scoreButtons: {
@@ -52,10 +52,10 @@ const styles = StyleSheet.create({
   button: {
     fontSize: 24,
     marginHorizontal: 10,
-    color: "#22C55E",
+    color: "#16A34A",
   },
   saveButton: {
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#16A34A",
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: "center",

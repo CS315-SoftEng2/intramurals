@@ -5,7 +5,7 @@ const { width } = Dimensions.get("window");
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1A1B26",
+    backgroundColor: "#F9FAFB",
   },
   centered: {
     flex: 1,
@@ -20,11 +20,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#CDD6F4",
+    color: "#1F2937",
   },
   subtitle: {
     fontSize: 14,
-    color: "#A6ADC8",
+    color: "#6B7280",
     marginTop: 4,
   },
   searchBarContainer: {
@@ -38,11 +38,11 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#24273A",
+    backgroundColor: "#F3F4F6",
     paddingHorizontal: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#313244",
+    borderColor: "#E5E7EB",
     marginRight: 8,
     height: 40,
   },
@@ -58,7 +58,9 @@ const styles = StyleSheet.create({
   },
   sortButton: {
     padding: 8,
-    backgroundColor: "#313244",
+    backgroundColor: "#D1FADF",
+    borderColor: "#E5E7EB",
+    borderWidth: 1,
     borderRadius: 8,
     marginRight: 8,
     alignItems: "center",
@@ -69,13 +71,15 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#89B4FA",
+    backgroundColor: "#16A34A",
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
   addButtonText: {
-    color: "#1E1E2E",
+    color: "#FFFFFF",
     marginLeft: 4,
     fontWeight: "600",
     fontSize: 14,
@@ -86,11 +90,11 @@ const styles = StyleSheet.create({
     paddingBottom: 80,
   },
   card: {
-    backgroundColor: "#24273A",
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#313244",
+    borderColor: "#E5E7EB",
     overflow: "hidden",
   },
   cardHeader: {
@@ -101,7 +105,7 @@ const styles = StyleSheet.create({
   },
   cardDivider: {
     height: 1,
-    backgroundColor: "#313244",
+    backgroundColor: "#F3F4F6",
   },
   teamInfo: {
     flexDirection: "row",
@@ -114,12 +118,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 2,
-    borderColor: "#1A1B26",
-  },
-  avatarText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#1E1E2E",
+    borderColor: "#E5E7EB",
   },
   teamTextInfo: {
     marginLeft: 12,
@@ -128,15 +127,15 @@ const styles = StyleSheet.create({
   teamName: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#CDD6F4",
+    color: "#111827",
   },
   teamId: {
-    color: "#A6ADC8",
+    color: "#111827",
     fontSize: 12,
     marginTop: 2,
   },
   teamMotto: {
-    color: "#A6ADC8",
+    color: "#6B7280",
     fontSize: 12,
     marginTop: 4,
     fontStyle: "italic",
@@ -151,14 +150,14 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 6,
-    backgroundColor: "#313244",
+    backgroundColor: "#D1E9FA",
     marginRight: 8,
   },
   deleteButton: {
     backgroundColor: "rgba(243, 139, 168, 0.1)",
   },
   actionText: {
-    color: "#89B4FA",
+    color: "#1E88E5",
     fontSize: 14,
     fontWeight: "500",
     marginLeft: 4,
@@ -182,12 +181,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   noDataText: {
-    color: "#A6ADC8",
+    color: "#111827",
     fontSize: 16,
     marginTop: 12,
   },
   modal: {
-    backgroundColor: "#24273A",
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     width: width - 40,
     alignSelf: "center",
@@ -202,13 +201,13 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   modalTitle: {
-    color: "#CDD6F4",
+    color: "#1F2937",
     fontSize: 18,
     fontWeight: "700",
   },
   modalDivider: {
     height: 1,
-    backgroundColor: "#313244",
+    backgroundColor: "#F3F4F6",
     marginBottom: 16,
   },
   formGroup: {
@@ -217,21 +216,21 @@ const styles = StyleSheet.create({
   },
   formLabel: {
     fontSize: 14,
-    color: "#CDD6F4",
+    color: "#111827",
     marginBottom: 8,
     fontWeight: "500",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#45475A",
-    backgroundColor: "#1E1E2E",
+    borderColor: "#E5E7EB",
+    backgroundColor: "#F3F4F6",
     padding: 12,
     borderRadius: 8,
-    color: "#CDD6F4",
+    color: "#111827",
     fontSize: 14,
   },
   submitButton: {
-    backgroundColor: "#89B4FA",
+    backgroundColor: "#16A34A",
     paddingVertical: 14,
     marginTop: 8,
     alignItems: "center",
@@ -240,7 +239,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   submitButtonText: {
-    color: "#1E1E2E",
+    color: "#FFFFFF",
     fontWeight: "700",
     fontSize: 16,
   },
