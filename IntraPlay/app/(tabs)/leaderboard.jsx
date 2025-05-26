@@ -37,13 +37,13 @@ const getTeamLogo = (filename) => {
 
 // TeamItem component
 const TeamItem = ({ item, index }) => {
-  const isTopThree = index < 3;
+  const isTopThree = item.adjusted_ranking <= 3;
   const rankColor = isTopThree
-    ? index === 0
-      ? "#FFD700"
-      : index === 1
-      ? "#C0C0C0"
-      : "#CD7F32"
+    ? item.adjusted_ranking === 1
+      ? "#FFD700" // Gold for rank 1
+      : item.adjusted_ranking === 2
+      ? "#C0C0C0" // Silver for rank 2
+      : "#CD7F32" // Bronze for rank 3
     : "#fff";
 
   return (
@@ -52,11 +52,11 @@ const TeamItem = ({ item, index }) => {
     >
       <View style={styles.rankContainer}>
         <Text style={[styles.rankText, { color: rankColor }]}>
-          {item.overall_ranking}
+          {item.adjusted_ranking}
         </Text>
         {isTopThree && (
           <MaterialIcons
-            name={index === 0 ? "emoji-events" : "star"}
+            name={item.adjusted_ranking === 1 ? "emoji-events" : "star"}
             size={20}
             color={rankColor}
             style={styles.rankIcon}
@@ -76,9 +76,35 @@ const Leaderboard = () => {
   // Queries
   const { data, loading, error } = useQuery(GET_LEADING_TEAM);
 
-  // Memoized team scores
+  // Memoized team scores with adjusted rankings
   const teamScores = useMemo(() => {
-    return data?.teamScores || [];
+    if (!data?.teamScores) return [];
+
+    // Sort teams by total_score in descending order
+    const sortedTeams = [...data.teamScores].sort(
+      (a, b) => b.total_score - a.total_score
+    );
+
+    // Find the highest score
+    const topScore = sortedTeams[0]?.total_score || 0;
+
+    // Assign adjusted rankings: rank 1 for all teams with the top score
+    let currentRank = 1;
+    let lastScore = null;
+
+    return sortedTeams.map((team, index) => {
+      if (team.total_score === topScore) {
+        // All teams with the top score get rank 1
+        return { ...team, adjusted_ranking: 1 };
+      } else {
+        // For non-top scores, increment rank only when score changes
+        if (team.total_score !== lastScore) {
+          currentRank = index + 1;
+        }
+        lastScore = team.total_score;
+        return { ...team, adjusted_ranking: currentRank };
+      }
+    });
   }, [data]);
 
   // Loading state

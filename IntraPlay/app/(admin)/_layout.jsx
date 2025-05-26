@@ -53,11 +53,41 @@ export default function AdminTabs() {
         }}
       />
       <Tabs.Screen
-        name="match"
+        name="match/match"
         options={{
           title: "Matches",
           headerShown: false,
           tabBarIcon: ({ color }) => <ScheduleIcon color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="match/schedule"
+        options={{
+          title: "Schedules",
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="schedule" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="match/event"
+        options={{
+          title: "Events",
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="event" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="match/category"
+        options={{
+          title: "Categories",
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="category" size={24} color={color} />
+          ),
         }}
       />
     </Tabs>

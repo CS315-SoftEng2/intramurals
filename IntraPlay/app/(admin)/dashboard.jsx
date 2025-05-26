@@ -162,7 +162,7 @@ const Dashboard = () => {
         icon: "sports-cricket",
         colors: colors.gradients.matches,
         isLoading: matchesLoading,
-        link: "/match",
+        link: "match/match",
       },
       {
         title: "Schedules",
@@ -170,7 +170,7 @@ const Dashboard = () => {
         icon: "event",
         colors: colors.gradients.schedule,
         isLoading: schedulesLoading,
-        link: "/match",
+        link: "match/schedule",
       },
       {
         title: "Events",
@@ -178,7 +178,7 @@ const Dashboard = () => {
         icon: "emoji-events",
         colors: colors.gradients.events,
         isLoading: eventsLoading,
-        link: "/match",
+        link: "match/event",
       },
       {
         title: "Categories",
@@ -186,7 +186,7 @@ const Dashboard = () => {
         icon: "category",
         colors: colors.gradients.categories,
         isLoading: categoriesLoading,
-        link: "/match",
+        link: "match/category",
       },
     ],
     [

@@ -307,7 +307,7 @@ const Index = () => {
           (match) =>
             match.score_a !== null &&
             match.score_b !== null &&
-            match.winner_team_id
+            !(match.score_a === 0 && match.score_b === 0) // Exclude matches where both scores are 0
         )
         ?.map((match) => {
           const schedule = scheduleData.schedules?.find(
@@ -319,8 +319,11 @@ const Index = () => {
           const category = categoryData.categories?.find(
             (c) => c.category_id === event?.category_id
           );
-          const winnerTeam = teamData.teams?.find(
-            (t) => t.team_id === match.winner_team_id
+          const teamA = teamData.teams?.find(
+            (t) => t.team_id === match.team_a_id
+          );
+          const teamB = teamData.teams?.find(
+            (t) => t.team_id === match.team_b_id
           );
 
           let parsedUpdatedAt;
@@ -332,14 +335,23 @@ const Index = () => {
             parsedUpdatedAt = new Date("1970-01-01T00:00:00Z");
           }
 
+          const isTie = match.score_a === match.score_b;
+
           return {
             ...match,
             event_name: event?.event_name || "Unknown Event",
             division: category?.division || "Unknown Division",
             venue: event?.venue || "Unknown Venue",
-            winner_team_color:
-              match.winner_team_color || winnerTeam?.team_color || "#22C55E",
+            winner_team_color: isTie
+              ? "#22C55E" // Default color for ties
+              : match.winner_team_id
+              ? teamData.teams?.find((t) => t.team_id === match.winner_team_id)
+                  ?.team_color || "#22C55E"
+              : "#22C55E",
+            team_a_color: teamA?.team_color || "#22C55E",
+            team_b_color: teamB?.team_color || "#22C55E",
             parsed_updated_at: parsedUpdatedAt,
+            isTie,
           };
         })
         ?.sort((a, b) => b.parsed_updated_at - a.parsed_updated_at) || []
@@ -521,43 +533,77 @@ const Index = () => {
           </Text>
         ) : (
           completedMatches.map((match, index) => {
-            const winnerName =
-              match.winner_team_id === match.team_a_id
-                ? match.team_a_name
-                : match.team_b_name;
-            const loserName =
-              match.winner_team_id === match.team_a_id
-                ? match.team_b_name
-                : match.team_a_name;
-            const winnerLogo =
-              match.winner_team_id === match.team_a_id
-                ? match.team_a_logo
-                : match.team_b_logo;
-            const winnerColor = normalizeColor(match.winner_team_color);
-            const darkerColor = lightenColor(winnerColor);
+            if (match.isTie) {
+              // Tie case
+              return (
+                <LinearGradient
+                  key={`${match.match_id}-${index}`}
+                  colors={[
+                    normalizeColor(match.team_a_color),
+                    normalizeColor(match.team_b_color),
+                  ]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.justNowCard}
+                >
+                  <Image
+                    source={getTeamLogo(match.team_a_logo)}
+                    style={styles.justNowTeamLogo}
+                  />
+                  <View style={styles.justNowTextContainer}>
+                    <Text style={styles.justNowTitle}>
+                      {`${match.team_a_name} AND ${match.team_b_name} TIES ON ${match.event_name}`.toUpperCase()}
+                    </Text>
+                    <Text style={styles.justNowSubtitle}>
+                      {`TIE ${match.score_a} - ${match.score_b}`.toUpperCase()}
+                    </Text>
+                  </View>
+                  <Image
+                    source={getTeamLogo(match.team_b_logo)}
+                    style={styles.justNowTeamLogo}
+                  />
+                </LinearGradient>
+              );
+            } else {
+              // Winner case
+              const winnerName =
+                match.winner_team_id === match.team_a_id
+                  ? match.team_a_name
+                  : match.team_b_name;
+              const loserName =
+                match.winner_team_id === match.team_a_id
+                  ? match.team_b_name
+                  : match.team_a_name;
+              const winnerLogo =
+                match.winner_team_id === match.team_a_id
+                  ? match.team_a_logo
+                  : match.team_b_logo;
+              const winnerColor = normalizeColor(match.winner_team_color);
+              const darkerColor = lightenColor(winnerColor);
 
-            return (
-              <LinearGradient
-                key={`${match.match_id}-${index}`}
-                colors={[winnerColor, darkerColor]}
-                start={{ x: 1, y: 0 }}
-                end={{ x: 0, y: 0 }}
-                style={styles.justNowCard}
-              >
-                <Image
-                  source={getTeamLogo(winnerLogo)}
-                  style={styles.justNowTeamLogo}
-                />
-                <View style={styles.justNowTextContainer}>
-                  <Text style={styles.justNowTitle}>
-                    {`${winnerName} WINS ${match.event_name}`.toUpperCase()}
-                  </Text>
-                  <Text style={styles.justNowSubtitle}>
-                    {`DEFEATED ${loserName} ${match.score_a} - ${match.score_b}`.toUpperCase()}
-                  </Text>
-                </View>
-              </LinearGradient>
-            );
+              return (
+                <LinearGradient
+                  key={`${match.match_id}-${index}`}
+                  colors={[winnerColor, darkerColor]}
+                  start={{ x: 1, y: 0 }}
+                  end={{ x: 0, y: 0 }}
+                  style={styles.justNowCard}
+                >
+                  <Image
+                    source={getTeamLogo(winnerLogo)}
+                    style={styles.justNowTeamLogo}
+                  />
+                  <View style={styles.justNowTextContainer}>
+                    <Text style={styles.justNowTitle}>
+                      {`${winnerName} WINS ${match.event_name}`.toUpperCase()}
+                    </Text>
+                    <Text style={styles.justNowSubtitle}>
+                      {`DEFEATED ${loserName} ${match.score_a} - ${match.score_b}`.toUpperCase()}
+                    </Text>
+                  </View>
+                </LinearGradient>
+              );
+            }
           })
         )}
       </View>

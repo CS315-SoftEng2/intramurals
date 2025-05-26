@@ -20,7 +20,6 @@ import CustomAlert from "../components/customAlert";
 
 // Styles
 import styles from "../../assets/styles/userAccountStyles";
-import globalstyles from "../../assets/styles/globalstyles";
 
 // Queries and mutations
 import GET_USERS from "../../queries/userAccountQuery";
@@ -255,13 +254,6 @@ const Users = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
-
-      {/* Logout button */}
-      <View style={globalstyles.loginButtonContainer}>
-        <TouchableOpacity onPress={() => handleLogout(logout)}>
-          <MaterialIcons name="logout" size={25} color="#22C55E" />
-        </TouchableOpacity>
-      </View>
 
       {/* Title */}
       <View style={styles.titleContainer}>

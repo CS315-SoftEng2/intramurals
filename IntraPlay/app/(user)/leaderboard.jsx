@@ -18,13 +18,16 @@ const Leaderboard = () => {
 
   const { logout } = useAuth();
 
-  const teams = useMemo(
-    () => [
-      { rank: 1, team: team_name_a, score: score_a },
-      { rank: 2, team: team_name_b, score: score_b },
-    ],
-    [team_name_a, team_name_b, score_a, score_b]
-  );
+  const teams = useMemo(() => {
+    const scoreA = parseInt(score_a, 10) || 0;
+    const scoreB = parseInt(score_b, 10) || 0;
+    const teamBRank = scoreA === scoreB ? 1 : 2;
+
+    return [
+      { rank: 1, team: team_name_a, score: scoreA },
+      { rank: teamBRank, team: team_name_b, score: scoreB },
+    ];
+  }, [team_name_a, team_name_b, score_a, score_b]);
 
   return (
     <ScrollView style={styles.container}>
@@ -46,7 +49,7 @@ const Leaderboard = () => {
           </View>
 
           {teams.map((item) => (
-            <View key={item.rank} style={styles.tableRow}>
+            <View key={item.rank + item.team} style={styles.tableRow}>
               <Text style={[styles.cell, styles.rankCell]}>{item.rank}</Text>
               <Text style={[styles.cell, styles.teamCell]}>{item.team}</Text>
               <Text style={[styles.cell, styles.scoreCell]}>{item.score}</Text>

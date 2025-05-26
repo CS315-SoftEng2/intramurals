@@ -21,7 +21,6 @@ import CustomAlert from "../components/customAlert";
 
 // Styles
 import styles from "../../assets/styles/adminTeamStyles";
-import globalstyles from "../../assets/styles/globalstyles";
 
 // Queries and mutations
 import GET_TEAMS from "../../queries/teamsQuery";
@@ -33,7 +32,6 @@ import {
 
 // Context and utilities
 import { useAuth } from "../../context/AuthContext";
-import { handleLogout } from "../../utils/handleLogout";
 
 // Team logos
 const teamLogos = {
@@ -282,13 +280,6 @@ const Teams = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
-
-      {/* Logout button */}
-      <View style={globalstyles.loginButtonContainer}>
-        <TouchableOpacity onPress={() => handleLogout(logout)}>
-          <MaterialIcons name="logout" size={25} color="#22C55E" />
-        </TouchableOpacity>
-      </View>
 
       {/* Title */}
       <View style={styles.titleContainer}>

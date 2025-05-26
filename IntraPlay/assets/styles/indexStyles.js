@@ -172,7 +172,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    marginRight: 10,
   },
   justNowTextContainer: {
     flex: 1,
@@ -183,11 +182,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textTransform: "uppercase",
     marginBottom: 2,
+    marginLeft: 10,
   },
   justNowSubtitle: {
     color: "#6B7280",
     fontSize: 12,
     textTransform: "uppercase",
+    marginLeft: 10,
   },
   justNowEmptyText: {
     color: "#111827",

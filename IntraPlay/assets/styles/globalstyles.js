@@ -78,7 +78,7 @@ const globalstyles = StyleSheet.create({
   },
   backButtonText: {
     color: "#fff",
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: "Rubik-Regular",
     padding: 5,
   },
