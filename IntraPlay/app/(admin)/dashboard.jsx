@@ -31,12 +31,12 @@ import GET_EVENTS from "../../queries/eventsQuery";
 import GET_CATEGORIES from "../../queries/categoriesQuery";
 
 const colors = {
-  background: "#F9FAFB",
-  border: "#E5E7EB",
+  background: "#1E1E2E",
+  border: "#444",
   cardBackground: "#2A2A3A",
   text: {
     primary: "#fff",
-    secondary: "#8F8F9E",
+    secondary: "#fff",
   },
   activityBorder: "#383852",
   iconBackground: "rgba(255, 255, 255, 0.2)",
@@ -213,7 +213,7 @@ const Dashboard = () => {
         {/* Logout button */}
         <View style={globalstyles.loginButtonContainer}>
           <TouchableOpacity onPress={() => handleLogout(logout)}>
-            <MaterialIcons name="logout" size={25} color="#22C55E" />
+            <MaterialIcons name="logout" size={25} color="#fff" />
           </TouchableOpacity>
         </View>
       </View>
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#111827",
+    color: "#fff",
     marginTop: 17,
   },
   statsContainer: {
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
   statsTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#111827",
+    color: "#fff",
   },
   errorText: {
     color: "#ff6b6b",

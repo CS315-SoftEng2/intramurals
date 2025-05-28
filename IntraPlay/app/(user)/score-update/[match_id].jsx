@@ -140,14 +140,7 @@ const ScoreUpdate = () => {
   };
 
   return (
-    <ScrollView style={{ backgroundColor: "#F9FAFB" }}>
-      {/* Logout button */}
-      <View style={globalstyles.loginButtonContainer}>
-        <TouchableOpacity onPress={() => handleLogout(logout)}>
-          <MaterialIcons name="logout" size={25} color="#22C55E" />
-        </TouchableOpacity>
-      </View>
-
+    <ScrollView style={{ backgroundColor: "#1E1E2E" }}>
       <View style={styles.contentContainer}>
         <Text style={styles.headerTitle}>
           {event_name} - {division}

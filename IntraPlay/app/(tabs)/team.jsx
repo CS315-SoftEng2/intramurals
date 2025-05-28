@@ -173,13 +173,6 @@ const Team = () => {
 
   return (
     <View style={[globalstyles.container, styles.mainContainer]}>
-      {/* Login button */}
-      <View style={globalstyles.loginButtonContainer}>
-        <Link href={"/login"}>
-          <MaterialIcons name="login" size={30} color="#22C55E" />
-        </Link>
-      </View>
-
       {/* Search and filter */}
       <View style={styles.searchContainer}>
         <View style={styles.searchRow}>
@@ -204,7 +197,7 @@ const Team = () => {
               <MaterialIcons
                 name="keyboard-arrow-down"
                 size={15}
-                color="#111827"
+                color="#fff"
                 style={styles.dropdownIcon}
               />
             </View>

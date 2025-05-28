@@ -5,7 +5,7 @@ const { width } = Dimensions.get("window");
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "#1E1E2E",
   },
   centered: {
     flex: 1,
@@ -20,11 +20,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#1F2937",
+    color: "#fff",
   },
   subtitle: {
     fontSize: 14,
-    color: "#6B7280",
+    color: "#aaa",
     marginTop: 4,
   },
   searchBarContainer: {
@@ -38,17 +38,17 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#2A2A3C",
     paddingHorizontal: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: "#aaa",
     marginRight: 8,
     height: 40,
   },
   searchInput: {
     flex: 1,
-    color: "#CDD6F4",
+    color: "#fff",
     marginLeft: 8,
     fontSize: 14,
   },
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   sortButton: {
     padding: 8,
     backgroundColor: "#D1FADF",
-    borderColor: "#E5E7EB",
+    borderColor: "#aaa",
     borderWidth: 1,
     borderRadius: 8,
     marginRight: 8,
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: "#aaa",
   },
   addButtonText: {
     color: "#FFFFFF",
@@ -90,11 +90,11 @@ const styles = StyleSheet.create({
     paddingBottom: 80,
   },
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#2A2A3C",
     borderRadius: 12,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: "#aaa",
     overflow: "hidden",
   },
   cardHeader: {
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   },
   cardDivider: {
     height: 1,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#aaa",
   },
   teamInfo: {
     flexDirection: "row",
@@ -117,8 +117,8 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#E5E7EB",
+    borderWidth: 1,
+    borderColor: "#000",
   },
   teamTextInfo: {
     marginLeft: 12,
@@ -127,15 +127,10 @@ const styles = StyleSheet.create({
   teamName: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#111827",
-  },
-  teamId: {
-    color: "#111827",
-    fontSize: 12,
-    marginTop: 2,
+    color: "#fff",
   },
   teamMotto: {
-    color: "#6B7280",
+    color: "#aaa",
     fontSize: 12,
     marginTop: 4,
     fontStyle: "italic",
@@ -150,7 +145,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 6,
-    backgroundColor: "#D1E9FA",
+    backgroundColor: "rgba(137, 180, 250, 0.1)",
     marginRight: 8,
   },
   deleteButton: {
@@ -181,12 +176,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   noDataText: {
-    color: "#111827",
+    color: "#fff",
     fontSize: 16,
     marginTop: 12,
   },
   modal: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#2A2A3C",
     borderRadius: 12,
     width: width - 40,
     alignSelf: "center",
@@ -201,13 +196,13 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   modalTitle: {
-    color: "#1F2937",
+    color: "#fff",
     fontSize: 18,
     fontWeight: "700",
   },
   modalDivider: {
     height: 1,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#aaa",
     marginBottom: 16,
   },
   formGroup: {
@@ -216,17 +211,17 @@ const styles = StyleSheet.create({
   },
   formLabel: {
     fontSize: 14,
-    color: "#111827",
+    color: "#fff",
     marginBottom: 8,
     fontWeight: "500",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    backgroundColor: "#F3F4F6",
+    borderColor: "#aaa",
+    backgroundColor: "#2A2A3C",
     padding: 12,
     borderRadius: 8,
-    color: "#111827",
+    color: "#fff",
     fontSize: 14,
   },
   submitButton: {
@@ -237,6 +232,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     borderRadius: 8,
     marginBottom: 20,
+  },
+  scrollView: {
+    flexGrow: 0,
+  },
+  scrollViewContent: {
+    paddingBottom: 16,
   },
   submitButtonText: {
     color: "#FFFFFF",

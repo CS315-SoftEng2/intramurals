@@ -10,19 +10,13 @@ export default function GuestTabs() {
     <Tabs
       screenOptions={{
         tabBarStyle: {
-          backgroundColor: "#FFFFFF",
+          backgroundColor: "#151521",
           height: 60,
           paddingBottom: 5,
           paddingTop: 5,
-          borderTopColor: "#E5E7EB",
-          shadowColor: "#000000",
-          shadowOpacity: 0.1,
-          shadowOffset: { width: 0, height: -2 },
-          shadowRadius: 8,
-          elevation: 8,
         },
-        tabBarActiveTintColor: "#22C55E",
-        tabBarInactiveTintColor: "#6B7280",
+        tabBarActiveTintColor: "#A4F168",
+        tabBarInactiveTintColor: "gray",
       }}
     >
       <Tabs.Screen

@@ -2,7 +2,6 @@
 import { useEffect, useMemo } from "react";
 import { Text, View, Image, ScrollView } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { Link } from "expo-router";
 import { parse } from "date-fns";
 import Toast from "react-native-toast-message";
 
@@ -253,20 +252,13 @@ const Scoreboard = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.contentContainer}>
-      {/* Login button */}
-      <View style={globalstyles.loginButtonContainer}>
-        <Link href={"/login"}>
-          <MaterialIcons name="login" size={30} color="#22C55E" />
-        </Link>
-      </View>
-
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Completed Matches</Text>
         <MaterialIcons
           name="sports-score"
           size={30}
-          color="#1F2937"
+          color="#fff"
           style={styles.icon}
         />
       </View>

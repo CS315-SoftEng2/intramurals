@@ -5,26 +5,28 @@ const { width } = Dimensions.get("window");
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "#1E1E2E",
   },
   contentContainer: {
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 10,
+    backgroundColor: "#1E1E2E",
   },
   otherContentContainer: {
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 10,
+    backgroundColor: "#1E1E2E",
   },
   tableTitle: {
     fontSize: 18,
-    fontWeight: "600",
-    color: "#1F2937",
+    fontWeight: "700",
+    color: "#fff",
     marginBottom: 10,
   },
   matchCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#2A2A3C",
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
@@ -36,55 +38,12 @@ const styles = StyleSheet.create({
   },
   cardText: {
     fontSize: 14,
-    color: "#1F2937",
+    color: "#fff",
     marginBottom: 6,
   },
   cardLabel: {
-    fontWeight: "600",
-    color: "#374151",
-  },
-  matchTable: {
-    borderRadius: 8,
-    overflow: "hidden",
-    backgroundColor: "#FFFFFF",
-    marginBottom: 15,
-  },
-  tableHeader: {
-    flexDirection: "row",
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
-  },
-  tableRow: {
-    flexDirection: "row",
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
-  },
-  headerCell: {
-    color: "#111827",
-    fontWeight: "600",
-    fontSize: 12,
-  },
-  cell: {
-    color: "#6B7280",
-    fontSize: 12,
-  },
-  smallCell: {
-    width: 55,
-  },
-  mediumCell: {
-    width: 85,
-  },
-  extraLargeCell: {
-    width: 160,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    fontWeight: "800",
+    color: "#fff",
   },
   errorText: {
     color: "#FF6B6B",
@@ -143,7 +102,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modal: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#2A2A3C",
     borderRadius: 12,
     width: width - 40,
     alignSelf: "center",
@@ -157,13 +116,13 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   modalTitle: {
-    color: "#1F2937",
+    color: "#fff",
     fontSize: 18,
     fontWeight: "700",
   },
   modalDivider: {
     height: 1,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#aaa",
     marginBottom: 16,
   },
   formGroup: {
@@ -172,17 +131,17 @@ const styles = StyleSheet.create({
   },
   formLabel: {
     fontSize: 14,
-    color: "#111827",
+    color: "#fff",
     marginBottom: 8,
     fontWeight: "500",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    backgroundColor: "#F3F4F6",
+    borderColor: "#aaa",
+    backgroundColor: "#2A2A3C",
     padding: 12,
     borderRadius: 8,
-    color: "111827",
+    color: "#fff",
     fontSize: 14,
     flexDirection: "row",
     alignItems: "center",
@@ -226,10 +185,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: "#6B7280",
+    borderBottomColor: "#aaa",
   },
   pickerItemText: {
-    color: "#6B7280",
+    color: "#aaa",
     fontSize: 14,
     fontWeight: "500",
   },
@@ -238,10 +197,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   selectedText: {
-    color: "#111827",
+    color: "#fff",
   },
   placeholderText: {
-    color: "grey",
+    color: "#aaa",
   },
   modalOverlay: {
     flex: 1,
@@ -250,7 +209,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   pickerModal: {
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#2A2A3C",
     borderRadius: 12,
     width: width - 40,
     maxHeight: "60%",
@@ -267,12 +226,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   pickerDoneButtonText: {
-    color: "#111827",
+    color: "#fff",
     fontWeight: "700",
     fontSize: 16,
   },
   disabledInput: {
-    backgroundColor: "#2D3748",
+    backgroundColor: "#fff",
     opacity: 0.6,
   },
 });

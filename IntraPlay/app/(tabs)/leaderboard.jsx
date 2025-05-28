@@ -107,6 +107,10 @@ const Leaderboard = () => {
     });
   }, [data]);
 
+  // Check if all teams have zero scores
+  const allScoresZero =
+    teamScores.length > 0 && teamScores.every((team) => team.total_score === 0);
+
   // Loading state
   if (loading) {
     return <LoadingIndicator visible={true} />;
@@ -123,32 +127,36 @@ const Leaderboard = () => {
 
   return (
     <View style={styles.container}>
-      {/* Login button */}
-      <View style={globalstyles.loginButtonContainer}>
-        <Link href={"/login"}>
-          <MaterialIcons name="login" size={30} color="#22C55E" />
-        </Link>
-      </View>
-
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerText}>Leaderboard</Text>
         <MaterialIcons
           name="leaderboard"
           size={30}
-          color="#1F2937"
+          color="#fff"
           style={styles.icon}
         />
       </View>
 
-      {/* Team list */}
-      <FlatList
-        data={teamScores}
-        keyExtractor={(item) => item.team_id.toString()}
-        renderItem={({ item, index }) => <TeamItem item={item} index={index} />}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
+      {/* Check for zero scores */}
+      {allScoresZero ? (
+        <View style={styles.noScoresContainer}>
+          <Text style={styles.noScoresText}>
+            No scores yet! Teams are still warming up.
+          </Text>
+        </View>
+      ) : (
+        /* Team list */
+        <FlatList
+          data={teamScores}
+          keyExtractor={(item) => item.team_id.toString()}
+          renderItem={({ item, index }) => (
+            <TeamItem item={item} index={index} />
+          )}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </View>
   );
 };

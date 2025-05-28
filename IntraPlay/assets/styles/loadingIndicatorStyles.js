@@ -5,11 +5,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#1E1E2E",
   },
   loadingText: {
     marginTop: 10,
-    color: "#111827",
+    color: "#FFFFFF",
     fontSize: 16,
   },
 });

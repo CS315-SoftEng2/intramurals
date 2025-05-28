@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   StatusBar,
   Image,
+  ScrollView,
 } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Modal from "react-native-modal";
@@ -65,7 +66,6 @@ const TeamItem = ({ item, onEdit, onDelete }) => (
         />
         <View style={styles.teamTextInfo}>
           <Text style={styles.teamName}>{item.team_name}</Text>
-          <Text style={styles.teamId}>Team ID: {item.team_id}</Text>
           {item.team_motto && (
             <Text style={styles.teamMotto}>"{item.team_motto}"</Text>
           )}
@@ -293,11 +293,11 @@ const Teams = () => {
       {/* Search and actions */}
       <View style={styles.searchBarContainer}>
         <View style={styles.searchBar}>
-          <MaterialIcons name="search" size={20} color="grey" />
+          <MaterialIcons name="search" size={20} color="#aaa" />
           <TextInput
             style={styles.searchInput}
             placeholder="Search teams..."
-            placeholderTextColor="grey"
+            placeholderTextColor="#aaa"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -369,58 +369,65 @@ const Teams = () => {
 
           <View style={styles.modalDivider} />
 
-          <View style={styles.formGroup}>
-            <Text style={styles.formLabel}>Team Name</Text>
-            <TextInput
-              placeholder="Enter team name"
-              value={formData.team_name}
-              onChangeText={(text) =>
-                setFormData({ ...formData, team_name: text })
-              }
-              style={styles.input}
-              placeholderTextColor="grey"
-            />
-          </View>
+          {/* Wrap form content in ScrollView */}
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollViewContent}
+            showsVerticalScrollIndicator={true}
+          >
+            <View style={styles.formGroup}>
+              <Text style={styles.formLabel}>Team Name</Text>
+              <TextInput
+                placeholder="Enter team name"
+                value={formData.team_name}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, team_name: text })
+                }
+                style={styles.input}
+                placeholderTextColor="grey"
+              />
+            </View>
 
-          <View style={styles.formGroup}>
-            <Text style={styles.formLabel}>Team Color</Text>
-            <TextInput
-              placeholder="Enter a color or hex color code (#RRGGBB)"
-              value={formData.team_color}
-              onChangeText={(text) =>
-                setFormData({ ...formData, team_color: text })
-              }
-              style={styles.input}
-              placeholderTextColor="grey"
-            />
-          </View>
+            <View style={styles.formGroup}>
+              <Text style={styles.formLabel}>Team Color</Text>
+              <TextInput
+                placeholder="Enter a color or hex color code (#RRGGBB)"
+                value={formData.team_color}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, team_color: text })
+                }
+                style={styles.input}
+                placeholderTextColor="grey"
+              />
+            </View>
 
-          <View style={styles.formGroup}>
-            <Text style={styles.formLabel}>Team Logo URL (Optional)</Text>
-            <TextInput
-              placeholder="Enter logo URL"
-              value={formData.team_logo}
-              onChangeText={(text) =>
-                setFormData({ ...formData, team_logo: text })
-              }
-              style={styles.input}
-              placeholderTextColor="grey"
-            />
-          </View>
+            <View style={styles.formGroup}>
+              <Text style={styles.formLabel}>Team Logo URL (Optional)</Text>
+              <TextInput
+                placeholder="Enter logo URL"
+                value={formData.team_logo}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, team_logo: text })
+                }
+                style={styles.input}
+                placeholderTextColor="grey"
+              />
+            </View>
 
-          <View style={styles.formGroup}>
-            <Text style={styles.formLabel}>Team Motto (Optional)</Text>
-            <TextInput
-              placeholder="Enter team motto"
-              value={formData.team_motto}
-              onChangeText={(text) =>
-                setFormData({ ...formData, team_motto: text })
-              }
-              style={styles.input}
-              placeholderTextColor="grey"
-              multiline
-            />
-          </View>
+            <View style={styles.formGroup}>
+              <Text style={styles.formLabel}>Team Motto (Optional)</Text>
+              <TextInput
+                placeholder="Enter team motto"
+                value={formData.team_motto}
+                onChangeText={(text) =>
+                  setFormData({ ...formData, team_motto: text })
+                }
+                style={styles.input}
+                placeholderTextColor="grey"
+                multiline
+              />
+            </View>
+          </ScrollView>
 
           <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
             <Text style={styles.submitButtonText}>

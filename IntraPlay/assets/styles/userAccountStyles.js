@@ -5,7 +5,7 @@ const { width } = Dimensions.get("window");
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "#1E1E2E",
   },
   centered: {
     flex: 1,
@@ -20,11 +20,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#1F2937",
+    color: "#fff",
   },
   subtitle: {
     fontSize: 14,
-    color: "#6B7280",
+    color: "#aaa",
     marginTop: 4,
   },
   searchBarContainer: {
@@ -38,17 +38,17 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#2A2A3C",
     paddingHorizontal: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: "#aaa",
     marginRight: 8,
     height: 40,
   },
   searchInput: {
     flex: 1,
-    color: "#111827",
+    color: "#fff",
     marginLeft: 8,
     fontSize: 14,
   },
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     padding: 8,
     backgroundColor: "#D1FADF",
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: "#aaa",
     borderRadius: 8,
     marginRight: 8,
     alignItems: "center",
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: "#aaa",
   },
   addButtonText: {
     color: "#FFFFFF",
@@ -89,22 +89,22 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#2A2A3C",
     borderRadius: 12,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: "#aaa",
     overflow: "hidden",
   },
   cardHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 16,
+    padding: 13,
   },
   cardDivider: {
     height: 1,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#aaa",
   },
   userInfo: {
     flexDirection: "row",
@@ -114,14 +114,14 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#D1FADF",
+    backgroundColor: "#BFDBFE",
     justifyContent: "center",
     alignItems: "center",
   },
   avatarText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#1A7F3C",
+    color: "#1E3A8A",
   },
   userTextInfo: {
     marginLeft: 12,
@@ -129,12 +129,7 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#111827",
-  },
-  userId: {
-    color: "#6B7280",
-    fontSize: 12,
-    marginTop: 2,
+    color: "#fff",
   },
   tagContainer: {
     paddingHorizontal: 10,
@@ -145,10 +140,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#BBF7D0",
   },
   userTag: {
-    backgroundColor: "#D1E9FA",
+    backgroundColor: "#BFDBFE",
   },
   tag: {
     color: "#065F46",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  userTagText: {
+    color: "#1E3A8A",
     fontSize: 12,
     fontWeight: "600",
   },
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 6,
-    backgroundColor: "#D1E9FA",
+    backgroundColor: "rgba(137, 180, 250, 0.1)",
     marginRight: 8,
   },
   deleteButton: {
@@ -193,12 +193,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   noDataText: {
-    color: "#111827",
+    color: "#fff",
     fontSize: 16,
     marginTop: 12,
   },
   modal: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#2A2A3C",
     borderRadius: 12,
     width: width - 40,
     alignSelf: "center",
@@ -212,13 +212,13 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   modalTitle: {
-    color: "#1F2937",
+    color: "#fff",
     fontSize: 18,
     fontWeight: "700",
   },
   modalDivider: {
     height: 1,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#444",
     marginBottom: 16,
   },
   formGroup: {
@@ -227,18 +227,18 @@ const styles = StyleSheet.create({
   },
   formLabel: {
     fontSize: 14,
-    color: "#1F2937",
+    color: "#fff",
     marginBottom: 8,
     marginTop: 8,
     fontWeight: "500",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    backgroundColor: "#F3F4F6",
+    borderColor: "#aaa",
+    backgroundColor: "#2A2A3C",
     padding: 12,
     borderRadius: 8,
-    color: "#111827",
+    color: "#fff",
     fontSize: 14,
   },
   radioContainer: {
@@ -246,22 +246,23 @@ const styles = StyleSheet.create({
   },
   radioButton: {
     borderWidth: 1,
-    borderColor: "#D1FADF",
+    borderColor: "#aaa",
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
     marginRight: 10,
+    backgroundColor: "#BFDBFE",
   },
   radioSelected: {
-    backgroundColor: "#D1FADF",
-    borderColor: "#E5E7EB",
+    backgroundColor: "#BFDBFE",
+    borderColor: "#aaa",
   },
   radioText: {
-    color: "#1A7F3C",
+    color: "#1E3A8A",
     fontSize: 14,
   },
   radioTextSelected: {
-    color: "#1A7F3C",
+    color: "#1E3A8A",
     fontWeight: "600",
   },
   submitButton: {

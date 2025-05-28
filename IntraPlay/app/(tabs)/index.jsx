@@ -1,7 +1,7 @@
 // React and library imports
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "expo-router";
-import { Text, View, Image, ScrollView, ActivityIndicator } from "react-native";
+import { Text, View, Image, ScrollView } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Font from "expo-font";
@@ -14,7 +14,6 @@ import CountdownTimer from "../../helpers/countDownTimer";
 
 // Styles
 import styles from "../../assets/styles/indexStyles";
-import globalstyles from "../../assets/styles/globalstyles";
 
 // Queries
 import GET_MATCHES from "../../queries/matchesQuery";
@@ -61,7 +60,7 @@ const normalizeColor = (color) => {
   return hexPattern.test(color) ? color : "#22C55E";
 };
 
-const lightenColor = (hex) => {
+const darkenColor = (hex) => {
   let color = hex.startsWith("#") ? hex.slice(1) : hex;
   if (color.length === 3)
     color = color
@@ -73,9 +72,9 @@ const lightenColor = (hex) => {
   const b = parseInt(color.slice(4, 6), 16);
   const factor = 0.6;
 
-  return `rgb(${Math.round(r + (255 - r) * factor)}, ${Math.round(
-    g + (255 - g) * factor
-  )}, ${Math.round(b + (255 - b) * factor)})`;
+  return `rgb(${Math.round(r * (1 - factor))}, ${Math.round(
+    g * (1 - factor)
+  )}, ${Math.round(b * (1 - factor))})`;
 };
 
 const convertToDateTime = (dateStr, timeStr) => {
@@ -259,8 +258,14 @@ const Index = () => {
 
       const isOngoing =
         startTime && endTime && now >= startTime && now <= endTime;
+      const isUpcoming = endTime && now < endTime;
 
-      return !isNaN(eventDate.getTime()) && eventDate >= today && !isOngoing;
+      return (
+        !isNaN(eventDate.getTime()) &&
+        eventDate >= today &&
+        !isOngoing &&
+        isUpcoming
+      );
     });
   }, [eventDetails, today]);
 
@@ -359,8 +364,20 @@ const Index = () => {
   }, [matchData, scheduleData, eventData, categoryData, teamData]);
 
   const leadingTeam = useMemo(() => {
+    if (!leadingData?.teamScores) {
+      return { team_logo: "default_logo.png", total_score: 0 };
+    }
+
+    const allScoresZero = leadingData.teamScores.every(
+      (team) => team.total_score === 0
+    );
+
+    if (allScoresZero) {
+      return { team_logo: "default_logo.png", total_score: 0 };
+    }
+
     return (
-      leadingData?.teamScores?.find((team) => team.overall_ranking === 1) || {
+      leadingData.teamScores.find((team) => team.overall_ranking === 1) || {
         team_logo: "default_logo.png",
         total_score: 0,
       }
@@ -385,7 +402,7 @@ const Index = () => {
       {/* Login button */}
       <View style={styles.loginButtonContainer}>
         <Link href={"/login"}>
-          <MaterialIcons name="login" size={30} color="#22C55E" />
+          <MaterialIcons name="login" size={30} color="#FFFFFF" />
         </Link>
       </View>
 
@@ -506,7 +523,7 @@ const Index = () => {
                   <MaterialIcons
                     name="location-on"
                     size={15}
-                    color="#111827"
+                    color="#aaa"
                     style={{ marginRight: 2 }}
                   />
                   <Text style={styles.venueText}>
@@ -579,7 +596,7 @@ const Index = () => {
                   ? match.team_a_logo
                   : match.team_b_logo;
               const winnerColor = normalizeColor(match.winner_team_color);
-              const darkerColor = lightenColor(winnerColor);
+              const darkerColor = darkenColor(winnerColor);
 
               return (
                 <LinearGradient

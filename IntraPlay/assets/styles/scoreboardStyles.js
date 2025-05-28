@@ -2,15 +2,15 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#F9FAFB",
-    paddingTop: 20,
+    backgroundColor: "#1E1E2E",
+    paddingTop: 10,
     alignItems: "stretch",
     justifyContent: "flex-start",
   },
   contentContainer: {
     flexGrow: 1,
-    backgroundColor: "#F9FAFB",
-    paddingTop: 20,
+    backgroundColor: "#1E1E2E",
+    paddingTop: 10,
     alignItems: "stretch",
     justifyContent: "flex-start",
   },
@@ -23,14 +23,14 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#1F2937",
+    color: "#FFFFFF",
   },
   icon: {
     marginLeft: 5,
   },
   divider: {
     height: 1,
-    backgroundColor: "#6B7280",
+    backgroundColor: "#444",
     marginHorizontal: 10,
     marginBottom: 10,
   },
@@ -47,13 +47,13 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   matchCardContent: {
-    backgroundColor: "#FFFFF",
+    backgroundColor: "#2A2A3C",
     borderRadius: 8,
     padding: 15,
     alignItems: "center",
   },
   completedMatchCard: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#2A2A3C",
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   eventName: {
-    color: "#1F2937",
+    color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "bold",
     fontFamily: "Racing Sans One-Regular",
@@ -88,19 +88,19 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   teamName: {
-    color: "#111827",
+    color: "#FFFFFF",
     fontSize: 16,
     fontFamily: "Oswald-Semi-Bold",
     textAlign: "center",
     marginBottom: 5,
   },
   score: {
-    color: "#22C55E",
+    color: "#FFFFFF",
     fontSize: 24,
     fontWeight: "bold",
   },
   versus: {
-    color: "#6B7280",
+    color: "#aaa",
     fontSize: 20,
     fontWeight: "bold",
     marginHorizontal: 10,
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   venueText: {
-    color: "#6B7280",
+    color: "#aaa",
     fontSize: 14,
     marginLeft: 5,
   },
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   emptyStateText: {
-    color: "#111827",
+    color: "#FFFFFF",
     textAlign: "center",
     fontSize: 16,
     padding: 10,

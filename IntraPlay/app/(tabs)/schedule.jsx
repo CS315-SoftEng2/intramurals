@@ -1,6 +1,5 @@
 // React and library imports
 import { useState, useMemo } from "react";
-import { Link } from "expo-router";
 import {
   Text,
   View,
@@ -328,25 +327,18 @@ const Schedule = () => {
 
   return (
     <SafeAreaView style={globalstyles.container}>
-      {/* Login button */}
-      <View style={globalstyles.loginButtonContainer}>
-        <Link href={"/login"}>
-          <MaterialIcons name="login" size={30} color="#22C55E" />
-        </Link>
-      </View>
-
       {/* Calendar */}
       <View style={styles.calendarContainer}>
         <View style={styles.monthSelector}>
           <TouchableOpacity onPress={getPreviousMonth}>
-            <MaterialIcons name="chevron-left" size={24} color="#1F2937" />
+            <MaterialIcons name="chevron-left" size={24} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.monthText}>
             {currentDate.toLocaleString("default", { month: "long" })}{" "}
             {calendarData.year}
           </Text>
           <TouchableOpacity onPress={getNextMonth}>
-            <MaterialIcons name="chevron-right" size={24} color="#1F2937" />
+            <MaterialIcons name="chevron-right" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
         {renderCalendarDays()}

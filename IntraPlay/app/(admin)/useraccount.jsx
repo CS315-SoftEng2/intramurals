@@ -45,7 +45,6 @@ const UserItem = ({ item, onEdit, onDelete }) => (
         </View>
         <View style={styles.userTextInfo}>
           <Text style={styles.username}>{item.user_name}</Text>
-          <Text style={styles.userId}>User ID: {item.user_id}</Text>
         </View>
       </View>
       <View
@@ -54,7 +53,14 @@ const UserItem = ({ item, onEdit, onDelete }) => (
           item.user_type === "admin" ? styles.adminTag : styles.userTag,
         ]}
       >
-        <Text style={styles.tag}>{item.user_type.toUpperCase()}</Text>
+        <Text
+          style={[
+            styles.tag,
+            item.user_type === "admin" ? styles.tag : styles.userTagText,
+          ]}
+        >
+          {item.user_type.toUpperCase()}
+        </Text>
       </View>
     </View>
     <View style={styles.cardDivider} />
@@ -78,9 +84,6 @@ const UserItem = ({ item, onEdit, onDelete }) => (
 );
 
 const Users = () => {
-  // Context
-  const { logout } = useAuth();
-
   // Queries and mutations
   const { loading, error, data, refetch } = useQuery(GET_USERS);
   const [addUser] = useMutation(ADD_USER);
@@ -267,11 +270,11 @@ const Users = () => {
       {/* Search and actions */}
       <View style={styles.searchBarContainer}>
         <View style={styles.searchBar}>
-          <MaterialIcons name="search" size={20} color="#A6ADC8" />
+          <MaterialIcons name="search" size={20} color="#aaa" />
           <TextInput
             style={styles.searchInput}
             placeholder="Search users..."
-            placeholderTextColor="#A6ADC8"
+            placeholderTextColor="#aaa"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -360,21 +363,6 @@ const Users = () => {
               placeholderTextColor="grey"
               secureTextEntry
             />
-            {!editMode && (
-              <>
-                <Text style={styles.formLabel}>Password</Text>
-                <TextInput
-                  placeholder="Enter password"
-                  value={formData.password}
-                  onChangeText={(text) =>
-                    setFormData({ ...formData, password: text })
-                  }
-                  style={styles.input}
-                  placeholderTextColor=""
-                  secureTextEntry
-                />
-              </>
-            )}
           </View>
 
           <View style={styles.formGroup}>

@@ -7,7 +7,7 @@ const toastConfig = {
       style={{
         height: 80,
         borderLeftColor: "#16A34A",
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "#2A2A3C",
         borderRadius: 12,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 4 },
@@ -22,12 +22,12 @@ const toastConfig = {
       text1Style={{
         fontSize: 18,
         fontWeight: "600",
-        color: "#10B981",
+        color: "#fff",
         lineHeight: 22,
       }}
       text2Style={{
         fontSize: 15,
-        color: "#111827",
+        color: "#aaa",
         lineHeight: 20,
       }}
     />
@@ -37,7 +37,7 @@ const toastConfig = {
       {...props}
       style={{
         borderLeftColor: "#EF4444",
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "#2A2A3C",
         borderRadius: 12,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 4 },
@@ -52,12 +52,12 @@ const toastConfig = {
       text1Style={{
         fontSize: 18,
         fontWeight: "600",
-        color: "#EF4444",
+        color: "#fff",
         lineHeight: 22,
       }}
       text2Style={{
         fontSize: 15,
-        color: "#F87171",
+        color: "#aaa",
         lineHeight: 20,
       }}
     />

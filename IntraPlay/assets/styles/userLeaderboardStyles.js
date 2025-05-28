@@ -3,13 +3,13 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
-    paddingTop: 20,
+    backgroundColor: "#1E1E2E",
+    paddingTop: 10,
     alignItems: "stretch",
     justifyContent: "flex-start",
   },
   loadingText: {
-    color: "#111827",
+    color: "#fff",
     fontSize: 16,
     textAlign: "center",
     marginTop: 20,
@@ -26,11 +26,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 20,
     borderBottomWidth: 1,
-    borderBottomColor: "#6B7280",
+    borderBottomColor: "#444",
     marginBottom: 20,
   },
   headerText: {
-    color: "#1F2937",
+    color: "#FFFFFF",
     fontSize: 24,
     fontWeight: "bold",
   },
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   teamCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#2A2A3C",
     borderRadius: 10,
     borderWidth: 1,
     marginVertical: 8,
@@ -75,14 +75,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   teamName: {
-    color: "#111827",
+    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 5,
   },
   scoreText: {
-    color: "#6B7280",
+    color: "#aaa",
     fontSize: 14,
+  },
+  noScoresContainer: {
+    justifyContent: "flex-start",
+    alignSelf: "center",
+  },
+  noScoresText: {
+    color: "#fff",
+    fontSize: 15,
+    paddingTop: 15,
   },
 });
 

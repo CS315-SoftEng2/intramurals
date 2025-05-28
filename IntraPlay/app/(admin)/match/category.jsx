@@ -266,7 +266,7 @@ const Category = () => {
                 setFormData({ ...formData, category_name: text })
               }
               style={styles.input}
-              placeholderTextColor="grey"
+              placeholderTextColor="#aaa"
             />
             <Text style={styles.formLabel}>Division</Text>
             <TextInput
@@ -276,7 +276,7 @@ const Category = () => {
                 setFormData({ ...formData, division: text })
               }
               style={styles.input}
-              placeholderTextColor="grey"
+              placeholderTextColor="#aaa"
             />
           </View>
           <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>

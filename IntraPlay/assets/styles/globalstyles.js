@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 const globalstyles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "#1E1E2E",
     justifyContent: "flex-start",
     alignItems: "center",
     paddingTop: 10,

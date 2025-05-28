@@ -6,7 +6,6 @@ import {
   Text,
   TouchableOpacity,
   TextInput,
-  Platform,
   ActivityIndicator,
   FlatList,
 } from "react-native";
@@ -559,7 +558,7 @@ const Match = () => {
               !eventsLoading &&
               !eventsError &&
               scheduleOptions.length <= 1 && (
-                <Text style={{ color: "#F38BA8", fontSize: 14 }}>
+                <Text style={{ color: "#fff", fontSize: 14 }}>
                   No schedules available
                 </Text>
               )}
@@ -571,7 +570,7 @@ const Match = () => {
                 setFormData({ ...formData, team_a_name: text })
               }
               style={styles.input}
-              placeholderTextColor="grey"
+              placeholderTextColor="#aaa"
             />
             <Text style={styles.formLabel}>Team B Name</Text>
             <TextInput
@@ -581,7 +580,7 @@ const Match = () => {
                 setFormData({ ...formData, team_b_name: text })
               }
               style={styles.input}
-              placeholderTextColor="grey"
+              placeholderTextColor="#aaa"
             />
             <Text style={styles.formLabel}>User Assigned</Text>
             <StyledPicker

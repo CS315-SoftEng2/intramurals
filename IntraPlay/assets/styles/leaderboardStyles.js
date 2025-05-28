@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "#1E1E2E",
   },
   contentContainer: {
     paddingHorizontal: 25,
@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#1F2937",
+    color: "#fff",
     marginBottom: 20,
     textAlign: "left",
   },
@@ -21,31 +21,31 @@ const styles = StyleSheet.create({
     marginTop: 15,
     borderRadius: 8,
     overflow: "hidden",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#2A2A3C",
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: "#aaa",
   },
   tableHeader: {
     flexDirection: "row",
     paddingVertical: 15,
     paddingHorizontal: 15,
     borderBottomWidth: 1,
-    borderBottomColor: "#111827",
+    borderBottomColor: "#aaa",
   },
   tableRow: {
     flexDirection: "row",
     paddingVertical: 15,
     paddingHorizontal: 15,
     borderBottomWidth: 1,
-    borderBottomColor: "#6B7280",
+    borderBottomColor: "#aaa",
   },
   headerCell: {
-    color: "#1F2937",
+    color: "#fff",
     fontWeight: "600",
     fontSize: 14,
   },
   cell: {
-    color: "#111827",
+    color: "#fff",
     fontSize: 16,
   },
   rankCell: {

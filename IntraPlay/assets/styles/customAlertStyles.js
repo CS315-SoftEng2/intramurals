@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
     margin: 0,
   },
   container: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#2A2A3C",
     borderRadius: 12,
     width: width - 40,
     alignSelf: "center",
@@ -19,17 +19,17 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   title: {
-    color: "#1F2937",
+    color: "#fff",
     fontSize: 18,
     fontWeight: "700",
   },
   divider: {
     height: 1,
-    backgroundColor: "grey",
+    backgroundColor: "#aaa",
     marginBottom: 16,
   },
   message: {
-    color: "#6B7280",
+    color: "#fff",
     fontSize: 14,
     paddingHorizontal: 20,
     paddingBottom: 20,
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   cancelButtonText: {
-    color: "#6B7280",
+    color: "#aaa",
     fontSize: 14,
     fontWeight: "600",
   },

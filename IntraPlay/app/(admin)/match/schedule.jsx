@@ -478,7 +478,7 @@ const Schedule = ({ adminId = 1 }) => {
               style={styles.input}
               onPress={() => setShowDatePicker(true)}
             >
-              <Text style={{ color: formData.date ? "#fff" : "#A6ADC8" }}>
+              <Text style={{ color: formData.date ? "#fff" : "#aaa" }}>
                 {formData.date || "Select Date"}
               </Text>
             </TouchableOpacity>
@@ -514,7 +514,7 @@ const Schedule = ({ adminId = 1 }) => {
               style={styles.input}
               onPress={() => setShowStartPicker(true)}
             >
-              <Text style={{ color: formData.start_time ? "#fff" : "#A6ADC8" }}>
+              <Text style={{ color: formData.start_time ? "#fff" : "#aaa" }}>
                 {formData.start_time || "Select Start Time"}
               </Text>
             </TouchableOpacity>
@@ -551,7 +551,7 @@ const Schedule = ({ adminId = 1 }) => {
               style={styles.input}
               onPress={() => setShowEndPicker(true)}
             >
-              <Text style={{ color: formData.end_time ? "#fff" : "#A6ADC8" }}>
+              <Text style={{ color: formData.end_time ? "#fff" : "#aaa" }}>
                 {formData.end_time || "Select End Time"}
               </Text>
             </TouchableOpacity>

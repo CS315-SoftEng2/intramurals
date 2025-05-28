@@ -2,8 +2,8 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   calendarContainer: {
-    backgroundColor: "#F3F4F6",
-    marginTop: 50,
+    backgroundColor: "#1D1C2B",
+    marginTop: 20,
     padding: 15,
     width: "100%",
   },
@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   monthText: {
-    color: "#1F2937",
+    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   dayHeaderText: {
-    color: "#111827",
+    color: "#6E6E6E",
     fontWeight: "bold",
     fontSize: 12,
   },
@@ -50,17 +50,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   dayText: {
-    color: "#6B7280",
+    color: "#fff",
     fontSize: 12,
   },
   eventDay: {
-    backgroundColor: "#E6F4EA",
+    backgroundColor: "#4A4A6A",
   },
   selectedDay: {
-    backgroundColor: "#34C759",
+    backgroundColor: "#A633D6",
   },
   selectedDayText: {
-    color: "#FFFFFF",
+    color: "#fff",
     fontWeight: "bold",
   },
   eventsContainer: {
@@ -68,14 +68,14 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   eventCard: {
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#2A2A3C",
     borderRadius: 12,
     padding: 12,
     marginBottom: 16,
     width: "100%",
   },
   eventTitle: {
-    color: "#111827",
+    color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 10,
@@ -99,10 +99,10 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   teamText: {
-    color: "#6B7280",
+    color: "#fff",
   },
   vsText: {
-    color: "#6B7280",
+    color: "#6E6E6E",
     marginHorizontal: 8,
   },
   eventDetails: {
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   eventDetailText: {
-    color: "#6B7280",
+    color: "#D3D3D3",
     marginLeft: 6,
     flex: 1,
   },

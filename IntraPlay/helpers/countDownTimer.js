@@ -75,7 +75,7 @@ const CountdownTimer = ({ eventDate, endTime }) => {
 
   // Render countdown text
   return (
-    <Text style={{ color: "#111827", fontSize: 14 }}>{timeRemaining}</Text>
+    <Text style={{ color: "#FFFFFF", fontSize: 14 }}>{timeRemaining}</Text>
   );
 };
 

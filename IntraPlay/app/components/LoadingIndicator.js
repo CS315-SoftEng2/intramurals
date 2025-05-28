@@ -12,7 +12,7 @@ const LoadingIndicator = ({ visible, message = "Loading..." }) => {
     <Modal transparent visible={visible} animationType="fade">
       {/*Container for loading indicator and message*/}
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#000000" />
+        <ActivityIndicator size="large" color="#FFFFFF" />
         <Text style={styles.loadingText}>{message}</Text>
       </View>
     </Modal>
