@@ -365,23 +365,18 @@ const Index = () => {
 
   const leadingTeam = useMemo(() => {
     if (!leadingData?.teamScores) {
-      return { team_logo: "default_logo.png", total_score: 0 };
+      return [];
     }
 
-    const allScoresZero = leadingData.teamScores.every(
-      (team) => team.total_score === 0
+    const maxScore = Math.max(
+      ...leadingData.teamScores.map((team) => team.total_score)
     );
 
-    if (allScoresZero) {
-      return { team_logo: "default_logo.png", total_score: 0 };
-    }
-
-    return (
-      leadingData.teamScores.find((team) => team.overall_ranking === 1) || {
-        team_logo: "default_logo.png",
-        total_score: 0,
-      }
+    const topTeams = leadingData.teamScores.filter(
+      (team) => team.total_score === maxScore && maxScore > 0
     );
+
+    return topTeams;
   }, [leadingData]);
 
   // Loading state
@@ -404,82 +399,6 @@ const Index = () => {
         <Link href={"/login"}>
           <MaterialIcons name="login" size={30} color="#FFFFFF" />
         </Link>
-      </View>
-
-      {/* Upcoming events */}
-      <Text style={styles.headerTitleUpcomingEvents}>
-        {upcomingEvents.some((event) => {
-          const eventDate = parse(
-            event.event_date,
-            "EEEE, MMMM d, yyyy",
-            new Date()
-          );
-          return eventDate.toDateString() === today.toDateString();
-        })
-          ? "Upcoming Events Today"
-          : "Upcoming Events"}
-      </Text>
-
-      <View style={styles.upcomingEventsContainer}>
-        {sortedKeys.length === 0 ? (
-          <Text style={{ color: "#fff", textAlign: "center" }}>
-            No upcoming events found.
-          </Text>
-        ) : (
-          sortedKeys.map((dateKey) => (
-            <View key={dateKey}>
-              <Text style={styles.dateHeader}>{dateKey}</Text>
-              <View style={styles.eventList}>
-                {groupedEvents[dateKey].map((event, index) => (
-                  <View
-                    key={`${event.match_id}-${index}`}
-                    style={styles.eventCard}
-                  >
-                    <View style={styles.eventCardContent}>
-                      <View style={styles.eventNameContainer}>
-                        <Text style={styles.eventName}>
-                          {event.event_name} - {event.division}
-                        </Text>
-                        <View style={styles.eventTimeRow}>
-                          <MaterialIcons
-                            name="schedule"
-                            size={12}
-                            color="#aaa"
-                          />
-                          <Text style={styles.eventTime}>
-                            {event.start_time} - {event.end_time}
-                          </Text>
-                        </View>
-                      </View>
-                      <View style={styles.locationContainer}>
-                        <Text style={styles.locationText}>{event.venue}</Text>
-                        <Text style={styles.teamText}>
-                          {event.team_a_name} vs {event.team_b_name}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                ))}
-              </View>
-            </View>
-          ))
-        )}
-      </View>
-
-      {/* Leading team */}
-      <Text style={styles.headerTitleLeadingTeam}>Leading Team</Text>
-
-      <View style={styles.leadingTeamContainer}>
-        <Image
-          source={getTeamLogo(leadingTeam?.team_logo)}
-          style={styles.team1Logo}
-        />
-        <View style={styles.scoreContainer}>
-          <Text style={styles.totalScoreLabel}>TOTAL SCORE</Text>
-          <Text style={styles.totalScoreValue}>
-            {leadingTeam?.total_score ?? 0}
-          </Text>
-        </View>
       </View>
 
       {/* Ongoing matches */}
@@ -622,6 +541,117 @@ const Index = () => {
               );
             }
           })
+        )}
+      </View>
+
+      {/* Leading team */}
+      <Text style={styles.headerTitleLeadingTeam}>Leading Team</Text>
+
+      <View
+        style={
+          leadingTeam.length > 1
+            ? styles.tiedTeamsContainer
+            : styles.leadingTeamContainer
+        }
+      >
+        {leadingTeam.length > 1 ? (
+          // Multiple teams tied - show side by side
+          <>
+            <View style={styles.leftTeamContainer}>
+              <Image
+                source={getTeamLogo(leadingTeam[0]?.team_logo)}
+                style={styles.tiedTeamLogo}
+              />
+            </View>
+
+            <View style={styles.centerScoreContainer}>
+              <Text style={styles.totalScoreLabel}>TOTAL SCORE</Text>
+              <Text style={styles.totalScoreValue}>
+                {leadingTeam[0]?.total_score ?? 0}
+              </Text>
+            </View>
+
+            <View style={styles.rightTeamContainer}>
+              <Image
+                source={getTeamLogo(leadingTeam[1]?.team_logo)}
+                style={styles.tiedTeamLogo}
+              />
+            </View>
+          </>
+        ) : (
+          // Single leading team - original layout
+          <>
+            <Image
+              source={getTeamLogo(leadingTeam[0]?.team_logo)}
+              style={styles.team1Logo}
+            />
+            <View style={styles.scoreContainer}>
+              <Text style={styles.totalScoreLabel}>TOTAL SCORE</Text>
+              <Text style={styles.totalScoreValue}>
+                {leadingTeam[0]?.total_score ?? 0}
+              </Text>
+            </View>
+          </>
+        )}
+      </View>
+
+      {/* Upcoming events */}
+      <Text style={styles.headerTitleUpcomingEvents}>
+        {upcomingEvents.some((event) => {
+          const eventDate = parse(
+            event.event_date,
+            "EEEE, MMMM d, yyyy",
+            new Date()
+          );
+          return eventDate.toDateString() === today.toDateString();
+        })
+          ? "Upcoming Events Today"
+          : "Upcoming Events"}
+      </Text>
+
+      <View style={styles.upcomingEventsContainer}>
+        {sortedKeys.length === 0 ? (
+          <Text style={{ color: "#fff", textAlign: "center" }}>
+            No upcoming events found.
+          </Text>
+        ) : (
+          sortedKeys.map((dateKey) => (
+            <View key={dateKey}>
+              <Text style={styles.dateHeader}>{dateKey}</Text>
+              <View style={styles.eventList}>
+                {groupedEvents[dateKey].map((event, index) => (
+                  <View
+                    key={`${event.match_id}-${index}`}
+                    style={styles.eventCard}
+                  >
+                    <View style={styles.eventCardContent}>
+                      <View style={styles.eventNameContainer}>
+                        <Text style={styles.eventName}>
+                          {event.event_name} - {event.division}
+                        </Text>
+                        <View style={styles.eventTimeRow}>
+                          <MaterialIcons
+                            name="schedule"
+                            size={12}
+                            color="#aaa"
+                          />
+                          <Text style={styles.eventTime}>
+                            {event.start_time} - {event.end_time}
+                          </Text>
+                        </View>
+                      </View>
+                      <View style={styles.locationContainer}>
+                        <Text style={styles.locationText}>{event.venue}</Text>
+                        <Text style={styles.teamText}>
+                          {event.team_a_name} vs {event.team_b_name}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </View>
+          ))
         )}
       </View>
     </ScrollView>
