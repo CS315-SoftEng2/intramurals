@@ -80,7 +80,6 @@ const Schedule = ({ adminId = 1 }) => {
     start_time: "",
     end_time: "",
     event_id: "",
-    category_id: "",
   });
 
   const schedules = scheduleData?.schedules || [];
@@ -110,31 +109,27 @@ const Schedule = ({ adminId = 1 }) => {
 
   // Event options for StyledPicker
   const eventOptions = useMemo(() => {
-    if (!eventsData?.events) return [];
+    if (!eventsData?.events || !categoriesData?.categories)
+      return [{ label: "Select Event", value: "", enabled: false }];
+
     return [
       { label: "Select Event", value: "", enabled: false },
-      ...eventsData.events.map((event) => ({
-        label: `${event.event_name}, ${event.venue}`,
-        value: event.event_id.toString(),
-      })),
-    ].sort((a, b) =>
-      a.value === "" ? -1 : parseInt(a.value) - parseInt(b.value)
-    );
-  }, [eventsData]);
+      ...eventsData.events.map((event) => {
+        const category = categoriesData.categories.find(
+          (cat) => cat.category_id === event.category_id
+        );
+        const categoryName = category?.category_name || "Unknown Category";
+        const divisionName = category?.division || "Unknown Division";
 
-  // Category options for StyledPicker
-  const categoryOptions = useMemo(() => {
-    if (!categoriesData?.categories) return [];
-    return [
-      { label: "Select Category", value: "", enabled: false },
-      ...categoriesData.categories.map((category) => ({
-        label: `${category.category_name} - ${category.division}`,
-        value: category.category_id.toString(),
-      })),
+        return {
+          label: `${event.event_name}, ${event.venue}, ${categoryName}, ${divisionName}`,
+          value: event.event_id.toString(),
+        };
+      }),
     ].sort((a, b) =>
       a.value === "" ? -1 : parseInt(a.value) - parseInt(b.value)
     );
-  }, [categoriesData]);
+  }, [eventsData, categoriesData]);
 
   const scheduleMap = useMemo(() => {
     return new Map(
@@ -145,7 +140,6 @@ const Schedule = ({ adminId = 1 }) => {
           start_time: schedule.start_time,
           end_time: schedule.end_time,
           event_id: schedule.event_id,
-          category_id: schedule.category_id,
         },
       ]) || []
     );
@@ -158,6 +152,7 @@ const Schedule = ({ adminId = 1 }) => {
         {
           event_name: event.event_name,
           venue: event.venue,
+          category_id: event.category_id?.toString() || null,
         },
       ]) || []
     );
@@ -181,7 +176,6 @@ const Schedule = ({ adminId = 1 }) => {
       start_time: "",
       end_time: "",
       event_id: "",
-      category_id: "",
     });
     setDateObj(new Date());
     setStartTimeObj(new Date());
@@ -200,7 +194,6 @@ const Schedule = ({ adminId = 1 }) => {
       start_time: schedule.start_time || "",
       end_time: schedule.end_time || "",
       event_id: String(schedule.event_id || ""),
-      category_id: String(schedule.category_id || ""),
     });
     setDateObj(parsedDate);
     setStartTimeObj(parsedStartTime);
@@ -251,8 +244,7 @@ const Schedule = ({ adminId = 1 }) => {
       !formData.date ||
       !formData.start_time ||
       !formData.end_time ||
-      !formData.event_id ||
-      !formData.category_id
+      !formData.event_id
     ) {
       Toast.show({
         type: "error",
@@ -263,12 +255,11 @@ const Schedule = ({ adminId = 1 }) => {
     }
 
     const eventId = parseInt(formData.event_id);
-    const categoryId = parseInt(formData.category_id);
-    if (isNaN(eventId) || isNaN(categoryId)) {
+    if (isNaN(eventId)) {
       Toast.show({
         type: "error",
         text1: "Invalid IDs",
-        text2: "Event and Category ID must be numbers.",
+        text2: "Event ID must be numbers.",
       });
       return;
     }
@@ -291,7 +282,6 @@ const Schedule = ({ adminId = 1 }) => {
         start_time: formData.start_time,
         end_time: formData.end_time,
         event_id: eventId,
-        category_id: categoryId,
       },
       adminId,
       scheduleId: editMode ? parseInt(editId) : undefined,
@@ -324,7 +314,6 @@ const Schedule = ({ adminId = 1 }) => {
         start_time: "",
         end_time: "",
         event_id: "",
-        category_id: "",
       });
       setDateObj(new Date());
       setStartTimeObj(new Date());
@@ -400,8 +389,8 @@ const Schedule = ({ adminId = 1 }) => {
           const event = schedule.event_id
             ? eventMap.get(schedule.event_id.toString()) || {}
             : {};
-          const category = schedule.category_id
-            ? categoryMap.get(schedule.category_id.toString()) || {}
+          const category = event.category_id
+            ? categoryMap.get(event.category_id.toString()) || {}
             : {};
 
           return (
@@ -448,7 +437,11 @@ const Schedule = ({ adminId = 1 }) => {
             </View>
           );
         }}
-        ListEmptyComponent={<Text>No schedules available.</Text>}
+        ListEmptyComponent={
+          <View style={styles.emptyTextContainer}>
+            <Text style={styles.emptyText}>No matches available.</Text>
+          </View>
+        }
       />
 
       {/* Modal */}
@@ -606,35 +599,6 @@ const Schedule = ({ adminId = 1 }) => {
                 No events available
               </Text>
             )}
-
-            {/* Category ID Picker */}
-            <Text style={styles.formLabel}>Category ID</Text>
-            <StyledPicker
-              selectedValue={formData.category_id}
-              onValueChange={(value) =>
-                setFormData({ ...formData, category_id: value })
-              }
-              items={categoryOptions}
-              placeholder="Select Category"
-              disabled={
-                categoriesLoading ||
-                categoriesError ||
-                categoryOptions.length <= 1
-              }
-            />
-            {categoriesLoading && <ActivityIndicator color="#A6ADC8" />}
-            {categoriesError && (
-              <Text style={{ color: "#F38BA8", fontSize: 14 }}>
-                Failed to load categories
-              </Text>
-            )}
-            {!categoriesLoading &&
-              !categoriesError &&
-              categoryOptions.length <= 1 && (
-                <Text style={{ color: "#F38BA8", fontSize: 14 }}>
-                  No categories available
-                </Text>
-              )}
           </View>
 
           {/* Submit Button */}
@@ -647,8 +611,7 @@ const Schedule = ({ adminId = 1 }) => {
                 eventsError ||
                 eventOptions.length <= 1 ||
                 categoriesLoading ||
-                categoriesError ||
-                categoryOptions.length <= 1) &&
+                categoriesError) &&
                 styles.submitButtonDisabled,
             ]}
             disabled={
@@ -657,8 +620,7 @@ const Schedule = ({ adminId = 1 }) => {
               eventsError ||
               eventOptions.length <= 1 ||
               categoriesLoading ||
-              categoriesError ||
-              categoryOptions.length <= 1
+              categoriesError
             }
           >
             {submitting ? (

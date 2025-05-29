@@ -236,7 +236,11 @@ const Category = () => {
             </View>
           </View>
         )}
-        ListEmptyComponent={<Text>No categories available.</Text>}
+        ListEmptyComponent={
+          <View style={styles.emptyTextContainer}>
+            <Text style={styles.emptyText}>No matches available.</Text>
+          </View>
+        }
       />
 
       {/* Add/Edit modal */}

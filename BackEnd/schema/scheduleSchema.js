@@ -8,7 +8,6 @@ type Schedule {
   start_time: Time!
   end_time: Time!
   event_id: Int!
-  category_id: Int!
 }
 
 type addScheduleResponse {
@@ -32,7 +31,6 @@ input AddScheduleInput {
   start_time: Time!
   end_time: Time!
   event_id: Int!
-  category_id: Int!
 }
 
 input UpdateScheduleInput {
@@ -40,6 +38,5 @@ input UpdateScheduleInput {
   start_time: Time
   end_time: Time
   event_id: Int
-  category_id: Int
 }
 `;

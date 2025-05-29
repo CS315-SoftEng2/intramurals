@@ -93,53 +93,26 @@ const Match = () => {
       .sort((a, b) => a.user_id - b.user_id);
   }, [usersData]);
 
-  // Combine schedules with event and category data
-  const scheduleOptions = useMemo(() => {
-    if (
-      !schedulesData?.schedules ||
-      !categoriesData?.categories ||
-      !eventsData?.events
-    )
-      return [];
-
-    const categoriesMap = new Map(
-      categoriesData.categories.map((cat) => [
-        cat.category_id,
-        `${cat.category_name} - ${cat.division}`,
-      ])
-    );
-    const eventsMap = new Map(
-      eventsData.events.map((event) => [event.event_id, event.event_name])
-    );
-    return [
-      { label: "Select Schedule", value: "", enabled: false },
-      ...schedulesData.schedules.map((schedule) => ({
-        label: `${schedule.date}, ${schedule.start_time} - ${
-          schedule.end_time
-        }, ${eventsMap.get(schedule.event_id) || "Unknown Event"}, ${
-          categoriesMap.get(schedule.category_id) || "Unknown Category"
-        }`,
-        value: schedule.schedule_id.toString(),
-      })),
-    ].sort((a, b) =>
-      a.value === "" ? -1 : parseInt(a.value) - parseInt(b.value)
-    );
-  }, [schedulesData, categoriesData, eventsData]);
-
+  // Memoized maps
   const scheduleMap = useMemo(() => {
     return new Map(
-      schedulesData?.schedules?.map((schedule) => [
-        schedule.schedule_id.toString(),
-        {
-          date: schedule.date,
-          start_time: schedule.start_time,
-          end_time: schedule.end_time,
-          event_id: schedule.event_id,
-          category_id: schedule.category_id,
-        },
-      ]) || []
+      schedulesData?.schedules?.map((schedule) => {
+        const event =
+          eventsData?.events?.find((e) => e.event_id === schedule.event_id) ||
+          {};
+        return [
+          schedule.schedule_id.toString(),
+          {
+            date: schedule.date,
+            start_time: schedule.start_time,
+            end_time: schedule.end_time,
+            event_id: schedule.event_id,
+            category_id: event.category_id?.toString(),
+          },
+        ];
+      }) || []
     );
-  }, [schedulesData]);
+  }, [schedulesData, eventsData]);
 
   const eventMap = useMemo(() => {
     return new Map(
@@ -148,6 +121,7 @@ const Match = () => {
         {
           event_name: event.event_name,
           venue: event.venue,
+          category_id: event.category_id?.toString(),
         },
       ]) || []
     );
@@ -173,6 +147,38 @@ const Match = () => {
       ]) || []
     );
   }, [usersData]);
+
+  const scheduleOptions = useMemo(() => {
+    if (
+      !schedulesData?.schedules ||
+      !categoriesData?.categories ||
+      !eventsData?.events
+    ) {
+      return [{ label: "Select Schedule", value: "", enabled: false }];
+    }
+
+    return [
+      { label: "Select Schedule", value: "", enabled: false },
+      ...schedulesData.schedules.map((schedule) => {
+        const event =
+          eventsData.events.find((e) => e.event_id === schedule.event_id) || {};
+        const category =
+          categoriesData.categories.find(
+            (c) => c.category_id === event.category_id
+          ) || {};
+        return {
+          label: `${schedule.date}, ${schedule.start_time} - ${
+            schedule.end_time
+          }, ${event.event_name || "Unknown Event"}, ${
+            category.category_name || "Unknown Category"
+          } - ${category.division || "Unknown Division"}`,
+          value: schedule.schedule_id.toString(),
+        };
+      }),
+    ].sort((a, b) =>
+      a.value === "" ? -1 : parseInt(a.value) - parseInt(b.value)
+    );
+  }, [schedulesData, categoriesData, eventsData]);
 
   const matches = matchData?.getMatches || [];
   const sortedMatches = useMemo(
@@ -317,9 +323,20 @@ const Match = () => {
   };
 
   const confirmDelete = async () => {
+    if (!deleteId || isNaN(parseInt(deleteId))) {
+      Toast.show({
+        type: "error",
+        text1: "Error!",
+        text2: "Invalid match ID.",
+      });
+      setAlertVisible(false);
+      setDeleteId(null);
+      return;
+    }
+
     try {
       const response = await deleteMatch({
-        variables: { adminId: 1, match_id: deleteId },
+        variables: { adminId: 1, matchId: parseInt(deleteId) },
       });
       const { type, message } = response.data.deleteMatch;
       Toast.show({
@@ -426,19 +443,35 @@ const Match = () => {
       {/* Table content */}
       <FlatList
         data={sortedMatches}
-        keyExtractor={(item) => item.match_id.toString()}
+        keyExtractor={(item) =>
+          item.match_id != null
+            ? item.match_id.toString()
+            : `fallback-${Math.random()}`
+        }
         contentContainerStyle={{ paddingBottom: 20 }}
         renderItem={({ item }) => {
-          // Get schedule details
+          if (
+            !item ||
+            item.match_id == null ||
+            item.schedule_id == null ||
+            item.user_assigned_id == null
+          ) {
+            return (
+              <View style={styles.matchCard}>
+                <Text style={styles.errorText}>
+                  Invalid match data. Please check the data source.
+                </Text>
+              </View>
+            );
+          }
+
           const schedule = scheduleMap.get(item.schedule_id.toString()) || {};
-          // Get event and category details from schedule
           const event = schedule.event_id
             ? eventMap.get(schedule.event_id.toString()) || {}
             : {};
-          const category = schedule.category_id
-            ? categoryMap.get(schedule.category_id.toString()) || {}
+          const category = event.category_id
+            ? categoryMap.get(event.category_id.toString()) || {}
             : {};
-          // Get user details
           const userName =
             userMap.get(item.user_assigned_id.toString()) ||
             "TBA Assigned User";
@@ -447,21 +480,23 @@ const Match = () => {
             <View style={styles.matchCard}>
               <Text style={styles.cardText}>
                 <Text style={styles.cardLabel}>Matchup Teams:</Text>{" "}
-                {item.team_a_name} vs {item.team_b_name}
+                {item.team_a_name || "TBA"} vs {item.team_b_name || "TBA"}
               </Text>
               <Text style={styles.cardText}>
-                <Text style={styles.cardLabel}>Date:</Text> {schedule.date}
+                <Text style={styles.cardLabel}>Date:</Text>{" "}
+                {schedule.date || "TBA"}
               </Text>
               <Text style={styles.cardText}>
                 <Text style={styles.cardLabel}>Time:</Text>{" "}
-                {schedule.start_time} - {schedule.end_time}
+                {schedule.start_time || "TBA"} - {schedule.end_time || "TBA"}
               </Text>
               <Text style={styles.cardText}>
-                <Text style={styles.cardLabel}>Venue:</Text> {event.venue}
+                <Text style={styles.cardLabel}>Venue:</Text>{" "}
+                {event.venue || "TBA"}
               </Text>
               <Text style={styles.cardText}>
                 <Text style={styles.cardLabel}>Event Name:</Text>{" "}
-                {event.event_name}
+                {event.event_name || "TBA"}
               </Text>
               <Text style={styles.cardText}>
                 <Text style={styles.cardLabel}>Category:</Text>{" "}
@@ -493,7 +528,11 @@ const Match = () => {
             </View>
           );
         }}
-        ListEmptyComponent={<Text>No matches available.</Text>}
+        ListEmptyComponent={
+          <View style={styles.emptyTextContainer}>
+            <Text style={styles.emptyText}>No matches available.</Text>
+          </View>
+        }
       />
 
       {/* Add/Edit modal */}

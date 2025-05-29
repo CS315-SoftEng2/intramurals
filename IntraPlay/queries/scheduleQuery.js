@@ -8,7 +8,6 @@ const GET_SCHEDULES = gql`
       start_time
       end_time
       event_id
-      category_id
     }
   }
 `;

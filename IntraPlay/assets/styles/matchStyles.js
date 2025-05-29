@@ -234,6 +234,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     opacity: 0.6,
   },
+  emptyText: {
+    color: "#fff",
+    fontSize: 16,
+    alignSelf: "center",
+  },
+  emptyTextContainer: {
+    justifyContent: "flex-start",
+    alignContent: "center",
+  },
 });
 
 export default styles;

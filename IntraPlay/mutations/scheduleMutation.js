@@ -9,7 +9,6 @@ export const ADD_SCHEDULE = gql`
         start_time
         end_time
         event_id
-        category_id
       }
       type
       message

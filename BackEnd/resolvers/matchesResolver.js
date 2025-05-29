@@ -7,18 +7,13 @@ export const matchesResolver = {
     getMatches: async () => {
       const client = await pool.connect();
       try {
-        // Queries all matches.
         const query = { text: "SELECT * FROM vw_matches" };
         const result = await client.query(query);
-
-        // Returns the match list.
         return result.rows;
       } catch (err) {
-        // Logs and throws error.
         console.error("Error:", err);
         throw new Error("Failed to fetch matches.");
       } finally {
-        // Closes the database connection.
         client.release();
       }
     },
@@ -27,21 +22,16 @@ export const matchesResolver = {
     getMatchById: async (_, { match_id }) => {
       const client = await pool.connect();
       try {
-        // Queries a match by ID.
         const query = {
           text: "SELECT * FROM match WHERE match_id = $1",
           values: [match_id],
         };
         const result = await client.query(query);
-
-        // Returns the match.
         return result.rows[0];
       } catch (err) {
-        // Logs and throws error.
         console.error("Error:", err);
         throw new Error("Failed to fetch match.");
       } finally {
-        // Closes the database connection.
         client.release();
       }
     },
@@ -50,10 +40,10 @@ export const matchesResolver = {
   Mutation: {
     // Adds a new match.
     addMatch: async (_, { match, admin_id }, context) => {
-      // Checks for expired token.
       if (context.type === "error") {
         return { type: "error", message: "Token expired." };
       }
+
       const client = await pool.connect();
       try {
         const {
@@ -65,32 +55,33 @@ export const matchesResolver = {
           user_assigned_id,
         } = match;
 
-        // Maps team names to team IDs.
+        // Step 1: Get team IDs from team names
         const teamQuery = {
-          text: `SELECT team_id, team_name FROM team WHERE LOWER(team_name) IN ($1, $2)`,
+          text: `SELECT team_id, LOWER(team_name) AS team_name FROM team WHERE LOWER(team_name) IN ($1, $2)`,
           values: [team_a_name.toLowerCase(), team_b_name.toLowerCase()],
         };
         const teamResult = await client.query(teamQuery);
 
         const teamMap = {};
-        teamResult.rows.forEach((t) => {
-          teamMap[t.team_name.toLowerCase()] = t.team_id;
+        teamResult.rows.forEach((row) => {
+          teamMap[row.team_name] = row.team_id;
         });
 
         const teamAId = teamMap[team_a_name.toLowerCase()];
         const teamBId = teamMap[team_b_name.toLowerCase()];
 
-        // Returns error if team IDs are not found.
         if (!teamAId || !teamBId) {
           return {
             type: "error",
-            message: `Team not found: ${team_a_name}, ${team_b_name}`,
+            message: `Team not found: ${!teamAId ? team_a_name : ""} ${
+              !teamBId ? team_b_name : ""
+            }`.trim(),
           };
         }
 
-        // Queries to add a match.
+        // Step 2: Call the PostgreSQL function to add the match
         const matchQuery = {
-          text: `SELECT * FROM fn_admin_add_match($1, $2, $3, $4, $5, $6, $7)`,
+          text: `SELECT * FROM fn_admin_add_match($1, $2, $3, $4, $5, $6, $7) AS result`,
           values: [
             admin_id,
             schedule_id,
@@ -102,40 +93,38 @@ export const matchesResolver = {
           ],
         };
         const result = await client.query(matchQuery);
+        const res = result.rows?.[0]?.result;
 
-        // Returns error if no result.
-        if (!result.rows[0]) {
+        if (!res || !res.content) {
           return {
             type: "error",
-            message: "Failed to add match: No result from database.",
+            message:
+              res?.message || "Failed to add match: No content returned.",
           };
         }
 
-        // Returns success response.
         return {
-          content: result.rows[0],
-          type: "success",
-          message: "Match added successfully.",
+          content: res.content,
+          type: res.type || "success",
+          message: res.message || "Match added successfully.",
         };
       } catch (err) {
-        // Logs and returns error.
         console.error("Error adding match:", err);
         return {
           type: "error",
           message: `Failed to add match: ${err.message}`,
         };
       } finally {
-        // Closes the database connection.
         client.release();
       }
     },
 
     // Updates an existing match.
     updateMatch: async (_, { admin_id, match_id, match }, context) => {
-      // Checks for expired token.
       if (context.type === "error") {
         return { type: "error", message: "Token expired." };
       }
+
       const client = await pool.connect();
       try {
         const {
@@ -147,7 +136,6 @@ export const matchesResolver = {
           user_assigned_id,
         } = match;
 
-        // Maps team names to team IDs.
         const teamQuery = {
           text: `SELECT team_id, team_name FROM team WHERE LOWER(team_name) IN ($1, $2)`,
           values: [team_a_name.toLowerCase(), team_b_name.toLowerCase()],
@@ -162,7 +150,6 @@ export const matchesResolver = {
         const teamAId = teamMap[team_a_name.toLowerCase()];
         const teamBId = teamMap[team_b_name.toLowerCase()];
 
-        // Returns error if team IDs are not found.
         if (!teamAId || !teamBId) {
           return {
             type: "error",
@@ -170,9 +157,8 @@ export const matchesResolver = {
           };
         }
 
-        // Queries to update a match.
         const matchQuery = {
-          text: `SELECT * FROM fn_admin_update_match($1, $2, $3, $4, $5, $6, $7, $8)`,
+          text: `SELECT * FROM fn_admin_update_match($1, $2, $3, $4, $5, $6, $7, $8) AS result`,
           values: [
             admin_id,
             match_id,
@@ -186,58 +172,54 @@ export const matchesResolver = {
         };
         const result = await client.query(matchQuery);
 
-        // Returns error if no result.
-        if (!result.rows[0]) {
-          return {
-            type: "error",
-            message: "Failed to update match: No result from database.",
-          };
+        if (result.rows.length > 0 && result.rows[0].result) {
+          return result.rows[0].result;
         }
 
-        // Returns success response.
         return {
-          type: "success",
-          message: "Match updated successfully.",
+          type: "error",
+          message: "Failed to update match: No result from database.",
         };
       } catch (err) {
-        // Logs and returns error.
         console.error("Error updating match:", err);
         return {
           type: "error",
           message: `Failed to update match: ${err.message}`,
         };
       } finally {
-        // Closes the database connection.
         client.release();
       }
     },
 
     // Deletes a match.
     deleteMatch: async (_, { admin_id, match_id }, context) => {
-      // Checks for expired token.
       if (context.type === "error") {
         return { type: "error", message: "Token expired." };
       }
+
       const client = await pool.connect();
       try {
-        // Queries to delete a match.
         const query = {
           text: "SELECT * FROM fn_admin_delete_match($1, $2) AS result",
           values: [admin_id, match_id],
         };
         const result = await client.query(query);
 
-        // Returns the query result.
+        if (result.rows.length > 0 && result.rows[0].result) {
+          return result.rows[0].result;
+        }
+
         return {
-          type: result.rows[0].result.type,
-          message: result.rows[0].result.message,
+          type: "error",
+          message: "Failed to delete match: No result from database.",
         };
       } catch (err) {
-        // Logs and throws error.
-        console.error("Error:", err);
-        throw new Error("Failed to delete match.");
+        console.error("Error deleting match:", err);
+        return {
+          type: "error",
+          message: "Failed to delete match.",
+        };
       } finally {
-        // Closes the database connection.
         client.release();
       }
     },

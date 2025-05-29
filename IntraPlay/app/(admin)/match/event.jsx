@@ -329,7 +329,11 @@ const Event = () => {
             </View>
           );
         }}
-        ListEmptyComponent={<Text>No events available.</Text>}
+        ListEmptyComponent={
+          <View style={styles.emptyTextContainer}>
+            <Text style={styles.emptyText}>No matches available.</Text>
+          </View>
+        }
       />
 
       {/* Add/Edit modal */}

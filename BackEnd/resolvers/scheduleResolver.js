@@ -122,14 +122,13 @@ export const scheduleResolver = {
       try {
         // Queries to add a schedule.
         const query = {
-          text: "SELECT fn_admin_add_schedule($1, $2, $3, $4, $5, $6) AS result",
+          text: "SELECT fn_admin_add_schedule($1, $2, $3, $4, $5) AS result",
           values: [
             admin_id,
             schedule.date,
             schedule.start_time,
             schedule.end_time,
             schedule.event_id,
-            schedule.category_id,
           ],
         };
         const result = await client.query(query);
@@ -165,7 +164,7 @@ export const scheduleResolver = {
       try {
         // Queries to update a schedule.
         const query = {
-          text: "SELECT * FROM fn_admin_update_schedule($1, $2, $3, $4, $5, $6, $7) AS result",
+          text: "SELECT * FROM fn_admin_update_schedule($1, $2, $3, $4, $5, $6) AS result",
           values: [
             admin_id,
             schedule_id,
@@ -173,7 +172,6 @@ export const scheduleResolver = {
             schedule.start_time,
             schedule.end_time,
             schedule.event_id,
-            schedule.category_id,
           ],
         };
         const result = await client.query(query);
