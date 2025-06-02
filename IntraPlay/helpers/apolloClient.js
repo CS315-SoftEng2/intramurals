@@ -11,7 +11,7 @@ import { onError } from "@apollo/client/link/error";
 import storage from "../utils/storage";
 
 // GraphQL API endpoint
-const API_ENDPOINT = "http://192.168.1.11:4002/graphql";
+const API_ENDPOINT = "http://192.168.1.12:4002/graphql";
 
 // Authentication link to add token to requests
 const authLink = new ApolloLink(async (operation, forward) => {
@@ -32,14 +32,12 @@ const authLink = new ApolloLink(async (operation, forward) => {
 
 // Error handling link for GraphQL and network errors
 const errorLink = onError(({ graphQLErrors, networkError }) => {
-  // Log GraphQL errors
   if (graphQLErrors)
     graphQLErrors.forEach(({ message, locations, path }) =>
       console.log(
         `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
       )
     );
-  // Log network errors
   if (networkError) console.log(`[Network error]: ${networkError}`);
 });
 
@@ -51,23 +49,22 @@ const link = ApolloLink.from([authLink, errorLink, httpLink]);
 
 // Apollo Client configuration
 const client1 = new ApolloClient({
-  link, // Combined links for requests
-  cache: new InMemoryCache(), // In-memory cache for query results
+  link,
+  cache: new InMemoryCache(),
   defaultOptions: {
     watchQuery: {
-      fetchPolicy: "network-only", // Always fetch from network
-      errorPolicy: "all", // Include all errors in response
+      fetchPolicy: "network-only",
+      errorPolicy: "all",
     },
     query: {
-      fetchPolicy: "network-only", // Always fetch from network
-      errorPolicy: "all", // Include all errors in response
+      fetchPolicy: "network-only",
+      errorPolicy: "all",
     },
     mutate: {
-      errorPolicy: "all", // Include–all errors in response
+      errorPolicy: "all",
     },
   },
-  connectToDevTools: true, // Enable Apollo DevTools
+  connectToDevTools: true,
 });
 
-// Export Apollo Client instance
 export default client1;

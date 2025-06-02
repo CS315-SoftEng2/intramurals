@@ -105,8 +105,8 @@ export const matchesResolver = {
 
         return {
           content: res.content,
-          type: res.type || "success",
-          message: res.message || "Match added successfully.",
+          type: res.type,
+          message: res.message,
         };
       } catch (err) {
         console.error("Error adding match:", err);

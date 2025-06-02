@@ -135,13 +135,11 @@ export const scheduleResolver = {
         const res = result.rows[0]?.result;
 
         // Returns the query result or an error.
-        return res
-          ? { content: res.content, type: res.type, message: res.message }
-          : {
-              content: null,
-              type: "error",
-              message: "Failed to add schedule.",
-            };
+        return {
+          content: res.content,
+          type: res.type,
+          message: res.message,
+        };
       } catch (err) {
         // Logs and throws error.
         console.error("Error:", err);
