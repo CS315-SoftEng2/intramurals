@@ -38,22 +38,22 @@ const Dashboard = () => {
     loading: matchLoading,
     error: matchError,
     data: matchData,
-  } = useQuery(GET_MATCHES);
+  } = useQuery(GET_MATCHES, { pollInterval: 1000 });
   const {
     loading: scheduleLoading,
     error: scheduleError,
     data: scheduleData,
-  } = useQuery(GET_SCHEDULE);
+  } = useQuery(GET_SCHEDULE, { pollInterval: 1000 });
   const {
     loading: venueLoading,
     error: venueError,
     data: venueData,
-  } = useQuery(GET_EVENTS);
+  } = useQuery(GET_EVENTS, { pollInterval: 1000 });
   const {
     loading: teamLoading,
     error: teamError,
     data: teamData,
-  } = useQuery(GET_TEAMS);
+  } = useQuery(GET_TEAMS, { pollInterval: 1000 });
 
   // Local state to store and manage user data
   const [userId, setUserId] = useState(null);

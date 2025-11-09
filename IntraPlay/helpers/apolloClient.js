@@ -11,12 +11,13 @@ import { onError } from "@apollo/client/link/error";
 import storage from "../utils/storage";
 
 // GraphQL API endpoint
-const API_ENDPOINT = "http://192.168.1.12:4002/graphql";
+const API_ENDPOINT = "http://192.168.254.105:4002/graphql";
 
 // Authentication link to add token to requests
 const authLink = new ApolloLink(async (operation, forward) => {
   // Retrieve token from storage
   const token = await storage.getItem("user_token");
+  console.log("Token: ", token);
 
   // Add token to request headers
   operation.setContext(({ headers = {} }) => ({

@@ -29,7 +29,7 @@ const appContext = ({ req }) => {
       return {
         content: {
           username: username,
-          usertype: username,
+          usertype: usertype,
         },
         type: "success",
         message: "Authorized!",

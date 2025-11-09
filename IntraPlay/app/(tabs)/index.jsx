@@ -106,32 +106,32 @@ const Index = () => {
     data: matchData,
     loading: matchLoading,
     error: matchError,
-  } = useQuery(GET_MATCHES);
+  } = useQuery(GET_MATCHES, { pollInterval: 1000 });
   const {
     data: scheduleData,
     loading: scheduleLoading,
     error: scheduleError,
-  } = useQuery(GET_SCHEDULES);
+  } = useQuery(GET_SCHEDULES, { pollInterval: 1000 });
   const {
     data: eventData,
     loading: eventLoading,
     error: eventError,
-  } = useQuery(GET_EVENTS);
+  } = useQuery(GET_EVENTS, { pollInterval: 1000 });
   const {
     data: categoryData,
     loading: categoryLoading,
     error: categoryError,
-  } = useQuery(GET_CATEGORIES);
+  } = useQuery(GET_CATEGORIES, { pollInterval: 1000 });
   const {
     data: teamData,
     loading: teamLoading,
     error: teamError,
-  } = useQuery(GET_TEAMS);
+  } = useQuery(GET_TEAMS, { pollInterval: 1000 });
   const {
     data: leadingData,
     loading: leadingLoading,
     error: leadingError,
-  } = useQuery(GET_LEADING_TEAM);
+  } = useQuery(GET_LEADING_TEAM, { pollInterval: 1000 });
 
   // Error handling
   useEffect(() => {

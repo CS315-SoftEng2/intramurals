@@ -154,14 +154,17 @@ const ScoreUpdate = () => {
           <View style={styles.teamScoreRow}>
             {/* Team A */}
             <View style={styles.teamColumn}>
-              <Text style={styles.teamTitle}>Team {teamName(team_a_id)}</Text>
-              <View style={styles.scoreButtons}>
+              <Text style={styles.teamTitle} numberOfLines={2}>
+                {teamName(team_a_id)}
+              </Text>
+              <View style={styles.scoreContainer}>
                 <TouchableOpacity
                   onPress={() => scoreA > 0 && setScoreA(scoreA - 1)}
+                  style={styles.scoreButton}
                 >
                   <Ionicons
                     name="remove-circle-outline"
-                    size={30}
+                    size={28}
                     color="#FB0707"
                   />
                 </TouchableOpacity>
@@ -174,10 +177,13 @@ const ScoreUpdate = () => {
                     setScoreA(parsed);
                   }}
                 />
-                <TouchableOpacity onPress={() => setScoreA(scoreA + 1)}>
+                <TouchableOpacity
+                  onPress={() => setScoreA(scoreA + 1)}
+                  style={styles.scoreButton}
+                >
                   <Ionicons
                     name="add-circle-outline"
-                    size={30}
+                    size={28}
                     color="#0EF061"
                   />
                 </TouchableOpacity>
@@ -186,14 +192,17 @@ const ScoreUpdate = () => {
 
             {/* Team B */}
             <View style={styles.teamColumn}>
-              <Text style={styles.teamTitle}>Team {teamName(team_b_id)}</Text>
-              <View style={styles.scoreButtons}>
+              <Text style={styles.teamTitle} numberOfLines={2}>
+                {teamName(team_b_id)}
+              </Text>
+              <View style={styles.scoreContainer}>
                 <TouchableOpacity
                   onPress={() => scoreB > 0 && setScoreB(scoreB - 1)}
+                  style={styles.scoreButton}
                 >
                   <Ionicons
                     name="remove-circle-outline"
-                    size={30}
+                    size={28}
                     color="#FB0707"
                   />
                 </TouchableOpacity>
@@ -206,10 +215,13 @@ const ScoreUpdate = () => {
                     setScoreB(parsed);
                   }}
                 />
-                <TouchableOpacity onPress={() => setScoreB(scoreB + 1)}>
+                <TouchableOpacity
+                  onPress={() => setScoreB(scoreB + 1)}
+                  style={styles.scoreButton}
+                >
                   <Ionicons
                     name="add-circle-outline"
-                    size={30}
+                    size={28}
                     color="#0EF061"
                   />
                 </TouchableOpacity>

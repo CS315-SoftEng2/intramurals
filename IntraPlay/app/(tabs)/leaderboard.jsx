@@ -74,7 +74,9 @@ const TeamItem = ({ item, index }) => {
 
 const Leaderboard = () => {
   // Queries
-  const { data, loading, error } = useQuery(GET_LEADING_TEAM);
+  const { data, loading, error } = useQuery(GET_LEADING_TEAM, {
+    pollInterval: 1000,
+  });
 
   // Memoized team scores with adjusted rankings
   const teamScores = useMemo(() => {

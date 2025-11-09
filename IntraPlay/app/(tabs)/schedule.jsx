@@ -37,27 +37,27 @@ const Schedule = () => {
     data: matchesData,
     loading: matchesLoading,
     error: matchesError,
-  } = useQuery(GET_MATCHES);
+  } = useQuery(GET_MATCHES, { pollInterval: 1000 });
   const {
     data: schedulesData,
     loading: schedulesLoading,
     error: schedulesError,
-  } = useQuery(GET_SCHEDULES);
+  } = useQuery(GET_SCHEDULES, { pollInterval: 1000 });
   const {
     data: eventsData,
     loading: eventsLoading,
     error: eventsError,
-  } = useQuery(GET_EVENTS);
+  } = useQuery(GET_EVENTS, { pollInterval: 1000 });
   const {
     data: categoriesData,
     loading: categoriesLoading,
     error: categoriesError,
-  } = useQuery(GET_CATEGORIES);
+  } = useQuery(GET_CATEGORIES, { pollInterval: 1000 });
   const {
     data: teamsData,
     loading: teamsLoading,
     error: teamsError,
-  } = useQuery(GET_TEAMS);
+  } = useQuery(GET_TEAMS, { pollInterval: 1000 });
 
   // Memoized calendar data
   const calendarData = useMemo(() => {

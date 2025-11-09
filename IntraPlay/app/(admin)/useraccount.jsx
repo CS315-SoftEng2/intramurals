@@ -167,6 +167,7 @@ const Users = () => {
         const { data: updateData } = await updateUser({
           variables: { ...variables, userId: editUserId },
         });
+        console.log(updateData.message);
         Toast.show({
           type: updateData.updateUserAccount.type.toLowerCase(),
           text1: updateData.updateUserAccount.message,

@@ -118,8 +118,12 @@ const Team = () => {
   const [selectedEvent, setSelectedEvent] = useState("All Events");
 
   // Queries
-  const { data: teamData, loading: teamLoading } = useQuery(GET_TEAMS);
-  const { data: matchData, loading: matchLoading } = useQuery(GET_MATCHES);
+  const { data: teamData, loading: teamLoading } = useQuery(GET_TEAMS, {
+    pollInterval: 1000,
+  });
+  const { data: matchData, loading: matchLoading } = useQuery(GET_MATCHES, {
+    pollInterval: 1000,
+  });
 
   // Memoized data
   const teamsData = useMemo(() => teamData?.teams || [], [teamData]);

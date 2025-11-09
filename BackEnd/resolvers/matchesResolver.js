@@ -44,6 +44,8 @@ export const matchesResolver = {
         return { type: "error", message: "Token expired." };
       }
 
+      console.log("Match added!");
+
       const client = await pool.connect();
       try {
         const {
